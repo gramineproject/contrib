@@ -8,7 +8,7 @@ cluster.
 .. warning::
 
    This example relies on insecure arguments provided at runtime and should not
-   be used production. To use trusted arguments, please see the `manpage of GSC
+   be used production. To use trusted arguments, please see `GSC documentation
    <https://gramine.readthedocs.io/projects/gsc>`__.
 
 #. Pull Python image::
