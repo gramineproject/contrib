@@ -1,13 +1,6 @@
-# Download and build Gramine. We need it to build and copy ra-tls-secret-prov files and
-# relevant libraries into the server and client Dockerfiles.
-if [ -d "gramine" ]; then
-    echo "***** gramine directory exists, proceeding to image generation *****"
-else
-    bash ./gramine_build.sh
-fi
-
-# Include Meson build output packages dir in $PKG_CONFIG_PATH, contains mbedTLS and util libs
-export PKG_CONFIG_PATH="$(find $PWD/gramine/meson_build_output/lib -type d -path '*/pkgconfig'):${PKG_CONFIG_PATH}"
+# Install Gramine, and build the ra-tls-secret-prov files and
+# relevant libraries to be used in the server and client Dockerfiles.
+bash ./install_gramine.sh
 
 # Create Server image
 cd gramine/CI-Examples/ra-tls-secret-prov
