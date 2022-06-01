@@ -31,7 +31,7 @@ Deploying a "HelloWorld" Python Application in a confidential compute AKS cluste
 
        kubectl apply -f gsc-aks-python-deployment.yaml
 
-## Test job status::
+## Test job status:
 
        kubectl get jobs -l app=gsc-aks-python-deployment
 
