@@ -1,0 +1,22 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: gsc-aks-python
+  labels:
+      app: gsc-aks-python
+spec:
+  template:
+      metadata:
+        labels:
+            app: gsc-aks-python
+      spec:
+        containers:
+        - name: gsc-aks-python
+          image:  <dockerhubusername>/gsc-aks-python
+          imagePullPolicy: Always
+          args: ["-c", "print('HelloWorld!')"] # WARNING: providing args in the deployment file is insecure!
+          resources:
+              limits:
+                sgx.intel.com/epc: "10Mi"
+        restartPolicy: Never
+  backoffLimit: 0

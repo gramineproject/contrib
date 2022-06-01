@@ -1,0 +1,2 @@
+sgx.enclave_size = "512M"
+sgx.thread_num = 4
