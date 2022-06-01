@@ -1,0 +1,6 @@
+sgx.enclave_size = "256M"
+sgx.thread_num = 4
+
+sgx.trusted_files = [
+  "file:/entrypoint.manifest",  # unused entry, only to test merging of manifests
+]
