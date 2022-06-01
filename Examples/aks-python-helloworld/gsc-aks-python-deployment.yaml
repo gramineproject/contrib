@@ -17,6 +17,6 @@ spec:
           args: ["-c", "print('HelloWorld!')"]
           resources:
               limits:
-                sgx.intel.com/epc: 512Mi
+                sgx.intel.com/epc: "10Mi"
         restartPolicy: Never
   backoffLimit: 0
