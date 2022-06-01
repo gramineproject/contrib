@@ -4,7 +4,7 @@ RUN apt-get update \
     && env DEBIAN_FRONTEND=noninteractive apt-get install -y \
     curl \
     gnupg2 \
-    wget \
+    wget
 
 # Installing Azure DCAP Quote Provider Library (az-dcap-client).
 # Here, the version of az-dcap-client should be in sync with the az-dcap-client

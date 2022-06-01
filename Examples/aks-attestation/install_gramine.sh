@@ -9,9 +9,7 @@ sudo apt-get install gramine-dcap # for out-of-tree DCAP driver (required by AKS
 
 gramine-sgx-gen-private-key
 
-git clone https://github.com/gramineproject/gramine.git --depth=1
-cd gramine && git fetch --all --tags && git checkout v1.2
+git clone --depth 1 https://github.com/gramineproject/gramine.git --branch v1.2
 
 # Copy dummy server certificate with Common Name as "<AKS-DNS-NAME.*.cloudapp.azure.com>
-cd ../
 cp -r ssl/* gramine/CI-Examples/ra-tls-secret-prov/ssl
