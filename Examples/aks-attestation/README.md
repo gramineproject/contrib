@@ -22,10 +22,9 @@ images, one for the client and one for the server. In our AKS attestation exampl
 no longer run on localhost, instead it will run in a Docker container inside the AKS cluster. The
 server container should be assigned a DNS name (e.g., `<AKS-DNS-NAME>`) to be accessible from the
 outside of the container. The client will send requests to this DNS name. Therefore, for
-demonstration we updated the example certificates from
-https://github.com/gramineproject/gramine/tree/master/CI-Examples/ra-tls-secret-prov/certs by
-replacing the "Common Name" field in the server certificate (i.e., `server2-sha256.crt`) from
-`localhost` to `<AKS-DNS-NAME.*.cloudapp.azure.com>`.
+demonstration, a server test certificate with "Common Name" specifed as
+`<AKS-DNS-NAME.*.cloudapp.azure.com>` is added to
+https://github.com/gramineproject/gramine/tree/master/CI-Examples/ra-tls-secret-prov/ssl.
 
 In order to create base client and server Docker images for the AKS environment, user can execute
 the `base-image-generation-script.sh` script. Since both client and server applications will run
@@ -34,7 +33,7 @@ server for verification, therefore the user needs to graminize the client applic
 following two steps create a native Docker server image and a graminized GSC client image for the
 AKS cluster.
 
-Note: This example is Ubuntu-specific (tested version is Ubuntu 18.04).
+Note: This example is Ubuntu 18.04-specific. This example was tested with Gramine v1.2.
 
 ### Creating server (secret provisioning service) image
 

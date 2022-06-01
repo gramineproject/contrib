@@ -20,7 +20,7 @@ RUN apt-get update \
 
 WORKDIR /ra-tls-secret-prov
 
-COPY gramine/CI-Examples/ra-tls-secret-prov/certs ./certs
+COPY gramine/CI-Examples/ra-tls-secret-prov/ssl ./ssl
 
 COPY gramine/CI-Examples/ra-tls-secret-prov/secret_prov_min_client /usr/local/bin
 
