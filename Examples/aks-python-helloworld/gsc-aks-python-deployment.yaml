@@ -17,6 +17,6 @@ spec:
           args: ["-c", "print('HelloWorld!')"]
           resources:
               limits:
-                kubernetes.azure.com/sgx_epc_mem_in_MiB: 10
+                sgx.intel.com/epc: 512
         restartPolicy: Never
   backoffLimit: 0
