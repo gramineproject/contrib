@@ -33,7 +33,7 @@ server for verification, therefore the user needs to graminize the client applic
 following two steps create a native Docker server image and a graminized GSC client image for the
 AKS cluster.
 
-Note: This example is Ubuntu-specific (tested version is Ubuntu 18.04).
+Note: This example is Ubuntu-specific. This example was tested with Gramine v1.2.
 
 ### Creating server (secret provisioning service) image
 

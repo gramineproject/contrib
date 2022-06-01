@@ -9,5 +9,5 @@ This directory contains pre-generated example certificates. In particular:
 - `server.key` -- RSA private key in PEM format. Loaded in server (verifier).
 
 Note: These certificates should not be used in production. Here, user should
-      update the server2-sha256.crt with ``Common Name`` pointing to the DNS
+      update the server.crt with ``Common Name`` pointing to the DNS
       name of the ra-tls-secret-prov server deployed in the AKS cluster.
