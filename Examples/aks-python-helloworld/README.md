@@ -1,4 +1,4 @@
-# Deploying a graminized Python Docker image to AKS cluster
+# Deploying a "HelloWorld" graminized Python Docker image to AKS cluster
 
 This example demonstrates how to translate the Python Docker Hub image to a
 graminized image, which can be readily deployed to a confidential compute AKS
@@ -24,8 +24,6 @@ cluster.
 
        docker tag gsc-python <dockerhubusername>/gsc-aks-python
        docker push <dockerhubusername>/gsc-aks-python
-
-Deploying a "HelloWorld" Python Application in a confidential compute AKS cluster
 
 ## Deploy `gsc-aks-python` job:
 
