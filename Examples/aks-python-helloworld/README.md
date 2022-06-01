@@ -12,7 +12,7 @@ cluster.
 
        docker pull python
 
-## Graminize the Python image using GSC, and allow insecure runtime arguments::
+## Graminize the Python image using GSC, and allow insecure runtime arguments:
 
        ./gsc build --insecure-args python python.manifest
 
