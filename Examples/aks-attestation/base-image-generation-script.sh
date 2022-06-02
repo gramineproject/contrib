@@ -1,6 +1,6 @@
 # Install Gramine, and build the ra-tls-secret-prov files and
 # relevant libraries to be used in the server and client Dockerfiles.
-bash ./install_gramine.sh
+/bin/sh install_gramine.sh
 
 # Create Server image
 cd gramine/CI-Examples/ra-tls-secret-prov
