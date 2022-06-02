@@ -5,7 +5,7 @@ graminized image, which can be readily deployed to a confidential compute AKS
 cluster.
 
 *Warning:* this example relies on insecure arguments provided at runtime and
-should not be used production. To use trusted arguments, please see
+should not be used in production. To use trusted arguments, please see
 [GSC documentation](https://gramine.readthedocs.io/projects/gsc).
 
 - Pull Python image:
