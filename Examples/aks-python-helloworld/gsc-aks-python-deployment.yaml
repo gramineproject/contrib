@@ -14,7 +14,7 @@ spec:
         - name: gsc-aks-python
           image:  <dockerhubusername>/gsc-aks-python
           imagePullPolicy: Always
-          args: ["-c", "print('HelloWorld!')"]
+          args: ["-c", "print('HelloWorld!')"] # WARNING: providing args in the deployment file is insecure!
           resources:
               limits:
                 sgx.intel.com/epc: "10Mi"
