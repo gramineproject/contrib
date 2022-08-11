@@ -1,0 +1,9 @@
+sgx.nonpie_binary = true
+sgx.enclave_size = "8G"
+sgx.thread_num = 128
+loader.pal_internal_mem_size = "128M"
+
+loader.uid=999
+loader.gid=999
+
+# Based on user input the manifest file will automatically be modified after this line

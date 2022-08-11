@@ -1,0 +1,9 @@
+sgx.nonpie_binary = true
+sgx.enclave_size = "1024M"
+sgx.thread_num = 8
+
+loader.uid=999
+loader.gid=999
+
+# Based on user input the manifest file will automatically be modified after this line
+sgx.file_check_policy = "allow_all_but_log"
