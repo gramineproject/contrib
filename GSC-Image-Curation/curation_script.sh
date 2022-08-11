@@ -21,9 +21,15 @@ base_image="$2"
 # Set base image name in the dockerfile
 sed -i 's|From.*|From '$base_image'|' $wrapper_dockerfile
 
+if [[ "$base_image" == *":"* ]]; then
+    app_image_x=$(echo $base_image | sed "s/:/_x:/")
+else
+    app_image_x="${base_image}_x"
+fi
+
 create_base_wrapper_image () {
-    docker rmi -f $base_image >/dev/null 2>&1
-    docker build -f $wrapper_dockerfile -t $base_image .
+    docker rmi -f $app_image_x >/dev/null 2>&1
+    docker build -f $wrapper_dockerfile -t $app_image_x .
 }
 
 create_gsc_image () {
@@ -49,17 +55,19 @@ create_gsc_image () {
 
     # Delete already existing gsc image for the base image
     docker rmi -f gsc-$base_image >/dev/null 2>&1
-    docker rmi -f gsc-$base_image-unsigned >/dev/null 2>&1
+    docker rmi -f gsc-$app_image_x-unsigned >/dev/null 2>&1
 
     if [ "$1" = "true" ]; then
-        ./gsc build -d $base_image  ../$start/$app_image_manifest
+        ./gsc build -d $app_image_x  ../$start/$app_image_manifest
     else
-        ./gsc build $base_image ../$start/$app_image_manifest
+        ./gsc build $app_image_x ../$start/$app_image_manifest
     fi
 
     echo ""
     echo ""
-    ./gsc sign-image $base_image enclave-key.pem
+    ./gsc sign-image $app_image_x enclave-key.pem
+    docker tag gsc-$app_image_x gsc-$base_image
+    docker rmi gsc-$app_image_x
 
     cd ../
     #rm -rf gsc >/dev/null 2>&1
@@ -135,7 +143,7 @@ attestation_required=$5
 if [ "$attestation_required" = "y" ]; then
     ca_cert_path=$6
 
-    # Exiting $start directory as the path to the ca cert can be w.r.t to
+    # Exiting $start directory as the path to the ca cert can be w.r.t to 
     # gsc_image_curation directory
     cd ../
     cp $ca_cert_path $start/ca.crt

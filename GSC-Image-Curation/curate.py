@@ -53,7 +53,7 @@ def main(stdscr, argv):
             stdscr.getch()
         return 1
 
-    log_file=base_image_type+'/'+base_image_name+'.log'
+    log_file=f'{base_image_type}.log'
     log_file_pointer = open(log_file, 'w')
 
     gsc_app_image='gsc-{}'.format(base_image_name)
@@ -100,12 +100,13 @@ def main(stdscr, argv):
     
     if ca_cert_path:
         os.chdir('verifier_image')
-        verifier_log_file = 'verifier-'+ base_image_name + '.log'
+        verifier_log_file = 'verifier.log'
         verifier_log_file_pointer = open(verifier_log_file, 'w')
-        update_user_and_commentary_win_array(user_console, guide_win, 'Building the RA-TLS Verifier image, this might take couple of minutes', '')
+        update_user_and_commentary_win_array(user_console, guide_win, ['Building the RA-TLS Verifier image, this might take couple of minutes'],
+         [f'You may monitor verifier_image/{verifier_log_file} for progress'])
         proc = subprocess.call(['./verifier_helper_script.sh', 'attestation_required'], shell=True, stdout=verifier_log_file_pointer, stderr=verifier_log_file_pointer)
         os.chdir('../')
-        check_image_creation_success(user_console, docker_socket,'verifier_image:latest','verifier_image/'+verifier_log_file)
+        check_image_creation_success(user_console, docker_socket,'verifier_image:latest', 'verifier_image/'+verifier_log_file)
 
 #   Provide arguments
     update_user_and_commentary_win_array(user_console, guide_win, arg_input, arg_help)
@@ -266,7 +267,6 @@ def update_user_and_commentary_win(user_console, guide_win, user_text, help_text
 def update_user_and_commentary_win_array(user_console, guide_win, user_text_arr, help_text_arr):
     user_console.erase()
     guide_win.erase()
-
 
     for user_text in user_text_arr:
         [y, x] = user_console.getyx()
