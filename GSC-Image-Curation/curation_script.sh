@@ -1,10 +1,10 @@
 #!/bin/bash
-echo printing args $0 $@
+
 start=$1
 wrapper_dockerfile=$start"-gsc.dockerfile"
 app_image_manifest=$start".manifest"
 
-# Specifing the Intel SGX driver installed on your machine. Below defaults correspond to 
+# Specifing the Intel SGX driver installed on your machine. Below defaults correspond to
 # DCAP out of tree driver.
 SGX_driver_repo='"https://github.com/intel/SGXDataCenterAttestationPrimitives.git"'
 SGX_driver_branch='"DCAP_1.11 \&\& cp -r driver/linux/* ."'
@@ -21,11 +21,9 @@ base_image="$2"
 # Set base image name in the dockerfile
 sed -i 's|From.*|From '$base_image'|' $wrapper_dockerfile
 
-app_image_x=$(echo $base_image | sed "s/:/_x:/")
-
 create_base_wrapper_image () {
-    docker rmi -f $app_image_x >/dev/null 2>&1
-    docker build -f $wrapper_dockerfile -t $app_image_x .
+    docker rmi -f $base_image >/dev/null 2>&1
+    docker build -f $wrapper_dockerfile -t $base_image .
 }
 
 create_gsc_image () {
@@ -51,20 +49,17 @@ create_gsc_image () {
 
     # Delete already existing gsc image for the base image
     docker rmi -f gsc-$base_image >/dev/null 2>&1
-    docker rmi -f gsc-$app_image_x-unsigned >/dev/null 2>&1
+    docker rmi -f gsc-$base_image-unsigned >/dev/null 2>&1
 
-    echo ""
     if [ "$1" = "true" ]; then
-    ./gsc build -d $app_image_x  ../$start/$app_image_manifest
+        ./gsc build -d $base_image  ../$start/$app_image_manifest
     else
-        ./gsc build $app_image_x ../$start/$app_image_manifest
+        ./gsc build $base_image ../$start/$app_image_manifest
     fi
 
     echo ""
     echo ""
-    ./gsc sign-image $app_image_x enclave-key.pem
-    docker tag gsc-$app_image_x gsc-$base_image
-#    docker rmi gsc-$app_image_x
+    ./gsc sign-image $base_image enclave-key.pem
 
     cd ../
     #rm -rf gsc >/dev/null 2>&1
@@ -73,7 +68,7 @@ create_gsc_image () {
 fetch_base_image_config () {
     base_image_config="$(docker image inspect "$base_image" | jq '.[].Config.'$1'')"
     if [[ "$base_image_config" = "null" || "$base_image_config" = "Null" || "$base_image_config" = "NULL" ]]; then
-    config_string=''
+        config_string=''
     else
         base_image_config=$(echo $base_image_config | sed 's/[][]//g')
         IFS=',' #setting comma as delimiter
@@ -93,19 +88,20 @@ echo ""
 signing_key_path="$3"
 if [ "$signing_key_path" = "test-key" ]; then
     echo "Generating signing key"
-    #Exiting $start directory as we want enclave key to be present in $gsc_image_creation directory
+
+    # Exit $start directory as we want enclave key to be present in $gsc_image_creation directory
     cd ..
     openssl genrsa -3 -out enclave-key.pem 3072
     signing_key_path="enclave-key.pem"
     cd $start
-    grep -qxF 'sgx.file_check_policy = "allow_all_but_log"' $app_image_manifest || 
+    grep -qxF 'sgx.file_check_policy = "allow_all_but_log"' $app_image_manifest ||
      echo 'sgx.file_check_policy = "allow_all_but_log"' >> $app_image_manifest
 fi
 
 # Runtime arguments:
 args=$4
 if [[ "$start" = "redis" ]]; then
-    args+="--protected-mode no --save ''"
+    args+=" --protected-mode no --save ''"
 fi
 # Forming a complete binary string
 # (format: <Base image entrypoint> <Base image cmd> <user provided runtime args>)
@@ -138,7 +134,10 @@ fi
 attestation_required=$5
 if [ "$attestation_required" = "y" ]; then
     ca_cert_path=$6
-    cd ../  #exiting start directory as the path to the ca cert can be w.r.t to gsc_image_curation directory
+
+    # Exiting $start directory as the path to the ca cert can be w.r.t to
+    # gsc_image_curation directory
+    cd ../
     cp $ca_cert_path $start/ca.crt
     cd $start
     sed -i 's|.*ca.crt.*|COPY ca.crt /ca.crt|' $wrapper_dockerfile
@@ -206,4 +205,4 @@ fi
 
 # Exit from $start directory
 cd ..
-create_gsc_image
+create_gsc_image ${11}

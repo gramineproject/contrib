@@ -56,50 +56,23 @@ def main(stdscr, argv):
     log_file=base_image_type+'/'+base_image_name+'.log'
     log_file_pointer = open(log_file, 'w')
 
-    gsc_app_image='x-gsc-{}'.format(base_image_name)
+    gsc_app_image='gsc-{}'.format(base_image_name)
     gsc_app_image_final = 'gsc-{}'.format(base_image_name)
 
     # Generating Test Image
     if len(argv) > min_length_of_argv:
         if argv[index_for_test_flag_in_argv]:
+            stdscr.addstr('Your test GSC image is being generated. This image is not supposed to be used in production \n\n')
+            stdscr.refresh()
             subprocess.call(["./curation_script.sh", base_image_type, base_image_name, "test-key",
                 '', "test-image", gsc_image_with_debug], stdout=log_file_pointer, stderr=log_file_pointer)
-            check_image_creation_success(docker_socket,gsc_app_image,log_file)
-            stdscr.addstr(f'Run the {gsc_app_image} using the below command')
+            check_image_creation_success(stdscr, docker_socket,gsc_app_image,log_file)
+            stdscr.addstr(f'Run the {gsc_app_image} docker image using the below command\n')
             stdscr.addstr(f'docker run  --device=/dev/sgx/enclave -it {gsc_app_image}')
+            stdscr.getch()
             return 1
 
-    # initialize the color pair for use later
-    curses.init_pair(1, curses.COLOR_WHITE, curses.COLOR_BLACK)
-    curses.init_pair(2, curses.COLOR_WHITE, curses.COLOR_BLUE)
-    curses.init_pair(3, curses.COLOR_RED, curses.COLOR_BLACK)
-    
-    WHITE_AND_BLACK = curses.color_pair(1)
-    WHITE_AND_BLUE = curses.color_pair(2)
-    RED = curses.color_pair(3)
-
-    title_win = curses.newwin(title_height, title_width, 0, 0)
-    user_console = curses.newwin(user_console_height, user_console_width, title_height, 0)
-    guide_win = curses.newwin(guide_win_height, guide_win_width, title_height, int (screen_width/2))
-    partition_win = curses.newwin(partition_height, partition_width, partition_y, int (sub_title_width) - 2)
-    
-    title_win.addstr(0, 0, " " * title_width, WHITE_AND_BLUE)
-    title_win.addstr(0, int((title_width/2) - (len(title)/2)), title, WHITE_AND_BLUE | curses.A_BOLD)
-    
-    sub_win_title = 'User Agent (Start here)'
-    sub_title_ind = 1
-    
-    input_start_y, input_start_x = 2 , int((sub_title_ind * sub_title_width) - (sub_title_width / 2) - len(sub_win_title)/2)
-    title_win.addstr(input_start_y, input_start_x, sub_win_title, WHITE_AND_BLACK | curses.A_BOLD | curses.A_UNDERLINE)
-
-    partition_win.bkgd(' ', curses.color_pair(2) | curses.A_BOLD)
-    partition_win.refresh()
-    
-    sub_win_title = "Commentary"
-    sub_title_ind = 2
-    input_start_y, input_start_x = 2 , int((sub_title_ind * sub_title_width) - (sub_title_width / 2) - len(sub_win_title)/2)
-    title_win.addstr(input_start_y, input_start_x, sub_win_title, WHITE_AND_BLACK | curses.A_BOLD | curses.A_UNDERLINE)
-    title_win.refresh()
+    user_console, guide_win = initwindows()
 
     update_user_and_commentary_win_array(user_console, guide_win, introduction, index)
     update_user_input()
@@ -129,6 +102,7 @@ def main(stdscr, argv):
         os.chdir('verifier_image')
         verifier_log_file = 'verifier-'+ base_image_name + '.log'
         verifier_log_file_pointer = open(verifier_log_file, 'w')
+        update_user_and_commentary_win_array(user_console, guide_win, 'Building the RA-TLS Verifier image, this might take couple of minutes', '')
         proc = subprocess.call(['./verifier_helper_script.sh', 'attestation_required'], shell=True, stdout=verifier_log_file_pointer, stderr=verifier_log_file_pointer)
         os.chdir('../')
         check_image_creation_success(user_console, docker_socket,'verifier_image:latest','verifier_image/'+verifier_log_file)
@@ -178,14 +152,46 @@ def main(stdscr, argv):
         run_command = [f'docker run  --device=/dev/sgx/enclave -it {gsc_app_image_final}']
     
     debug_help = [f'Run with debug (-d) enabled to get more information in the event of failures during runtime:', f'python curate.py -d {base_image_type}/{base_image_name}', \
-        f"It's also possible that you run into issues resulting from lack of sufficient Enclave pages, or insufficient number of thread. The {base_image_type}.manifest can be ' \
-            'modified to change the defaults"]
+        f"It's also possible that you run into issues resulting from lack of sufficient Enclave pages, or insufficient number of thread. The {base_image_type}.manifest can be " \
+            "modified to change the defaults"]
     update_user_and_commentary_win_array(user_console, guide_win, user_info, debug_help) 
     
 #    edit_user_win(user_console, user_info)
-    user_console.getch()
     update_run_win(run_command)    
     user_console.getch()
+
+def initwindows():
+    # initialize the color pair for use later
+    curses.init_pair(1, curses.COLOR_WHITE, curses.COLOR_BLACK)
+    curses.init_pair(2, curses.COLOR_WHITE, curses.COLOR_BLUE)
+    curses.init_pair(3, curses.COLOR_RED, curses.COLOR_BLACK)
+
+    WHITE_AND_BLACK = curses.color_pair(1)
+    WHITE_AND_BLUE = curses.color_pair(2)
+
+    title_win = curses.newwin(title_height, title_width, 0, 0)
+    user_console = curses.newwin(user_console_height, user_console_width, title_height, 0)
+    guide_win = curses.newwin(guide_win_height, guide_win_width, title_height, int (screen_width/2))
+    partition_win = curses.newwin(partition_height, partition_width, partition_y, int (sub_title_width) - 2)
+
+    title_win.addstr(0, 0, " " * title_width, WHITE_AND_BLUE)
+    title_win.addstr(0, int((title_width/2) - (len(title)/2)), title, WHITE_AND_BLUE | curses.A_BOLD)
+
+    sub_win_title = 'User Agent (Start here)'
+    sub_title_ind = 1
+
+    input_start_y, input_start_x = 2 , int((sub_title_ind * sub_title_width) - (sub_title_width / 2) - len(sub_win_title)/2)
+    title_win.addstr(input_start_y, input_start_x, sub_win_title, WHITE_AND_BLACK | curses.A_BOLD | curses.A_UNDERLINE)
+
+    partition_win.bkgd(' ', curses.color_pair(2) | curses.A_BOLD)
+    partition_win.refresh()
+
+    sub_win_title = "Commentary"
+    sub_title_ind = 2
+    input_start_y, input_start_x = 2 , int((sub_title_ind * sub_title_width) - (sub_title_width / 2) - len(sub_win_title)/2)
+    title_win.addstr(input_start_y, input_start_x, sub_win_title, WHITE_AND_BLACK | curses.A_BOLD | curses.A_UNDERLINE)
+    title_win.refresh()
+    return(user_console, guide_win)
 
 def resize_screen(screen_height, screen_width):
     subprocess.call(["echo","-e",f"\x1b[8;{screen_height};{screen_width}t"])

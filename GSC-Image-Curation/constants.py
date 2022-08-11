@@ -40,12 +40,12 @@ signing_key_help = ["SGX requires RSA 3072 keys with public exponent equal to 3.
 attestation_prompt = ['Do you require remote attestation? Enter y or CTRL+G to skip.']
 attestation_help = ['https://gramine.readthedocs.io/en/stable/attestation.html']
 
-server_ca_cert_prompt = ['Please open another terminal window and copy the ca.crt, server.crt,'
-                'and server.key certificates to gsc_image_curation/verifier_image/ssl'
-                ' directory. No input will result in the generation of test certificates that should be'
-                'used only for learning purposes, and not in production.', 'Enter done when the above is done', 'Enter test to generate test certificates' , 'Enter CTRL+G to skip attestation']
+server_ca_cert_prompt = ['Please open another terminal window and copy the ca.crt, server.crt, '
+                'and server.key certificates to gsc_image_curation/verifier_image/ssl directory ',
+                'Enter done when ready',\
+                     'OR Enter test to generate test certificates' , 'OR Enter CTRL+G to skip attestation']
 server_ca_help = ['RA-TLS attestation flow requires you to provide a set of certificates and keys to enable the attestation flow.'
-'This CA certificate will be used to verify the server during the Remote Attestation TLS (RA_TLS) flow. A sample set is provided'
+'This CA certificate will be used to verify the server during the Remote Attestation TLS (RA_TLS) flow. A sample set is provided '
 'here - https://github.com/gramineproject/contrib/tree/master/Examples/aks-attestation/ssl']
 
 encrypted_files_prompt = ['If the base image contain encrypted data, please provide the path to these files. ' \
