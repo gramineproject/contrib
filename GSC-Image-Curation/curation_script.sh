@@ -1,5 +1,5 @@
 #!/bin/bash
-
+echo printing args $0 $@
 start=$1
 wrapper_dockerfile=$start"-gsc.dockerfile"
 app_image_manifest=$start".manifest"

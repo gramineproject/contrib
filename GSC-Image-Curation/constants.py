@@ -60,4 +60,4 @@ arg_help = ['Gramine will ignore any arguments provider at docker run-time, so e
 env_input = ['Please specify a list of env variables and respective values separated by comma' \
                 '(accepted format: name="Xyz",age="20") -> ']
 env_help =  ['Gramine will ignore any env specified at runtime, so please ensure you provide those here.']
-
+wait_message = ['Your Gramine Shielded Container image is being created. This might take a few minutes.']
