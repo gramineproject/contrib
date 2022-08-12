@@ -285,7 +285,7 @@ def main(stdscr, argv):
                      f'You can run the {gsc_app_image} using the following command. Host networking (--net=host) is optional']
         run_command = [f'docker run --net=host --device=/dev/sgx/enclave -it {gsc_app_image}']
 
-    debug_help = [f'Run with debug (-d) enabled to get more information in the event of failures during runtime:', f'python curate.py -d {base_image_type}/{base_image_name}' \
+    debug_help = [f'Run with debug (-d) enabled to get more information in the event of failures during runtime:', f'python curate.py -d {base_image_type}/{base_image_name}', \
      f"It's also possible that you run into issues resulting from lack of sufficient enclave memory pages, or insufficient number of threads. The {base_image_type}.manifest can be " \
           "modified to change the defaults"]
     update_user_and_commentary_win_array(user_console, guide_win, user_info, debug_help) 
