@@ -268,7 +268,7 @@ def main(stdscr, argv):
         encryption_key = fetch_file_from_user('', '', user_console)
         ef_required = 'y'
 
-    update_user_and_commentary_win_array(user_console, guide_win, wait_message, ['You may monitor {base_image_type}/gsc.log for detailed progress'])
+    update_user_and_commentary_win_array(user_console, guide_win, wait_message, [f'You may monitor {base_image_type}/gsc.log for detailed progress'])
 
     subprocess.call(['./curation_script.sh', base_image_type, base_image_name, key_path, args,
                   attestation_required, ca_cert_path, env_required, envs, ef_required,
