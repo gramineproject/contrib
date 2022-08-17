@@ -1,4 +1,5 @@
 #!/usr/bin/python
+from cProfile import label
 import curses
 from curses import wrapper
 from curses.textpad import Textbox, rectangle
@@ -285,21 +286,22 @@ def main(stdscr, argv):
     if envs:
         env_required = 'y'
 
-#   Provide encrypted files
-    update_user_and_commentary_win_array(user_console, guide_win, encrypted_files_prompt, \
-        encypted_files_help)
-    encrypted_files = update_user_input()
-
-#   Provide encryption key
     ef_required = 'n'
     encryption_key = ''
-    if encrypted_files:
-        encryption_key_prompt = 'Please provide the path to the key used for the encryption.'
-        edit_user_win(user_console, encryption_key_prompt)
-        encryption_key = fetch_file_from_user('', '', user_console)
-        ef_required = 'y'
+    encrypted_files = ''
+    if attestation_required == 'y':
+    #   Provide encrypted files
+        update_user_and_commentary_win_array(user_console, guide_win, encrypted_files_prompt, \
+            encypted_files_help)
+        encrypted_files = update_user_input()
 
-    run_command = [run_command_no_att.format(gsc_app_image)]
+    #   Provide encryption key
+        if encrypted_files:
+            encryption_key_prompt = 'Please provide the path to the key used for the encryption.'
+            edit_user_win(user_console, encryption_key_prompt)
+            encryption_key = fetch_file_from_user('', '', user_console)
+            ef_required = 'y'
+
     update_user_and_commentary_win_array(user_console, guide_win, wait_message, \
         [f'You may monitor {log_file} for detailed progress'])
     subprocess.call(['./curation_script.sh', base_image_type, base_image_name, key_path, args,

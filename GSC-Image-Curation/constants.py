@@ -47,16 +47,19 @@ attestation_help = ['https://gramine.readthedocs.io/en/stable/attestation.html']
 server_ca_cert_prompt = ['>> Remote Attestation:' , 'To enable remote attestation using Azure DCAP '
                          'client libs, use another terminal to copy the ca.crt, server.crt, and '
                          'server.key certificates to gsc_image_curation/verifier_image/ssl directory ',
-                          '- Type done and press CTRL+G when ready, OR', '- Type test and press CTRL+G'
-                          ' to create test certificates', '- OR press CTRL+G to skip attestation']
+                         "NOTE: Attestation is required for using Gramine's Encrypted Filesystem, "
+                         'for example to provision a decryption key for encrypted files, after a '
+                         'successful attestation','- Type done and press CTRL+G when ready, OR',
+                         '- Type test and press CTRL+G to create test certificates',
+                         '- OR press CTRL+G to skip attestation']
 server_ca_help = ['This step enables the host enclave to communicate to a remote verifier over an '
-               'RA-TLS link. This remote verifier uses Azure DCAP client libs to verify the Quote '
-               'supplied by the host enclave. RA-TLS attestation flow requires you to provide a '
-               'set of certificates and keys to enable the attestation flow. The CA certificate '
-               'will be used to TLS authenticate the verifier during the Remote Attestation '
-               'TLS (RA_TLS) flow. A test sample set of RA-TLS keys and certs are provided here.',
-               'https://github.com/gramineproject/contrib/tree/master/Examples/aks-attestation/ssl',
-               'For further reading - ', 'https://gramine.readthedocs.io/en/stable/attestation.html']
+                  'RA-TLS link. This remote verifier uses Azure DCAP client libs to verify the Quote '
+                  'supplied by the host enclave. RA-TLS attestation flow requires you to provide a '
+                  'set of certificates and keys to enable the attestation flow. The CA certificate '
+                  'will be used to TLS authenticate the verifier during the Remote Attestation '
+                  'TLS (RA_TLS) flow. A test sample set of RA-TLS keys and certs are provided here.',
+                  'https://github.com/gramineproject/contrib/tree/master/Examples/aks-attestation/ssl',
+                  'For further reading - ', 'https://gramine.readthedocs.io/en/stable/attestation.html']
 
 encrypted_files_prompt = ['>> Encrypted File System:', 'If the base image contain encrypted data, '
                          'please provide the path to these files. Accepted format: file1:path_relative_path/file2:file3',
