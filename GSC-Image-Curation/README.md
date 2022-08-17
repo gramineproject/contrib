@@ -24,17 +24,17 @@ Want to genenerate a preconfigured test graminized image for redis:7.0.0 dockerh
 need to do is execute the gsc curation script as given below. At the end of the curation, the script
 will also advise how to run the graminized image with docker.
 
-`$ python3 ./curate.py redis/redis:7.0.0 test`
+`$ sudo python3 ./curate.py redis/redis:7.0.0 test`
 
 To generate a custom image
-`$ python3 ./curate.py redis/<your image>`
+`$ sudo python3 ./curate.py redis/<your image>`
 
 
 (2) Pytorch
 
 To generate a preconfigured test graminized image for pytorch:x dockerhub image
 
-`$ python3 ./curate.py pytorch/<pytorch_image> test`
+`$ sudo python3 ./curate.py pytorch/<pytorch_image> test`
 
 To generate a custom image
-`$ python3 ./curate.py pytorch/<your image>`
+`$ sudo python3 ./curate.py pytorch/<your image>`
