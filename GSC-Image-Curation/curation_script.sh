@@ -58,7 +58,12 @@ create_gsc_image () {
 
     cd ../
     #rm -rf gsc >/dev/null 2>&1
+
+    # cleaning up intermediate images
+    docker rmi -f gsc-$app_image-unsigned >/dev/null 2>&1
+    docker rmi -f $app_image >/dev/null 2>&1
 }
+
 
 fetch_base_image_config () {
     base_image_config="$(docker image inspect "$base_image" | jq '.[].Config.'$1'')"
