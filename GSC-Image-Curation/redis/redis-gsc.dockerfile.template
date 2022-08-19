@@ -1,4 +1,4 @@
-From redis
+From
 
 # COPY ca.crt /ca.crt
 

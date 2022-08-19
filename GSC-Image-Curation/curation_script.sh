@@ -5,12 +5,8 @@ wrapper_dockerfile=$start"-gsc.dockerfile"
 app_image_manifest=$start".manifest"
 
 cd $start
-
-# Bring the dockerfile to default
-sed -i 's|.*ca.crt.*|# COPY ca.crt /ca.crt|' $wrapper_dockerfile
-
-# Bring the manifest file to default
-sed -i '0,/# Based on user input the manifest file will automatically be modified after this line/I!d' $app_image_manifest
+cp $wrapper_dockerfile".template" $wrapper_dockerfile
+cp $app_image_manifest".template" $app_image_manifest
 
 base_image="$2"
 # Set base image name in the dockerfile
