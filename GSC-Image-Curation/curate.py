@@ -229,8 +229,8 @@ def main(stdscr, argv):
                 '', "test-image", gsc_image_with_debug], stdout=log_file_pointer, \
                     stderr=log_file_pointer)
             check_image_creation_success(stdscr, docker_socket,gsc_app_image,log_file)
-            stdscr.addstr(f'Run the {gsc_app_image} docker image using the below command. Host'
-                'networking (--net=host) is optional\n')
+            stdscr.addstr(f'Run the {gsc_app_image} docker image in an Azure Confidential Compute '
+            'instance using the below command. Host networking (--net=host) is optional\n')
             stdscr.addstr(f'docker run --net=host --device=/dev/sgx/enclave -it {gsc_app_image}')
             stdscr.getch()
             return 1
@@ -239,6 +239,15 @@ def main(stdscr, argv):
 
     update_user_and_commentary_win_array(user_console, guide_win, introduction, index)
     update_user_input()
+
+    kernel_name=subprocess.check_output(["uname -r"],encoding='utf8',shell=True)
+    if 'azure' not in kernel_name:
+        update_user_and_commentary_win_array(user_console, guide_win, ['Warning: You are building '
+        'these images on an non Azure Confidential Compute instance' + color_set, 'Please ensure you run the '
+        'final images on an Azure VM or in the AKS cluster only', 'Press CTRL+G to continue'],
+        ['The target deployment environment is assumed to be an Azure Confidential compute instance'
+            ' with out of tree DCAP driver'])
+        update_user_input()
 
 #   Obtain enclave signing key
     update_user_and_commentary_win_array(user_console, guide_win, key_prompt, signing_key_help)
