@@ -4,11 +4,6 @@ start=$1
 wrapper_dockerfile=$start"-gsc.dockerfile"
 app_image_manifest=$start".manifest"
 
-# Specifing the Intel SGX driver installed on your machine. Below defaults correspond to
-# DCAP out of tree driver.
-SGX_driver_repo='"https://github.com/intel/SGXDataCenterAttestationPrimitives.git"'
-SGX_driver_branch='"DCAP_1.11 \&\& cp -r driver/linux/* ."'
-
 cd $start
 
 # Bring the dockerfile to default
@@ -43,13 +38,7 @@ create_gsc_image () {
     rm enclave-key.pem >/dev/null 2>&1
 
     cd gsc
-    cp config.yaml.template config.yaml
-
-    sed -i 's|v1.2|master|' config.yaml
-
-    # Set SGX driver as dcap (this helps to generated an Azure compatible image)
-    sed -i 's|^    Repository: ""|    Repository: '"$SGX_driver_repo"'|' config.yaml
-    sed -i 's|^    Branch:     ""|    Branch:     '"$SGX_driver_branch"'|' config.yaml
+    cp ../config.yaml config.yaml
 
     # Delete already existing gsc image for the base image
     docker rmi -f gsc-$base_image >/dev/null 2>&1
