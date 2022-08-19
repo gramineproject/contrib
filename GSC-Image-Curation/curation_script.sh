@@ -64,7 +64,6 @@ create_gsc_image () {
     docker rmi -f $app_image >/dev/null 2>&1
 }
 
-
 fetch_base_image_config () {
     base_image_config="$(docker image inspect "$base_image" | jq '.[].Config.'$1'')"
     if [[ "$base_image_config" = "null" || "$base_image_config" = "Null" || "$base_image_config" = "NULL" ]]; then
