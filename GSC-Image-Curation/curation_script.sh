@@ -72,7 +72,6 @@ fetch_base_image_config () {
         base_image_config=$(echo $base_image_config | sed 's/[][]//g')
         IFS=',' #setting comma as delimiter
         read -a base_image_config_list <<<"$base_image_config"
-        unset IFS
         config_string=' '
         for i in "${base_image_config_list[@]}"
         do
@@ -160,7 +159,6 @@ if [ "$env_required" = "y" ]; then
     envs=$8
     IFS=',' #setting comma as delimiter
     read -a env_list <<<"$envs" #reading str as an array as tokens separated by IFS
-    unset IFS
     echo '' >> $app_image_manifest
     echo '# User Provided Environment Variables' >> $app_image_manifest
     for i in "${env_list[@]}"
