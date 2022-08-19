@@ -1,20 +1,22 @@
 #!/usr/bin/python
-from cProfile import label
+
 import curses
+import docker
+import os
+import os.path
 import re
+import subprocess
+import sys
+import textwrap
+import time
+
+from cProfile import label
+from constants import *
 from curses import wrapper
 from curses.textpad import Textbox, rectangle
 from glob import escape
-import sys
-from sys import argv
-import textwrap
-import time
-import subprocess
-import os
-import os.path
 from os import path
-import docker
-from constants import *
+from sys import argv
 
 def initwindows():
     curses.init_pair(1, curses.COLOR_WHITE, curses.COLOR_BLACK)
