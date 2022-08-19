@@ -1,7 +1,6 @@
 #!/usr/bin/python
 from cProfile import label
 import curses
-import re
 from curses import wrapper
 from curses.textpad import Textbox, rectangle
 from glob import escape
