@@ -65,19 +65,21 @@ encrypted_files_prompt = ['>> Encrypted File System:', 'If the base image contai
                          'please provide the path to these files. Accepted format: file1:path_relative_path/file2:file3',
                          'E.g., for gsc_image_creation/pytorch/pytorch_with_encrypted_files/Dockerfile '
                          'based image, the encrypted files input would be --> ',
-                         'classes.txt:input.jpg:alexnet-pretrained.pt:app/result.txt' + color_set]
+                         'classes.txt:input.jpg:alexnet-pretrained.pt:app/result.txt' + color_set,
+                         'Press CTRL+G when done']
 encypted_files_help = ["Gramine's Encrypted FS feature supports transparently decrypting data using"
                        " the encryption key that will be provisioned after successful attestation."]
 
 arg_input = ['>> Runtime Arguments:', 'Specify docker run-time arguments here in a single string. '
             'for eg, if your docker runtime is ', 'docker run -it bash -c ls' + color_set, 'then the '
-            'arg that needs to be provided here is', '-c ls' + color_set]
+            'arg that needs to be provided here is', '-c ls' + color_set, 'Press CTRL+G when done']
 arg_help = ['Allowing an attacker to control executable arguments can break the security of the '
             'resulting enclave. Gramine will ignore any arguments provided at docker run-time, '
             'so ensure those are provided here now']
 
 env_input = ['>> Runtime Environments:', 'Please specify a list of env variables and respective '
-             'values separated by comma', 'Accepted format:', 'name="Xyz",age="20"' + color_set]
+             'values separated by comma', 'Accepted format:', 'name="Xyz",age="20"' + color_set,
+             'Press CTRL+G when done']
 env_help =  ['This step secures the environment variables. Gramine will ignore environment '
              'variables specified at runtime, so please ensure you provide those here.']
 wait_message = ['Image Creation:', 'Your Gramine Shielded Container image is being created. '
