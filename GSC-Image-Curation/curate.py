@@ -210,7 +210,8 @@ def main(stdscr, argv):
             stdscr.getch()
             return 1
 
-    log_file = f'{base_image_type}/{base_image_name}.log'
+    log_file_name, n = re.subn('[:/]', '_', base_image_name)
+    log_file = f'{base_image_type}/{log_file_name}.log'
     log_file_pointer = open(log_file, 'w')
 
     gsc_app_image ='gsc-{}'.format(base_image_name)
@@ -313,8 +314,10 @@ def main(stdscr, argv):
         user_info = ['The curated GSC image, and the remote attestation and secrets provisioning '
         'verifier image is ready. To run these images with host networking enabled (--net=host), '
         'start the verifier and GSC image in separate terminals in the order shown in the blue box.']
+        key_name_and_path=encryption_key.rsplit('/',1)
         run_command = [f'docker run --net=host {debug_enclave_command_for_verifier} '
-        f'--device=/dev/sgx/enclave  -it verifier_image:latest {encryption_key}',
+        f'--device=/dev/sgx/enclave -v {key_name_and_path[0]}:/keys -it verifier_image:latest '
+        f'/keys/{key_name_and_path[1]}',
         f'docker run --device=/dev/sgx/enclave -e SECRET_PROVISION_SERVERS=<server-dns_name:port> '
         f'-v /var/run/aesmd/aesm.socket:/var/run/aesmd/aesm.socket -it {gsc_app_image}']
     else:
