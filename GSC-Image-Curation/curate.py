@@ -254,15 +254,17 @@ def main(stdscr, argv):
     key_path = fetch_file_from_user('', 'test-key', user_console)
     debug_enclave_command_for_verifier=''
     if key_path == 'test-key':
-        debug_enclave_command_for_verifier=('-e RA_TLS_ALLOW_DEBUG_ENCLAVE_INSECURE=1 -e '
-        'RA_TLS_ALLOW_OUTDATED_TCB_INSECURE=1')
+        debug_enclave_command_for_verifier='-e RA_TLS_ALLOW_DEBUG_ENCLAVE_INSECURE=1 -e ' \
+        'RA_TLS_ALLOW_OUTDATED_TCB_INSECURE=1'
 
 #   Remote Attestation with RA-TLS
     update_user_and_commentary_win_array(user_console, guide_win, server_ca_cert_prompt, \
         server_ca_help)
     attestation_input = update_user_input()
     ca_cert_path = ''
+    verifier_server = '<verifier-dns-name:port>'
     attestation_required = ''
+    host_net = ''
     if attestation_input == 'done':
         ca_cert_path = fetch_file_from_user('verifier_image/ssl/ca.crt', '', user_console)
         server_cert_path = fetch_file_from_user('verifier_image/ssl/server.crt', '', \
@@ -272,7 +274,8 @@ def main(stdscr, argv):
 
     if attestation_input == 'test':
         ca_cert_path='verifier_image/ca.crt'
-
+        verifier_server = '"localhost:4433"'
+        host_net = '--net=host'
 
     if ca_cert_path:
         attestation_required = 'y'
@@ -324,30 +327,26 @@ def main(stdscr, argv):
 
     commands_fp = open("commands.txt", 'w')
     if attestation_required == 'y':
-        user_info = ['The curated GSC image, and the remote attestation and secrets provisioning '
-        'verifier image is ready. To run these images with host networking enabled (--net=host), '
-        'start the verifier and then GSC image in separate terminals using commands in commands.txt file.']
-        results_on_host = ''
-        if base_image_type == "pytorch":
-            results_on_host = "-v /tmp/result_12aug:/workspace/app"
+        user_info = ['The curated GSC image {gsc_app_image}, and the remote attestation verifier '
+        'image is ready. ', 'You can run the images using the instructions provided in the below '
+        'file.','commands.txt' + color_set, 'Press CTRL+G to exit the application']
         verifier_run = ''
-        workload_run = (f'docker run --rm --net=host --device=/dev/sgx/enclave -e SECRET_PROVISION_SERVERS="localhost:4433" '
-                f'-v /var/run/aesmd/aesm.socket:/var/run/aesmd/aesm.socket {results_on_host} -it {gsc_app_image}')
+        workload_run = (f'docker run --rm {host_net} --device=/dev/sgx/enclave -e SECRET_PROVISION_SERVERS={verifier_server} '
+                f'-v /var/run/aesmd/aesm.socket:/var/run/aesmd/aesm.socket -it {gsc_app_image}')
         if encryption_key == '':
-            verifier_run = (f'docker run --rm --net=host {debug_enclave_command_for_verifier} '
+            verifier_run = (f'docker run --rm {host_net} {debug_enclave_command_for_verifier} '
             f'--device=/dev/sgx/enclave -it verifier_image:latest')
         else:
             key_name_and_path=encryption_key.rsplit('/',1)
-            verifier_run = (f'docker run --rm --net=host --device=/dev/sgx/enclave {debug_enclave_command_for_verifier}'
+            verifier_run = (f'docker run --rm {host_net} --device=/dev/sgx/enclave {debug_enclave_command_for_verifier}'
             f' -v {key_name_and_path[0]}:/keys -it verifier_image:latest'
             f' /keys/{key_name_and_path[1]}')
-
         run_command = f'{verifier_run} \n \n{workload_run}'
     else:
         user_info = [f'The curated GSC image is ready.', f'You can run the {gsc_app_image} '
-        'using the following command. Host networking (--net=host) is optional', 'Press CTRL+G to exit the '
+        'using the instructions provided in the below file.','commands.txt' + color_set, 'Press CTRL+G to exit the '
         'application']
-        run_command = [run_command_no_att.format(gsc_app_image)]
+        run_command = [run_command_no_att.format(host_net, gsc_app_image)]
 
     commands_fp.write(run_command)
     commands_fp.close()

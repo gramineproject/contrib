@@ -87,7 +87,7 @@ wait_message = ['Image Creation:', 'Your Gramine Shielded Container image is bei
 system_config_message = ['System config by default is assumed to be an Azure instance with kernel'
                          ' , with Out of band SGX DCAP driver. The defaults can be modified in the'
                          ' system_config file']
-run_command_no_att = 'docker run --net=host --device=/dev/sgx/enclave -it {}'
+run_command_no_att = 'docker run {} --device=/dev/sgx/enclave -it {}'
 run_with_debug = 'python curate.py -d {}/{}' + color_set
 extra_debug_instr = "It's also possible that you may run into issues resulting from lack of " \
                     'sufficient enclave memory pages, or insufficient number of threads. ' \
