@@ -48,12 +48,13 @@ create_gsc_image () {
 
     echo ""
     echo ""
-    ./gsc sign-image $app_image_x enclave-key.pem
-    docker tag gsc-$app_image_x gsc-$base_image
-    docker rmi gsc-$app_image_x
+
+    docker tag gsc-$app_image_x-unsigned gsc-$base_image-unsigned
+    docker rmi gsc-$app_image_x-unsigned
+    ./gsc sign-image $base_image enclave-key.pem
 
     cd ../
-    #rm -rf gsc >/dev/null 2>&1
+    rm -rf gsc >/dev/null 2>&1
 
     # cleaning up intermediate images
     docker rmi -f gsc-$app_image-unsigned >/dev/null 2>&1

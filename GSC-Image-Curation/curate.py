@@ -254,8 +254,8 @@ def main(stdscr, argv):
     key_path = fetch_file_from_user('', 'test-key', user_console)
     debug_enclave_command_for_verifier=''
     if key_path == 'test-key':
-        debug_enclave_command_for_verifier='-e RA_TLS_ALLOW_DEBUG_ENCLAVE_INSECURE=1 -e '
-        'RA_TLS_ALLOW_OUTDATED_TCB_INSECURE=1'
+        debug_enclave_command_for_verifier=('-e RA_TLS_ALLOW_DEBUG_ENCLAVE_INSECURE=1 -e '
+        'RA_TLS_ALLOW_OUTDATED_TCB_INSECURE=1')
 
 #   Remote Attestation with RA-TLS
     update_user_and_commentary_win_array(user_console, guide_win, server_ca_cert_prompt, \
@@ -322,26 +322,38 @@ def main(stdscr, argv):
                   encrypted_files, gsc_image_with_debug], stdout=log_file_pointer, stderr=log_file_pointer)
     check_image_creation_success(user_console, docker_socket, gsc_app_image, log_file)
 
+    commands_fp = open("commands.txt", 'w')
     if attestation_required == 'y':
         user_info = ['The curated GSC image, and the remote attestation and secrets provisioning '
         'verifier image is ready. To run these images with host networking enabled (--net=host), '
-        'start the verifier and GSC image in separate terminals in the order shown in the blue box.']
-        key_name_and_path=encryption_key.rsplit('/',1)
-        run_command = [f'docker run --net=host {debug_enclave_command_for_verifier} '
-        f'--device=/dev/sgx/enclave -v {key_name_and_path[0]}:/keys -it verifier_image:latest '
-        f'/keys/{key_name_and_path[1]}',
-        f'docker run --device=/dev/sgx/enclave -e SECRET_PROVISION_SERVERS=<server-dns_name:port> '
-        f'-v /var/run/aesmd/aesm.socket:/var/run/aesmd/aesm.socket -it {gsc_app_image}']
+        'start the verifier and then GSC image in separate terminals using commands in commands.txt file.']
+        results_on_host = ''
+        if base_image_type == "pytorch":
+            results_on_host = "-v /tmp/result_12aug:/workspace/app"
+        verifier_run = ''
+        workload_run = (f'docker run --rm --net=host --device=/dev/sgx/enclave -e SECRET_PROVISION_SERVERS="localhost:4433" '
+                f'-v /var/run/aesmd/aesm.socket:/var/run/aesmd/aesm.socket {results_on_host} -it {gsc_app_image}')
+        if encryption_key == '':
+            verifier_run = (f'docker run --rm --net=host {debug_enclave_command_for_verifier} '
+            f'--device=/dev/sgx/enclave -it verifier_image:latest')
+        else:
+            key_name_and_path=encryption_key.rsplit('/',1)
+            verifier_run = (f'docker run --rm --net=host --device=/dev/sgx/enclave {debug_enclave_command_for_verifier}'
+            f' -v {key_name_and_path[0]}:/keys -it verifier_image:latest'
+            f' /keys/{key_name_and_path[1]}')
+
+        run_command = f'{verifier_run} \n \n{workload_run}'
     else:
-        user_info = [f'The curated GSC image image is ready.', f'You can run the {gsc_app_image} '
+        user_info = [f'The curated GSC image is ready.', f'You can run the {gsc_app_image} '
         'using the following command. Host networking (--net=host) is optional', 'Press CTRL+G to exit the '
         'application']
         run_command = [run_command_no_att.format(gsc_app_image)]
 
+    commands_fp.write(run_command)
+    commands_fp.close()
     debug_help = ['Run with debug (-d) enabled to get more information in the event of failures '
     'during runtime:', run_with_debug.format(base_image_type, base_image_name), extra_debug_instr.format(base_image_type)]
     update_user_and_commentary_win_array(user_console, guide_win, user_info, debug_help)
-    update_run_win(run_command)
 
     while (user_console.getch() != 7):
         continue
