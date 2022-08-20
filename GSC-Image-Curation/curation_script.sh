@@ -38,7 +38,7 @@ create_gsc_image () {
 
     # Delete already existing gsc image for the base image
     docker rmi -f gsc-$base_image >/dev/null 2>&1
-    docker rmi -f gsc-$app_image_x-unsigned >/dev/null 2>&1
+    docker rmi -f gsc-$base_image-unsigned >/dev/null 2>&1
 
     if [ "$1" = "true" ]; then
         ./gsc build -d $app_image_x  ../$start/$app_image_manifest
@@ -51,7 +51,9 @@ create_gsc_image () {
 
     docker tag gsc-$app_image_x-unsigned gsc-$base_image-unsigned
     docker rmi gsc-$app_image_x-unsigned
-    ./gsc sign-image $base_image enclave-key.pem
+    if [ signing_key_path != 'no-sign' ]; then
+        ./gsc sign-image $base_image enclave-key.pem
+    fi
 
     cd ../
     rm -rf gsc >/dev/null 2>&1

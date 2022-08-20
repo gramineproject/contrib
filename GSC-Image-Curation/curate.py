@@ -172,6 +172,20 @@ def update_run_win(text):
 
     editwin.refresh()
 
+def get_enclave_signing_input(user_console):
+    sign_file = ''
+    while not path.exists(sign_file):
+        sign_file = update_user_input()
+        if sign_file == 'n':
+            key_path = 'no-sign'
+            return key_path
+        elif sign_file == '':
+            key_path = 'test-key'
+            return key_path
+        else:
+            error = f'Error: {sign_file} file does not exist. Please follow instructions above'
+            update_user_error_win(user_console, error)
+
 def main(stdscr, argv):
     stdscr.clear()
     resize_screen(screen_height, screen_width)
@@ -218,6 +232,7 @@ def main(stdscr, argv):
     log_file_pointer = open(log_file, 'w')
 
     gsc_app_image ='gsc-{}'.format(base_image_name)
+    gsc_app_image_unsigned ='gsc-{}-unsigned'.format(base_image_name)
 
     # Generating Test Image
     if len(argv) > min_length_of_argv:
@@ -251,13 +266,11 @@ def main(stdscr, argv):
 
 #   Obtain enclave signing key
     update_user_and_commentary_win_array(user_console, guide_win, key_prompt, signing_key_help)
-    key_path = fetch_file_from_user('', 'test-key', user_console)
-    debug_enclave_command_for_verifier=''
+    key_path = get_enclave_signing_input(user_console)
     if key_path == 'test-key':
-        debug_enclave_command_for_verifier='-e RA_TLS_ALLOW_DEBUG_ENCLAVE_INSECURE=1 -e ' \
-        'RA_TLS_ALLOW_OUTDATED_TCB_INSECURE=1'
+        config = 'test'
 
-#   Remote Attestation with RA-TLS
+    # Remote Attestation with RA-TLS
     update_user_and_commentary_win_array(user_console, guide_win, server_ca_cert_prompt, \
         server_ca_help)
     attestation_input = update_user_input()
@@ -276,6 +289,7 @@ def main(stdscr, argv):
         ca_cert_path='verifier_image/ca.crt'
         verifier_server = '"localhost:4433"'
         host_net = '--net=host'
+        config = 'test'
 
     if ca_cert_path:
         attestation_required = 'y'
@@ -323,13 +337,20 @@ def main(stdscr, argv):
     subprocess.call(['./curation_script.sh', base_image_type, base_image_name, key_path, args,
                   attestation_required, ca_cert_path, env_required, envs, ef_required,
                   encrypted_files, gsc_image_with_debug], stdout=log_file_pointer, stderr=log_file_pointer)
-    check_image_creation_success(user_console, docker_socket, gsc_app_image, log_file)
+    image = gsc_app_image
+    if key_path == 'no-sign':
+        image = gsc_app_image_unsigned
+    check_image_creation_success(user_console, docker_socket, image, log_file)
 
     commands_fp = open("commands.txt", 'w')
     if attestation_required == 'y':
-        user_info = ['The curated GSC image {gsc_app_image}, and the remote attestation verifier '
+        debug_enclave_command_for_verifier=''
+        if config == 'test':
+            debug_enclave_command_for_verifier='-e RA_TLS_ALLOW_DEBUG_ENCLAVE_INSECURE=1 -e ' \
+            'RA_TLS_ALLOW_OUTDATED_TCB_INSECURE=1'
+        user_info = [f'The curated GSC image {gsc_app_image}, and the remote attestation verifier '
         'image is ready. ', 'You can run the images using the instructions provided in the below '
-        'file.','commands.txt' + color_set, 'Press CTRL+G to exit the application']
+        'file.','commands.txt' + color_set, app_exit_messg]
         verifier_run = ''
         workload_run = (f'docker run --rm {host_net} --device=/dev/sgx/enclave -e SECRET_PROVISION_SERVERS={verifier_server} '
                 f'-v /var/run/aesmd/aesm.socket:/var/run/aesmd/aesm.socket -it {gsc_app_image}')
@@ -343,17 +364,25 @@ def main(stdscr, argv):
             f' /keys/{key_name_and_path[1]}')
         run_command = f'{verifier_run} \n \n{workload_run}'
     else:
-        user_info = [f'The curated GSC image is ready.', f'You can run the {gsc_app_image} '
-        'using the instructions provided in the below file.','commands.txt' + color_set, 'Press CTRL+G to exit the '
-        'application']
-        run_command = [run_command_no_att.format(host_net, gsc_app_image)]
+        user_info = [f'The curated GSC image is ready.', f'You can run the {gsc_app_image} image '
+        'using the instructions provided in the below file.','commands.txt' + color_set, app_exit_messg]
+        run_command = run_command_no_att.format(host_net, gsc_app_image)
 
+    if key_path == 'no-sign':
+        commands_fp.write(f'Please follow the below instructions to sign the gsc image with your '
+        'signing key:-\n'
+        f'git clone https://github.com/gramineproject/gsc.git\n'
+        f'cd gsc\n'
+        f'./gsc sign-image {base_image_name} <enclave-key.pem>\n\n'
+        f'Run the image(s) as shown below:\n')
     commands_fp.write(run_command)
     commands_fp.close()
+
     debug_help = ['Run with debug (-d) enabled to get more information in the event of failures '
     'during runtime:', run_with_debug.format(base_image_type, base_image_name), extra_debug_instr.format(base_image_type)]
     update_user_and_commentary_win_array(user_console, guide_win, user_info, debug_help)
 
+#   Exit application with CTRL+G
     while (user_console.getch() != 7):
         continue
 

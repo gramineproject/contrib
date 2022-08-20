@@ -35,11 +35,14 @@ index = ['The target deployment environment is assumed to be an Azure Confidenti
          'Enclave Signing Key', 'Attestation', 'Secret Provisioning', 'Encrypted Files',
          'Environment Variables', 'Runtime Arguments', 'Execution & Debug']
 
-key_prompt = ['>> Enclave signing key:' , 'Please provide path to your signing key in the blue box:'
-              ' (press CTRL+G when done; no input will autogenerate a test key)']
+key_prompt = ['>> Enclave signing key:' , '- Please provide path to your enclave signing key in the '
+              'blue box, and press CTRL+G OR',
+              "- Press n and CTRL+G if you don't want to sign the graminized image OR",
+              '- Press CTRL+G without any input to generate a test signing key']
 signing_key_help = ['SGX requires RSA 3072 keys with public exponent equal to 3. You can generate '
                     'signing key for learning and testing purposes using this command:',
-                    'openssl genrsa -3 -out enclave-key.pem 3072' + color_set]
+                    'openssl genrsa -3 -out enclave-key.pem 3072' + color_set,
+                    'You can also generate unsigned images incase you wish to sign them separately']
 
 attestation_prompt = ['Do you require remote attestation? Enter y or CTRL+G to skip.']
 attestation_help = ['https://gramine.readthedocs.io/en/stable/attestation.html']
@@ -92,3 +95,4 @@ run_with_debug = 'python curate.py -d {}/{}' + color_set
 extra_debug_instr = "It's also possible that you may run into issues resulting from lack of " \
                     'sufficient enclave memory pages, or insufficient number of threads. ' \
                     'The {}.manifest can be modified to change the defaults.'
+app_exit_messg = 'Press CTRL+G to exit the application'
