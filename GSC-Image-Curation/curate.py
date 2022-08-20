@@ -185,6 +185,7 @@ def get_enclave_signing_input(user_console):
         else:
             error = f'Error: {sign_file} file does not exist. Please follow instructions above'
             update_user_error_win(user_console, error)
+    return sign_file
 
 def main(stdscr, argv):
     stdscr.clear()
@@ -267,6 +268,7 @@ def main(stdscr, argv):
 #   Obtain enclave signing key
     update_user_and_commentary_win_array(user_console, guide_win, key_prompt, signing_key_help)
     key_path = get_enclave_signing_input(user_console)
+    config = ''
     if key_path == 'test-key':
         config = 'test'
 
