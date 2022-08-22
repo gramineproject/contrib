@@ -187,17 +187,19 @@ def get_enclave_signing_input(user_console):
 
 def get_attestation_input(user_console):
     attestation_input = update_user_input()
-    while (attestation_input not in ['test', 'done', CTRL_G]):
-        update_user_error_win(user_console, 'Invalid option specified')
-        attestation_input = update_user_input()
+    while True:
+        while (attestation_input not in ['test', 'done', '']):
+            update_user_error_win(user_console, 'Invalid option specified')
+            attestation_input = update_user_input()
         if attestation_input == 'done':
             if (path.exists('verifier_image/ssl/ca.crt') and \
                 path.exists('verifier_image/ssl/server.crt') and \
                 path.exists('verifier_image/ssl/server.key')):
                 return attestation_input
-            update_user_error_win(user_console, 'One more files not does not exist')
+            update_user_error_win(user_console, 'One or more files not does not exist')
             attestation_input = update_user_input()
-    return attestation_input
+            continue
+        return attestation_input
 
 def main(stdscr, argv):
     stdscr.clear()
