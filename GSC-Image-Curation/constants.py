@@ -128,5 +128,5 @@ azure_warning = ['Warning: You are building '
 azure_help =  ['The target deployment environment is assumed to be an Azure Confidential compute instance'
             ' with out of tree DCAP driver']
 verifier_log_file = 'verifier.log'
-file_nf_error = 'Error: {sign_file} file does not exist. Please follow instructions above'
+file_nf_error = 'Error: {} file does not exist. Please follow instructions above'
 CTRL_G = 7
