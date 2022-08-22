@@ -1,0 +1,4 @@
+*.log
+redis-gsc.dockerfile
+redis.manifest
+entry_script_redis.sh
