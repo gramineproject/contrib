@@ -185,6 +185,20 @@ def get_enclave_signing_input(user_console):
             update_user_error_win(user_console, file_nf_error.format(sign_file))
     return sign_file
 
+def get_attestation_input(user_console):
+    attestation_input = update_user_input()
+    while (attestation_input not in ['test', 'done', CTRL_G]):
+        update_user_error_win(user_console, 'Invalid option specified')
+        attestation_input = update_user_input()
+        if attestation_input == 'done':
+            if (path.exists('verifier_image/ssl/ca.crt') and \
+                path.exists('verifier_image/ssl/server.crt') and \
+                path.exists('verifier_image/ssl/server.key')):
+                return attestation_input
+            update_user_error_win(user_console, 'One more files not does not exist')
+            attestation_input = update_user_input()
+    return attestation_input
+
 def main(stdscr, argv):
     stdscr.clear()
     resize_screen(screen_height, screen_width)
@@ -265,17 +279,13 @@ def main(stdscr, argv):
     # Remote Attestation with RA-TLS
     update_user_and_commentary_win_array(user_console, guide_win, attestation_prompt, \
         attestation_help)
-    attestation_input = update_user_input()
+
+    attestation_input = get_attestation_input(user_console)
     ca_cert_path = ''
     verifier_server = '<verifier-dns-name:port>'
     attestation_required = ''
     host_net = ''
     if attestation_input == 'done':
-        ca_cert_path = fetch_file_from_user('verifier_image/ssl/ca.crt', '', user_console)
-        server_cert_path = fetch_file_from_user('verifier_image/ssl/server.crt', '', \
-            user_console)
-        server_key_path = fetch_file_from_user('verifier_image/ssl/server.key', '', \
-            user_console)
         attestation_required = 'y'
 
     if attestation_input == 'test':
@@ -342,8 +352,8 @@ def main(stdscr, argv):
         verifier_run_command = 'docker run --rm {host_net} --device=/dev/sgx/enclave' \
             '{debug_enclave_env_ver_ext}' + enc_keys_mount_str + '-it verifier_image:latest' \
                 + enc_keys_path_str
-        run_command = f'{verifier_run_command} \n \n\
-            {workload_run.format(host_net, verifier_server, gsc_app_image)}'
+        run_command = f'{verifier_run_command} \n \n' \
+            f'{workload_run.format(host_net, verifier_server, gsc_app_image)}'
     else:
         run_command = run_command_no_att.format(host_net, gsc_app_image)
 
