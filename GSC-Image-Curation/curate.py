@@ -324,7 +324,7 @@ def main(stdscr, argv):
         verifier_log_file_pointer = open(verifier_log_file, 'w')
         update_user_and_commentary_win_array(user_console, guide_win, [verifier_build_messg], \
             [verifier_log_help.format(verifier_log_file)])
-        subprocess.call(['./verifier_helper_script.sh', attestation_input], shell=True, \
+        subprocess.call(['./verifier_helper_script.sh', attestation_input], \
             stdout=verifier_log_file_pointer, stderr=verifier_log_file_pointer)
         os.chdir('../')
         check_image_creation_success(user_console, docker_socket,'verifier_image:latest', \
@@ -346,7 +346,7 @@ def main(stdscr, argv):
             debug_enclave_env_ver_ext = debug_enclave_env_verifier
         enc_keys_mount_str, enc_keys_path_str = '' , ''
         if encryption_key:
-            key_name_and_path = encryption_key.rsplit('/', 1)
+            key_name_and_path = os.path.abspath(encryption_key).rsplit('/', 1)
             enc_keys_mount_str =  enc_keys_mount.format(key_name_and_path[0])
             enc_keys_path_str = enc_key_path.format(key_name_and_path[1])
         verifier_run_command = 'docker run --rm {host_net} --device=/dev/sgx/enclave' \
