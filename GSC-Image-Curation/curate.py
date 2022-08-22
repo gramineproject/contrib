@@ -196,7 +196,8 @@ def get_attestation_input(user_console):
                 path.exists('verifier_image/ssl/server.crt') and \
                 path.exists('verifier_image/ssl/server.key')):
                 return attestation_input
-            update_user_error_win(user_console, 'One or more files not does not exist')
+            update_user_error_win(user_console, 'One or more files does not exist at'
+            ' verifier_image/ssl/ directory')
             attestation_input = update_user_input()
             continue
         return attestation_input
@@ -289,6 +290,7 @@ def main(stdscr, argv):
     host_net = ''
     if attestation_input == 'done':
         attestation_required = 'y'
+        ca_cert_path = 'verifier_image/ca.crt'
 
     if attestation_input == 'test':
         ca_cert_path, verifier_server = 'verifier_image/ca.crt', '"localhost:4433"'
@@ -351,8 +353,8 @@ def main(stdscr, argv):
             key_name_and_path = os.path.abspath(encryption_key).rsplit('/', 1)
             enc_keys_mount_str =  enc_keys_mount.format(key_name_and_path[0])
             enc_keys_path_str = enc_key_path.format(key_name_and_path[1])
-        verifier_run_command = 'docker run --rm {host_net} --device=/dev/sgx/enclave' \
-            '{debug_enclave_env_ver_ext}' + enc_keys_mount_str + '-it verifier_image:latest' \
+        verifier_run_command = f'docker run --rm {host_net} --device=/dev/sgx/enclave ' \
+            f'{debug_enclave_env_ver_ext}' + enc_keys_mount_str + ' -it verifier_image:latest' \
                 + enc_keys_path_str
         run_command = f'{verifier_run_command} \n \n' \
             f'{workload_run.format(host_net, verifier_server, gsc_app_image)}'
