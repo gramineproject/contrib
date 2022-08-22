@@ -102,8 +102,7 @@ def update_user_input():
 def fetch_file_from_user(file, default, user_console):
     if file:
         while not path.exists(file):
-            error = f'Error: {file} file does not exist. Please follow instructions above'
-            update_user_error_win(user_console, error)
+            update_user_error_win(user_console, file_nf_error.format(file))
             update_user_input()
         return file
     file = update_user_input()
@@ -183,8 +182,7 @@ def get_enclave_signing_input(user_console):
             key_path = 'test-key'
             return key_path
         else:
-            error = f'Error: {sign_file} file does not exist. Please follow instructions above'
-            update_user_error_win(user_console, error)
+            update_user_error_win(user_console, file_nf_error.format(sign_file))
     return sign_file
 
 def main(stdscr, argv):
@@ -221,8 +219,7 @@ def main(stdscr, argv):
     docker_socket = docker.from_env()
     base_image = get_docker_image(docker_socket, base_image_name)
     if base_image is None:
-        stdscr.addstr(f'Warning: Cannot find application Docker image `{base_image_name}`.\n')
-        stdscr.addstr('Fetching from Docker Hub ...\n')
+        stdscr.addstr(image_not_found_warn.format(base_image_name))
         stdscr.refresh()
         if pull_docker_image(stdscr, docker_socket, base_image_name) == -1:
             stdscr.getch()
@@ -238,16 +235,13 @@ def main(stdscr, argv):
     # Generating Test Image
     if len(argv) > min_length_of_argv:
         if argv[index_for_test_flag_in_argv]:
-            stdscr.addstr('Your test GSC image is being generated. This image is not supposed to be'
-                'used in production \n\n')
+            stdscr.addstr(test_image_mssg)
             stdscr.refresh()
             subprocess.call(["./curation_script.sh", base_image_type, base_image_name, "test-key",
                 '', "test-image", gsc_image_with_debug], stdout=log_file_pointer, \
                     stderr=log_file_pointer)
             check_image_creation_success(stdscr, docker_socket,gsc_app_image,log_file)
-            stdscr.addstr(f'Run the {gsc_app_image} docker image in an Azure Confidential Compute '
-            'instance using the below command. Host networking (--net=host) is optional\n')
-            stdscr.addstr(f'docker run --net=host --device=/dev/sgx/enclave -it {gsc_app_image}')
+            stdscr.addstr(test_run_instr.format(gsc_app_image, gsc_app_image))
             stdscr.getch()
             return 1
 
@@ -258,11 +252,7 @@ def main(stdscr, argv):
 
     kernel_name=subprocess.check_output(["uname -r"],encoding='utf8',shell=True)
     if 'azure' not in kernel_name:
-        update_user_and_commentary_win_array(user_console, guide_win, ['Warning: You are building '
-        'these images on an non Azure Confidential Compute instance' + color_set, 'Please ensure you run the '
-        'final images on an Azure VM or in the AKS cluster only', 'Press CTRL+G to continue'],
-        ['The target deployment environment is assumed to be an Azure Confidential compute instance'
-            ' with out of tree DCAP driver'])
+        update_user_and_commentary_win_array(user_console, guide_win, azure_warning, azure_help )
         update_user_input()
 
 #   Obtain enclave signing key
@@ -273,8 +263,8 @@ def main(stdscr, argv):
         config = 'test'
 
     # Remote Attestation with RA-TLS
-    update_user_and_commentary_win_array(user_console, guide_win, server_ca_cert_prompt, \
-        server_ca_help)
+    update_user_and_commentary_win_array(user_console, guide_win, attestation_prompt, \
+        attestation_help)
     attestation_input = update_user_input()
     ca_cert_path = ''
     verifier_server = '<verifier-dns-name:port>'
@@ -286,26 +276,12 @@ def main(stdscr, argv):
             user_console)
         server_key_path = fetch_file_from_user('verifier_image/ssl/server.key', '', \
             user_console)
+        attestation_required = 'y'
 
     if attestation_input == 'test':
-        ca_cert_path='verifier_image/ca.crt'
-        verifier_server = '"localhost:4433"'
-        host_net = '--net=host'
-        config = 'test'
-
-    if ca_cert_path:
+        ca_cert_path, verifier_server = 'verifier_image/ca.crt', '"localhost:4433"'
+        host_net, config = '--net=host', 'test'
         attestation_required = 'y'
-        os.chdir('verifier_image')
-        verifier_log_file = 'verifier.log'
-        verifier_log_file_pointer = open(verifier_log_file, 'w')
-        update_user_and_commentary_win_array(user_console, guide_win, ['Building the RA-TLS Verifier'
-        ' image, this might take couple of minutes'],
-         [f'You may monitor verifier_image/{verifier_log_file} for progress'])
-        proc = subprocess.call(['./verifier_helper_script.sh', 'attestation_required'], shell=True, \
-            stdout=verifier_log_file_pointer, stderr=verifier_log_file_pointer)
-        os.chdir('../')
-        check_image_creation_success(user_console, docker_socket,'verifier_image:latest', \
-            'verifier_image/'+verifier_log_file)
 
 #   Provide arguments
     update_user_and_commentary_win_array(user_console, guide_win, arg_input, arg_help)
@@ -329,13 +305,22 @@ def main(stdscr, argv):
 
     #   Provide encryption key
         if encrypted_files:
-            encryption_key_prompt = 'Please provide the path to the key used for the encryption.'
             edit_user_win(user_console, encryption_key_prompt)
             encryption_key = fetch_file_from_user('', '', user_console)
             ef_required = 'y'
 
-    update_user_and_commentary_win_array(user_console, guide_win, wait_message, \
-        [f'You may monitor {log_file} for detailed progress'])
+    if ca_cert_path:
+        os.chdir('verifier_image')
+        verifier_log_file_pointer = open(verifier_log_file, 'w')
+        update_user_and_commentary_win_array(user_console, guide_win, [verifier_build_messg], \
+            [verifier_log_help.format(verifier_log_file)])
+        subprocess.call(['./verifier_helper_script.sh', attestation_input], shell=True, \
+            stdout=verifier_log_file_pointer, stderr=verifier_log_file_pointer)
+        os.chdir('../')
+        check_image_creation_success(user_console, docker_socket,'verifier_image:latest', \
+            'verifier_image/'+verifier_log_file)
+
+    update_user_and_commentary_win_array(user_console, guide_win, wait_message, log_progress.format(log_file))
     subprocess.call(['./curation_script.sh', base_image_type, base_image_name, key_path, args,
                   attestation_required, ca_cert_path, env_required, envs, ef_required,
                   encrypted_files, gsc_image_with_debug], stdout=log_file_pointer, stderr=log_file_pointer)
@@ -344,48 +329,36 @@ def main(stdscr, argv):
         image = gsc_app_image_unsigned
     check_image_creation_success(user_console, docker_socket, image, log_file)
 
-    commands_fp = open("commands.txt", 'w')
+    commands_fp = open(commands_file, 'w')
     if attestation_required == 'y':
-        debug_enclave_command_for_verifier=''
+        debug_enclave_env_ver_ext = ''
         if config == 'test':
-            debug_enclave_command_for_verifier='-e RA_TLS_ALLOW_DEBUG_ENCLAVE_INSECURE=1 -e ' \
-            'RA_TLS_ALLOW_OUTDATED_TCB_INSECURE=1'
-        user_info = [f'The curated GSC image {gsc_app_image}, and the remote attestation verifier '
-        'image is ready. ', 'You can run the images using the instructions provided in the below '
-        'file.','commands.txt' + color_set, app_exit_messg]
-        verifier_run = ''
-        workload_run = (f'docker run --rm {host_net} --device=/dev/sgx/enclave -e SECRET_PROVISION_SERVERS={verifier_server} '
-                f'-v /var/run/aesmd/aesm.socket:/var/run/aesmd/aesm.socket -it {gsc_app_image}')
-        if encryption_key == '':
-            verifier_run = (f'docker run --rm {host_net} {debug_enclave_command_for_verifier} '
-            f'--device=/dev/sgx/enclave -it verifier_image:latest')
-        else:
-            key_name_and_path=encryption_key.rsplit('/',1)
-            verifier_run = (f'docker run --rm {host_net} --device=/dev/sgx/enclave {debug_enclave_command_for_verifier}'
-            f' -v {key_name_and_path[0]}:/keys -it verifier_image:latest'
-            f' /keys/{key_name_and_path[1]}')
-        run_command = f'{verifier_run} \n \n{workload_run}'
+            debug_enclave_env_ver_ext = debug_enclave_env_verifier
+        enc_keys_mount_str, enc_keys_path_str = '' , ''
+        if encryption_key:
+            key_name_and_path = encryption_key.rsplit('/', 1)
+            enc_keys_mount_str =  enc_keys_mount.format(key_name_and_path[0])
+            enc_keys_path_str = enc_key_path.format(key_name_and_path[1])
+        verifier_run_command = 'docker run --rm {host_net} --device=/dev/sgx/enclave' \
+            '{debug_enclave_env_ver_ext}' + enc_keys_mount_str + '-it verifier_image:latest' \
+                + enc_keys_path_str
+        run_command = f'{verifier_run_command} \n \n\
+            {workload_run.format(host_net, verifier_server, gsc_app_image)}'
     else:
-        user_info = [f'The curated GSC image is ready.', f'You can run the {gsc_app_image} image '
-        'using the instructions provided in the below file.','commands.txt' + color_set, app_exit_messg]
         run_command = run_command_no_att.format(host_net, gsc_app_image)
 
+    user_info = [image_ready_messg.format(gsc_app_image), commands_file + color_set, app_exit_messg]
     if key_path == 'no-sign':
-        commands_fp.write(f'Please follow the below instructions to sign the gsc image with your '
-        'signing key:-\n'
-        f'git clone https://github.com/gramineproject/gsc.git\n'
-        f'cd gsc\n'
-        f'./gsc sign-image {base_image_name} <enclave-key.pem>\n\n'
-        f'Run the image(s) as shown below:\n')
+        commands_fp.write(sign_instr.format(base_image_name))
     commands_fp.write(run_command)
     commands_fp.close()
 
-    debug_help = ['Run with debug (-d) enabled to get more information in the event of failures '
-    'during runtime:', run_with_debug.format(base_image_type, base_image_name), extra_debug_instr.format(base_image_type)]
+    debug_help = [debug_run_messg, run_with_debug.format(base_image_type, base_image_name),
+                  extra_debug_instr.format(base_image_type)]
     update_user_and_commentary_win_array(user_console, guide_win, user_info, debug_help)
 
 #   Exit application with CTRL+G
-    while (user_console.getch() != 7):
+    while (user_console.getch() != CTRL_G):
         continue
 
 wrapper(main, argv)
