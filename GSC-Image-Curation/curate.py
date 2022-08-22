@@ -320,7 +320,7 @@ def main(stdscr, argv):
         check_image_creation_success(user_console, docker_socket,'verifier_image:latest', \
             'verifier_image/'+verifier_log_file)
 
-    update_user_and_commentary_win_array(user_console, guide_win, wait_message, log_progress.format(log_file))
+    update_user_and_commentary_win_array(user_console, guide_win, wait_message, [log_progress.format(log_file)])
     subprocess.call(['./curation_script.sh', base_image_type, base_image_name, key_path, args,
                   attestation_required, ca_cert_path, env_required, envs, ef_required,
                   encrypted_files, gsc_image_with_debug], stdout=log_file_pointer, stderr=log_file_pointer)
