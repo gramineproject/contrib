@@ -97,7 +97,10 @@ def update_user_input():
     box = Textbox(editwin)
     box.edit()
     editwin.refresh()
-    return(box.gather().strip().replace("\n", ""))
+    user_input = box.gather().strip().replace("\n", "")
+    editwin.erase()
+    editwin.refresh()
+    return(user_input)
 
 def fetch_file_from_user(file, default, user_console):
     if file:
