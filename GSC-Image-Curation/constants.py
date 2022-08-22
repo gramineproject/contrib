@@ -120,8 +120,8 @@ workload_run = 'docker run --rm {} --device=/dev/sgx/enclave -e SECRET_PROVISION
                '-v /var/run/aesmd/aesm.socket:/var/run/aesmd/aesm.socket -it {}'
 enc_keys_mount = '-v {}:/keys'
 enc_key_path = ' /keys/{}'
-debug_enclave_env_verifier = '-e RA_TLS_ALLOW_DEBUG_ENCLAVE_INSECURE=1 -e ' \
-                                     'RA_TLS_ALLOW_OUTDATED_TCB_INSECURE=1'
+debug_enclave_env_verifier = ' -e RA_TLS_ALLOW_DEBUG_ENCLAVE_INSECURE=1 -e ' \
+                                     'RA_TLS_ALLOW_OUTDATED_TCB_INSECURE=1 '
 azure_warning = ['Warning: You are building '
         'these images on an non Azure Confidential Compute instance' + color_set, 'Please ensure you run the '
         'final images on an Azure VM or in the AKS cluster only', 'Press CTRL+G to continue']
