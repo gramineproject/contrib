@@ -24,7 +24,8 @@ test_image_mssg = 'Your test GSC image is being generated. This image is not sup
                   'used in production \n\n'
 test_run_instr = 'Run the {} docker image in an Azure Confidential Compute ' \
                  'instance using the below command. Host networking (--net=host) is optional\n\n' \
-                 'docker run --net=host --device=/dev/sgx/enclave -it {}'
+                 'docker run --net=host --device=/dev/sgx/enclave -it {}.\n\n' \
+                 'Press any key to exit the app'
 image_not_found_warn = 'Warning: Cannot find application Docker image `{}`.\n' \
                        'Fetching from Docker Hub ...\n\n'
 log_progress = 'You may monitor {} for detailed progress'
@@ -123,7 +124,7 @@ enc_key_path = ' /keys/{}'
 debug_enclave_env_verifier = ' -e RA_TLS_ALLOW_DEBUG_ENCLAVE_INSECURE=1 -e ' \
                                      'RA_TLS_ALLOW_OUTDATED_TCB_INSECURE=1 '
 azure_warning = ['Warning: You are building '
-        'these images on an non Azure Confidential Compute instance' + color_set, 'Please ensure you run the '
+        'these images on a non Azure Confidential Compute instance' + color_set, 'Please ensure you run the '
         'final images on an Azure VM or in the AKS cluster only', 'Press CTRL+G to continue']
 azure_help =  ['The target deployment environment is assumed to be an Azure Confidential compute instance'
             ' with out of tree DCAP driver']
