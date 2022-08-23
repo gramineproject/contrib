@@ -293,10 +293,10 @@ def main(stdscr, argv):
     host_net = ''
     if attestation_input == 'done':
         attestation_required = 'y'
-        ca_cert_path = 'verifier_image/ca.crt'
+        ca_cert_path = 'verifier_image/ssl_common/ca.crt'
 
     if attestation_input == 'test':
-        ca_cert_path, verifier_server = 'verifier_image/ca.crt', '"localhost:4433"'
+        ca_cert_path, verifier_server = 'verifier_image/ssl_common/ca.crt', '"localhost:4433"'
         host_net, config = '--net=host', 'test'
         attestation_required = 'y'
 
@@ -351,14 +351,17 @@ def main(stdscr, argv):
         debug_enclave_env_ver_ext = ''
         if config == 'test':
             debug_enclave_env_ver_ext = debug_enclave_env_verifier
+
+        ssl_folder_abs_path_on_host = os.path.abspath(ssl_folder_path_on_host)
+        verifier_cert_mount_str = verifier_cert_mount.format(ssl_folder_abs_path_on_host)
         enc_keys_mount_str, enc_keys_path_str = '' , ''
         if encryption_key:
             key_name_and_path = os.path.abspath(encryption_key).rsplit('/', 1)
             enc_keys_mount_str =  enc_keys_mount.format(key_name_and_path[0])
             enc_keys_path_str = enc_key_path.format(key_name_and_path[1])
         verifier_run_command = f'docker run --rm {host_net} --device=/dev/sgx/enclave ' \
-            f'{debug_enclave_env_ver_ext}' + enc_keys_mount_str + ' -it verifier_image:latest' \
-                + enc_keys_path_str
+            f'{debug_enclave_env_ver_ext}' + verifier_cert_mount_str + ' ' + enc_keys_mount_str + \
+            ' -it verifier_image:latest' + enc_keys_path_str
         run_command = f'{verifier_run_command} \n \n' \
             f'{workload_run.format(host_net, verifier_server, gsc_app_image)}'
     else:

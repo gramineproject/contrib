@@ -10,4 +10,5 @@ Once this file is downloaded , please save it to plaintext directory.
 
 `docker build -t <pytorch-plain> .`
 
-once the image is created , please use `gsc_imae_creation/curation-script.sh` to create the <gsc-pytorch-plain> image
+once the image is created , please refer `GSC-Image-Curation/README.md` to create the
+<gsc-pytorch-plain> image.
