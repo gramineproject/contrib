@@ -331,7 +331,7 @@ def main(stdscr, argv):
         verifier_log_file_pointer = open(verifier_log_file, 'w')
         update_user_and_commentary_win_array(user_console, guide_win, [verifier_build_messg], \
             [verifier_log_help.format(verifier_log_file)])
-        subprocess.call(['./verifier_helper_script.sh', attestation_input], \
+        subprocess.call(['./verifier_helper_script.sh', attestation_input, ef_required], \
             stdout=verifier_log_file_pointer, stderr=verifier_log_file_pointer)
         os.chdir('../')
         check_image_creation_success(user_console, docker_socket,'verifier_image:latest', \
@@ -358,10 +358,9 @@ def main(stdscr, argv):
         if encryption_key:
             key_name_and_path = os.path.abspath(encryption_key).rsplit('/', 1)
             enc_keys_mount_str =  enc_keys_mount.format(key_name_and_path[0])
-            enc_keys_path_str = enc_key_path.format(key_name_and_path[1])
         verifier_run_command = f'docker run --rm {host_net} --device=/dev/sgx/enclave ' \
             f'{debug_enclave_env_ver_ext}' + verifier_cert_mount_str + ' ' + enc_keys_mount_str + \
-            ' -it verifier_image:latest' + enc_keys_path_str
+            ' -it verifier_image:latest'
         run_command = f'{verifier_run_command} \n \n' \
             f'{workload_run.format(host_net, verifier_server, gsc_app_image)}'
     else:

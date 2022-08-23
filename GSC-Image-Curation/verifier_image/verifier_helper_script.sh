@@ -20,7 +20,14 @@ else
     cd ../../../../
 fi
 
+cp verifier.dockerfile.template verifier.dockerfile
+
+if [ "$2" = "y" ]; then
+    echo 'CMD ["/keys/wrap-key"]' >> verifier.dockerfile
+fi
+
 docker rmi -f verifier_image >/dev/null 2>&1
 docker build -f verifier.dockerfile -t verifier_image .
 
+rm verifier.dockerfile 2>&1
 rm -rf gramine >/dev/null 2>&1
