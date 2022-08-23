@@ -1,0 +1,6 @@
+*.log
+entry_script_pytorch.sh
+pytorch-gsc.dockerfile
+pytorch.manifest
+pytorch_with_plain_text_files/plaintext/alexnet-pretrained.pt
+pytorch_with_encrypted_files/encrypted/alexnet-pretrained.pt
