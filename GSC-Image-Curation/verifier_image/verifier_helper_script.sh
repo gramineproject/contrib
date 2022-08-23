@@ -11,13 +11,13 @@ rm -rf  ssl_common >/dev/null 2>&1
 mkdir -p ssl_common
 
 if [ "$1" = "done" ]; then
-    cp ssl/ca.crt  ssl_common
-    cp ssl/server.crt  ssl_common
-    cp ssl/server.key  ssl_common
+    cd ssl
+    cp ca.crt server.crt server.key ../ssl_common
+    cd ..
 else
-    cp gramine/CI-Examples/ra-tls-secret-prov/ssl/ca.crt  ssl_common
-    cp gramine/CI-Examples/ra-tls-secret-prov/ssl/server.crt  ssl_common
-    cp gramine/CI-Examples/ra-tls-secret-prov/ssl/server.key  ssl_common
+    cd gramine/CI-Examples/ra-tls-secret-prov/ssl
+    cp ca.crt server.crt server.key ../../../../ssl_common
+    cd ../../../../
 fi
 
 docker rmi -f verifier_image >/dev/null 2>&1

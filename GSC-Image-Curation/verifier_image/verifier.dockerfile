@@ -15,9 +15,6 @@ RUN wget https://packages.microsoft.com/ubuntu/18.04/prod/pool/main/a/az-dcap-cl
 
 WORKDIR /ra-tls-secret-prov
 
-# This directory is created to accept verifier cert and key at runtime
-RUN mkdir -p /ra-tls-secret-prov/ssl
-
 COPY gramine/CI-Examples/ra-tls-secret-prov/secret_prov_server_dcap /usr/local/bin
 
 RUN echo 'deb [arch=amd64] https://download.01.org/intel-sgx/sgx_repo/ubuntu bionic main' \

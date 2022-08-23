@@ -19,8 +19,7 @@ mv input.jpg classes.txt alexnet-pretrained.pt ./encrypted
 
 `docker build -t <pytorch-image-with-encrypted-files> .`
 
-once the image is created , please refer `GSC-Image-Curation/README.md` to create the
-<gsc-pytorch-image-with-encrypted-files> image
+Please refer `GSC-Image-Curation/README.md` to curate the above image with GSC.
 
 Note: Since, this image contains encrypted files, please provide the below string when prompted for
 encrypted files option `classes.txt:input.jpg:alexnet-pretrained.pt:app/result.txt` during gsc image

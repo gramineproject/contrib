@@ -293,10 +293,10 @@ def main(stdscr, argv):
     host_net = ''
     if attestation_input == 'done':
         attestation_required = 'y'
-        ca_cert_path = 'verifier_image/ssl_common/ca.crt'
+        ca_cert_path = ssl_folder_path_on_host+'/ca.crt'
 
     if attestation_input == 'test':
-        ca_cert_path, verifier_server = 'verifier_image/ssl_common/ca.crt', '"localhost:4433"'
+        ca_cert_path, verifier_server = ssl_folder_path_on_host+'/ca.crt', '"localhost:4433"'
         host_net, config = '--net=host', 'test'
         attestation_required = 'y'
 
