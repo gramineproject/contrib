@@ -41,8 +41,8 @@ introduction = ['This application will provide step-by-step guidance in creating
 
 index = ['The target deployment environment is assumed to be an Azure Confidential compute instance'
          ' with out of tree DCAP driver. Following stages are involved in the GSC image curation:',
-         'Enclave Signing Key', 'Attestation', 'Secret Provisioning', 'Encrypted Files',
-         'Environment Variables', 'Runtime Arguments', 'Execution & Debug']
+         'Enclave Signing Key', 'Attestation', 'Secret Provisioning', 'Runtime Arguments',
+         'Environment Variables', 'Encrypted Files', 'Execution & Debug']
 
 key_prompt = ['>> Enclave signing key:' , '- Please provide path to your enclave signing key in the '
               'blue box, and press CTRL+G OR',
@@ -121,6 +121,8 @@ workload_run = 'docker run --rm {} --device=/dev/sgx/enclave -e SECRET_PROVISION
                '-v /var/run/aesmd/aesm.socket:/var/run/aesmd/aesm.socket -it {}'
 enc_keys_mount = '-v {}:/keys'
 enc_key_path = ' /keys/{}'
+ssl_folder_path_on_host = 'verifier_image/ssl_common'
+verifier_cert_mount = '-v {}:/ra-tls-secret-prov/ssl'
 debug_enclave_env_verifier = ' -e RA_TLS_ALLOW_DEBUG_ENCLAVE_INSECURE=1 -e ' \
                                      'RA_TLS_ALLOW_OUTDATED_TCB_INSECURE=1 '
 azure_warning = ['Warning: You are building '
