@@ -313,6 +313,7 @@ def main(stdscr, argv):
 
     ef_required = 'n'
     encryption_key = ''
+    enc_key_path_in_verifier = ''
     encrypted_files = ''
     if attestation_required == 'y':
     #   Provide encrypted files
@@ -324,6 +325,8 @@ def main(stdscr, argv):
         if encrypted_files:
             edit_user_win(user_console, encryption_key_prompt)
             encryption_key = fetch_file_from_user('', '', user_console)
+            encryption_key_name = os.path.basename(encryption_key)
+            enc_key_path_in_verifier = enc_key_path.format(encryption_key_name)
             ef_required = 'y'
 
     if ca_cert_path:
@@ -331,8 +334,8 @@ def main(stdscr, argv):
         verifier_log_file_pointer = open(verifier_log_file, 'w')
         update_user_and_commentary_win_array(user_console, guide_win, [verifier_build_messg], \
             [verifier_log_help.format(verifier_log_file)])
-        subprocess.call(['./verifier_helper_script.sh', attestation_input, ef_required], \
-            stdout=verifier_log_file_pointer, stderr=verifier_log_file_pointer)
+        subprocess.call(['./verifier_helper_script.sh', attestation_input, enc_key_path_in_verifier]
+                , stdout=verifier_log_file_pointer, stderr=verifier_log_file_pointer)
         os.chdir('../')
         check_image_creation_success(user_console, docker_socket,'verifier_image:latest', \
             'verifier_image/'+verifier_log_file)
