@@ -202,6 +202,10 @@ if [ "$attestation_required" = "y" ]; then
     rm ca.crt
 fi
 
+if [[ "${11}" = "true" && "$signing_key_path" != "test-key" && "$start" = "redis" ]]; then
+    echo 'loader.pal_internal_mem_size = "192M"' >> $app_image_manifest
+fi
+
 # Exit from $start directory
 cd ..
 create_gsc_image ${11}
