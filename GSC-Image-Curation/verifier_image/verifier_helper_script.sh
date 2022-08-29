@@ -22,8 +22,8 @@ fi
 
 cp verifier.dockerfile.template verifier.dockerfile
 
-if [ "$2" = "y" ]; then
-    echo 'CMD ["/keys/wrap-key"]' >> verifier.dockerfile
+if [ ! -z "$2" ]; then
+    echo 'CMD ["'$2'"]' >> verifier.dockerfile
 fi
 
 docker rmi -f verifier_image >/dev/null 2>&1
