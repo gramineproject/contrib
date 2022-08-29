@@ -174,6 +174,11 @@ def update_run_win(text):
 
     editwin.refresh()
 
+# User is expected provide the path to a signing key, or either of the below
+# 'n' = amounts to 'no-sign' which means the curated GSC image will be an unsigned image, that the
+#       user can sign later on.
+# No input will result in the generation of a test key. The image hence generated should not be
+# used in production.
 def get_enclave_signing_input(user_console):
     sign_file = ''
     while not path.exists(sign_file):
