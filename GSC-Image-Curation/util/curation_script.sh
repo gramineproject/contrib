@@ -34,7 +34,7 @@ create_gsc_image () {
     rm enclave-key.pem >/dev/null 2>&1
 
     cd gsc
-    cp ../config.yaml config.yaml
+    cp ../util/config.yaml config.yaml
 
     # Delete already existing gsc image for the base image
     docker rmi -f gsc-$base_image >/dev/null 2>&1

@@ -53,10 +53,10 @@ signing_key_help = ['SGX requires RSA 3072 keys with public exponent equal to 3.
                     'openssl genrsa -3 -out enclave-key.pem 3072' + color_set,
                     'You can also generate unsigned images incase you wish to sign them separately']
 verifier_build_messg = 'Building the RA-TLS Verifier image, this might take couple of minutes'
-verifier_log_help = 'You may monitor verifier_image/{} for progress'
+verifier_log_help = 'You may monitor verifier/{} for progress'
 attestation_prompt = ['>> Remote Attestation:' , 'To enable remote attestation using Azure DCAP '
                          'client libs, use another terminal to copy the ca.crt, server.crt, and '
-                         'server.key certificates to gsc_image_curation/verifier_image/ssl directory ',
+                         'server.key certificates to gsc_image_curation/verifier/ssl directory ',
                          "NOTE: Attestation is required for using Gramine's Encrypted Filesystem, "
                          'for example to provision a decryption key for encrypted files, after a '
                          'successful attestation','- Type done and press CTRL+G when ready, OR',
@@ -121,7 +121,7 @@ workload_run = 'docker run --rm {} --device=/dev/sgx/enclave -e SECRET_PROVISION
                '-v /var/run/aesmd/aesm.socket:/var/run/aesmd/aesm.socket -it {}'
 enc_keys_mount = '-v {}:/keys'
 enc_key_path = '/keys/{}'
-ssl_folder_path_on_host = 'verifier_image/ssl_common'
+ssl_folder_path_on_host = 'verifier/ssl_common'
 verifier_cert_mount = '-v {}:/ra-tls-secret-prov/ssl'
 debug_enclave_env_verifier = ' -e RA_TLS_ALLOW_DEBUG_ENCLAVE_INSECURE=1 -e ' \
                                      'RA_TLS_ALLOW_OUTDATED_TCB_INSECURE=1 '

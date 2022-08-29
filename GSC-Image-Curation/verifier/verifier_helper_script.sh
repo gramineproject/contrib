@@ -27,7 +27,7 @@ if [ ! -z "$2" ]; then
 fi
 
 docker rmi -f verifier_image >/dev/null 2>&1
-docker build -f verifier.dockerfile -t verifier_image .
+docker build -f verifier.dockerfile -t verifier .
 
 rm verifier.dockerfile 2>&1
 rm -rf gramine >/dev/null 2>&1
