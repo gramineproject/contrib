@@ -3,6 +3,8 @@ sgx.enclave_size = "8G"
 sgx.thread_num = 128
 loader.pal_internal_mem_size = "128M"
 
+# This is required to run workload as non-root user, any random number works except 1000 which
+# is for root.
 loader.uid=999
 loader.gid=999
 
