@@ -1,4 +1,21 @@
 #!/bin/bash
+
+# This script takes input from GSC-Image-Curation/curate.py and creates gsc image.
+# The input parameters in sequence are below:
+#   Argument                      Expected
+#   number                         Value
+# -- arg1    : base_image_type e.g. redis or pytorch
+# -- arg2    : base_image_name e.g. <your_image_name>
+# -- arg3    : gsc sign key path or 'test-key' (in case of no key)
+# -- arg4    : runtime argument string
+# -- arg5    : y or n (in case of attestation required)
+# -- arg6    : verifier's ca certificate path
+# -- arg7    : y or n (whether user has environment variables or not)
+# -- arg8    : actual environment variable string
+# -- arg9    : y or n (whether user has encrypted files as part of base image or not)
+# -- arg10   : actual encrypted files string
+# -- arg11   : true (then builds gsc with -d option) or false
+
 echo printing args $0 $@
 start=$1
 wrapper_dockerfile=$start"-gsc.dockerfile"
