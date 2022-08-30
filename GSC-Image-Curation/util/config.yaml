@@ -1,5 +1,4 @@
-# Specify the OS distro. Currently tested distros are
-# ``ubuntu:18.04``, ``ubuntu:20.04``, ``ubuntu:21.04`` and ``centos:8``.
+# Specify the OS distro. For Eg. ``ubuntu:18.04``, ``ubuntu:20.04``.
 Distro: "ubuntu:18.04"
 
 # If the image has a specific registry, define it here.
@@ -12,16 +11,9 @@ Gramine:
     Repository: "https://github.com/gramineproject/gramine.git"
     Branch:     "master"
 
-# Specify the Intel SGX driver installed on your machine (more specifically, on the machine where
-# the graminized Docker container will run); there are several variants of the SGX driver:
-#
-#   - legacy out-of-tree driver: use something like the below values, but adjust the branch name
-#         Repository: "https://github.com/01org/linux-sgx-driver.git"
-#         Branch:     "sgx_driver_1.9"
-#
-#   - DCAP out-of-tree driver: use something like the below values
-#         Repository: "https://github.com/intel/SGXDataCenterAttestationPrimitives.git"
-#         Branch:     "DCAP_1.11 && cp -r driver/linux/* ."
+# Specify the Intel SGX driver installed on your target machine (more specifically, on the machine
+# where the graminized Docker container will run); Default assumption is DCAP out-of-tree driver,
+# but for DCAP in-kernel driver: use empty values like below
 #
 #   - DCAP in-kernel driver: use empty values like below
 #         Repository: ""
