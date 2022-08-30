@@ -1,0 +1,4 @@
+*.log
+/ca.crt
+/ssl/*
+/ssl_common/*

@@ -1,4 +1,15 @@
 #!/usr/bin/python
+# This file will provide step-by-step guidance in creating your own custom containers protected
+# by Gramine. User will be prompted for input at every stage, and once the application has all
+# the details, it will call a separate curation script (util/curation_script.sh) that takes the
+# user provided inputs to create the graminized container image using GSC. This python file also
+# calls into a remote attestation verifier server generation script
+# (verifier/verifier_helper_script.sh) that will generate the verifier images, whose responsibility
+# would be to verify the SGX quotes sent by the graminized container image.
+# Following are the command line parameters accepted by this file
+#  '<type of workload>/<base image to be graminized>' For eg redis/redis:7.0.0
+#  'test' : to generate a test image (for learning purposes) with a test enclave signing key.
+#  'd'    : to generate a debug graminized container helpful for debugging issues.
 
 import curses
 import docker
@@ -11,13 +22,14 @@ import textwrap
 import time
 
 from cProfile import label
-from constants import *
+from util.constants import *
 from curses import wrapper
 from curses.textpad import Textbox, rectangle
 from glob import escape
 from os import path
 from sys import argv
 
+# -------GUI curses interfaces--------------------------------------------------------------------
 def initwindows():
     curses.init_pair(1, curses.COLOR_WHITE, curses.COLOR_BLACK)
     curses.init_pair(2, curses.COLOR_WHITE, curses.COLOR_BLUE)
@@ -28,30 +40,32 @@ def initwindows():
 
     title_win = curses.newwin(title_height, title_width, 0, 0)
     user_console = curses.newwin(user_console_height, user_console_width, title_height, 0)
-    guide_win = curses.newwin(guide_win_height, guide_win_width, title_height, int (screen_width/2))
-    partition_win = curses.newwin(partition_height, partition_width, partition_y, \
-        int (sub_title_width) - 2)
+    guide_win = curses.newwin(guide_win_height, guide_win_width, title_height,
+     int (screen_width/2))
+    partition_win = curses.newwin(partition_height, partition_width, partition_y,
+     int (sub_title_width) - 2)
 
     title_win.addstr(0, 0, " " * title_width, WHITE_AND_BLUE)
-    title_win.addstr(0, int((title_width/2) - (len(title)/2)), title, WHITE_AND_BLUE | curses.A_BOLD)
+    title_win.addstr(0, int((title_width/2) - (len(title)/2)), title, WHITE_AND_BLUE
+     | curses.A_BOLD)
 
     sub_win_title = user_win_title
     sub_title_ind = 1
 
-    input_start_y, input_start_x = 2 , int((sub_title_ind * sub_title_width) - (sub_title_width / 2) \
-        - len(sub_win_title)/2)
-    title_win.addstr(input_start_y, input_start_x, sub_win_title, WHITE_AND_BLACK | curses.A_BOLD | \
-        curses.A_UNDERLINE)
+    input_start_y, input_start_x = 2 , int((sub_title_ind * sub_title_width)
+     - (sub_title_width / 2) - len(sub_win_title)/2)
+    title_win.addstr(input_start_y, input_start_x, sub_win_title, WHITE_AND_BLACK | curses.A_BOLD
+     | curses.A_UNDERLINE)
 
     partition_win.bkgd(' ', curses.color_pair(2) | curses.A_BOLD)
     partition_win.refresh()
 
     sub_win_title = help_win_title
     sub_title_ind = 2
-    input_start_y, input_start_x = 2 , int((sub_title_ind * sub_title_width) - (sub_title_width / 2) \
-        - len(sub_win_title)/2)
-    title_win.addstr(input_start_y, input_start_x, sub_win_title, WHITE_AND_BLACK | curses.A_BOLD | \
-        curses.A_UNDERLINE)
+    input_start_y, input_start_x = 2 , int((sub_title_ind * sub_title_width)
+     - (sub_title_width / 2) - len(sub_win_title)/2)
+    title_win.addstr(input_start_y, input_start_x, sub_win_title, WHITE_AND_BLACK | curses.A_BOLD
+     | curses.A_UNDERLINE)
     title_win.refresh()
     return(user_console, guide_win)
 
@@ -59,37 +73,12 @@ def resize_screen(screen_height, screen_width):
     subprocess.call(["echo","-e",f"\x1b[8;{screen_height};{screen_width}t"])
     time.sleep(0.35)
 
-def check_image_creation_success(win, docker_socket, image_name, log_file):
-    image = get_docker_image(docker_socket, image_name)
-    if image is None:
-        win.addstr(f'\n\n\n`{image_name}` creation failed, exiting....')
-        win.addstr(f'For more info, look at the logs file here: {log_file}')
-        win.getch()
-        sys.exit(1)
-
-def pull_docker_image(win, docker_socket, image_name):
-    try:
-        docker_image = docker_socket.images.pull(image_name)
-        return 0
-    except (docker.errors.ImageNotFound, docker.errors.APIError):
-        win.addstr(f'Error: Could not fetch `{image_name}` image from dockerhub \n')
-        win.addstr('Please check the image name is correct and try again.')
-        win.refresh()
-        return -1
-
 def print_correct_usage(win, arg):
     win.addstr(f'Usage: {arg} <redis/redis:7.0.0> (for custom image)\n')
     win.addstr(f'Usage: {arg} <redis/redis:7.0.0> test (for test image)\n\n')
     win.addstr('Press any key to exit')
     win.getch()
     sys.exit(1)
-
-def get_docker_image(docker_socket, image_name):
-    try:
-        docker_image = docker_socket.images.get(image_name)
-        return docker_image
-    except (docker.errors.ImageNotFound, docker.errors.APIError):
-        return None
 
 def update_user_input():
     editwin = curses.newwin(user_input_height, user_input_width, user_input_start_y, 0)
@@ -101,23 +90,6 @@ def update_user_input():
     editwin.erase()
     editwin.refresh()
     return(user_input)
-
-def fetch_file_from_user(file, default, user_console):
-    if file:
-        while not path.exists(file):
-            update_user_error_win(user_console, file_nf_error.format(file))
-            update_user_input()
-        return file
-    file = update_user_input()
-    while not path.exists(file):
-        if(len(file) == 0):
-            if default:
-                file = default
-                return file   
-        error = f'Error: {file} file does not exist.'
-        update_user_error_win(user_console, error)
-        file = update_user_input()
-    return file
 
 def update_user_and_commentary_win(user_console, guide_win, user_text, help_text, offset):
     user_console.erase()
@@ -138,7 +110,8 @@ def update_user_and_commentary_win_array(user_console, guide_win, user_text_arr,
             color = curses.color_pair(2) | curses.A_REVERSE
             user_text = user_text.replace(color_set , '')
         [y, x] = user_console.getyx()
-        user_console.addstr(y + line_offset, 0, textwrap.fill(user_text, user_console_width), color)
+        user_console.addstr(y + line_offset, 0, textwrap.fill(user_text, user_console_width),
+         color)
     
     for help_text in help_text_arr:
         color = 0
@@ -153,8 +126,8 @@ def update_user_and_commentary_win_array(user_console, guide_win, user_text_arr,
 
 def update_user_error_win(user_console, error_text):
     [y, _] = user_console.getyx()
-    user_console.addstr(y + 2, 0, textwrap.fill(error_text, user_console_width), curses.A_BOLD \
-        | curses.color_pair(3))
+    user_console.addstr(y + 2, 0, textwrap.fill(error_text, user_console_width), curses.A_BOLD
+     | curses.color_pair(3))
     user_console.refresh()
 
 def edit_user_win(user_console, error_text):
@@ -165,15 +138,63 @@ def edit_user_win(user_console, error_text):
 def update_run_win(text):
     editwin = curses.newwin(user_input_height, user_input_width, user_input_start_y, 0)
     editwin.bkgd(' ', curses.color_pair(2) | curses.A_BOLD)
-    
+
     start = 0
     for text_input in text:
-        editwin.addstr(start, 0, textwrap.fill(text_input, user_input_width), curses.color_pair(2) \
-            | curses.A_BOLD)
+        editwin.addstr(start, 0, textwrap.fill(text_input, user_input_width), curses.color_pair(2)
+         | curses.A_BOLD)
         start = start + 2
 
     editwin.refresh()
 
+# --------docker image curation support interfaces------------------------------------------------
+def get_docker_image(docker_socket, image_name):
+    try:
+        docker_image = docker_socket.images.get(image_name)
+        return docker_image
+    except (docker.errors.ImageNotFound, docker.errors.APIError):
+        return None
+
+def check_image_creation_success(win, docker_socket, image_name, log_file):
+    image = get_docker_image(docker_socket, image_name)
+    if image is None:
+        win.addstr(f'\n\n\n`{image_name}` creation failed, exiting....')
+        win.addstr(f'For more info, look at the logs file here: {log_file}')
+        win.getch()
+        sys.exit(1)
+
+def pull_docker_image(win, docker_socket, image_name):
+    try:
+        docker_image = docker_socket.images.pull(image_name)
+        return 0
+    except (docker.errors.ImageNotFound, docker.errors.APIError):
+        win.addstr(f'Error: Could not fetch `{image_name}` image from dockerhub \n')
+        win.addstr('Please check the image name is correct and try again.')
+        win.refresh()
+        return -1
+
+def fetch_file_from_user(file, default, user_console):
+    if file:
+        while not path.exists(file):
+            update_user_error_win(user_console, file_nf_error.format(file))
+            update_user_input()
+        return file
+    file = update_user_input()
+    while not path.exists(file):
+        if(len(file) == 0):
+            if default:
+                file = default
+                return file
+        error = f'Error: {file} file does not exist.'
+        update_user_error_win(user_console, error)
+        file = update_user_input()
+    return file
+
+# User is expected to provide the path to a signing key, or either of the below
+# 'n' = amounts to 'no-sign' which means the curated GSC image will be an unsigned image, that
+# the user can sign later on.
+# No input will result in the generation of a test key. The image hence generated should not be
+# used in production.
 def get_enclave_signing_input(user_console):
     sign_file = ''
     while not path.exists(sign_file):
@@ -195,12 +216,12 @@ def get_attestation_input(user_console):
             update_user_error_win(user_console, 'Invalid option specified')
             attestation_input = update_user_input()
         if attestation_input == 'done':
-            if (path.exists('verifier_image/ssl/ca.crt') and \
-                path.exists('verifier_image/ssl/server.crt') and \
-                path.exists('verifier_image/ssl/server.key')):
+            if (path.exists('verifier/ssl/ca.crt')
+             and path.exists('verifier/ssl/server.crt')
+             and path.exists('verifier/ssl/server.key')):
                 return attestation_input
             update_user_error_win(user_console, 'One or more files does not exist at'
-            ' verifier_image/ssl/ directory')
+            ' verifier/ssl/ directory')
             attestation_input = update_user_input()
             continue
         return attestation_input
@@ -257,9 +278,9 @@ def main(stdscr, argv):
         if argv[index_for_test_flag_in_argv]:
             stdscr.addstr(test_image_mssg)
             stdscr.refresh()
-            subprocess.call(["./curation_script.sh", base_image_type, base_image_name, "test-key",
-                '', "test-image", gsc_image_with_debug], stdout=log_file_pointer, \
-                    stderr=log_file_pointer)
+            subprocess.call(["util/curation_script.sh", base_image_type, base_image_name,
+             "test-key", '', "test-image", gsc_image_with_debug], stdout=log_file_pointer,
+              stderr=log_file_pointer)
             check_image_creation_success(stdscr, docker_socket,gsc_app_image,log_file)
             stdscr.addstr(test_run_instr.format(gsc_app_image, gsc_app_image))
             stdscr.getch()
@@ -272,10 +293,10 @@ def main(stdscr, argv):
 
     kernel_name=subprocess.check_output(["uname -r"],encoding='utf8',shell=True)
     if 'azure' not in kernel_name:
-        update_user_and_commentary_win_array(user_console, guide_win, azure_warning, azure_help )
+        update_user_and_commentary_win_array(user_console, guide_win, azure_warning, azure_help)
         update_user_input()
 
-#   Obtain enclave signing key
+    # Obtain enclave signing key
     update_user_and_commentary_win_array(user_console, guide_win, key_prompt, signing_key_help)
     key_path = get_enclave_signing_input(user_console)
     config = ''
@@ -283,8 +304,8 @@ def main(stdscr, argv):
         config = 'test'
 
     # Remote Attestation with RA-TLS
-    update_user_and_commentary_win_array(user_console, guide_win, attestation_prompt, \
-        attestation_help)
+    update_user_and_commentary_win_array(user_console, guide_win, attestation_prompt,
+     attestation_help)
 
     attestation_input = get_attestation_input(user_console)
     ca_cert_path = ''
@@ -300,11 +321,11 @@ def main(stdscr, argv):
         host_net, config = '--net=host', 'test'
         attestation_required = 'y'
 
-#   Provide arguments
+    # Provide arguments
     update_user_and_commentary_win_array(user_console, guide_win, arg_input, arg_help)
     args = update_user_input()
 
-#   Provide enviroment variables
+    # Provide enviroment variables
     update_user_and_commentary_win_array(user_console, guide_win, env_input, env_help)
     env_required = 'n'
     envs = update_user_input()
@@ -316,12 +337,12 @@ def main(stdscr, argv):
     enc_key_path_in_verifier = ''
     encrypted_files = ''
     if attestation_required == 'y':
-    #   Provide encrypted files
-        update_user_and_commentary_win_array(user_console, guide_win, encrypted_files_prompt, \
-            encypted_files_help)
+        # Provide encrypted files
+        update_user_and_commentary_win_array(user_console, guide_win, encrypted_files_prompt,
+         encypted_files_help)
         encrypted_files = update_user_input()
 
-    #   Provide encryption key
+        # Provide encryption key
         if encrypted_files:
             edit_user_win(user_console, encryption_key_prompt)
             encryption_key = fetch_file_from_user('', '', user_console)
@@ -330,20 +351,22 @@ def main(stdscr, argv):
             ef_required = 'y'
 
     if ca_cert_path:
-        os.chdir('verifier_image')
+        os.chdir('verifier')
         verifier_log_file_pointer = open(verifier_log_file, 'w')
-        update_user_and_commentary_win_array(user_console, guide_win, [verifier_build_messg], \
-            [verifier_log_help.format(verifier_log_file)])
-        subprocess.call(['./verifier_helper_script.sh', attestation_input, enc_key_path_in_verifier]
-                , stdout=verifier_log_file_pointer, stderr=verifier_log_file_pointer)
+        update_user_and_commentary_win_array(user_console, guide_win, [verifier_build_messg],
+         [verifier_log_help.format(verifier_log_file)])
+        subprocess.call(['./verifier_helper_script.sh', attestation_input,
+         enc_key_path_in_verifier], stdout=verifier_log_file_pointer,
+         stderr=verifier_log_file_pointer)
         os.chdir('../')
-        check_image_creation_success(user_console, docker_socket,'verifier_image:latest', \
-            'verifier_image/'+verifier_log_file)
+        check_image_creation_success(user_console, docker_socket,'verifier:latest',
+         'verifier/'+verifier_log_file)
 
-    update_user_and_commentary_win_array(user_console, guide_win, wait_message, [log_progress.format(log_file)])
-    subprocess.call(['./curation_script.sh', base_image_type, base_image_name, key_path, args,
-                  attestation_required, ca_cert_path, env_required, envs, ef_required,
-                  encrypted_files, gsc_image_with_debug], stdout=log_file_pointer, stderr=log_file_pointer)
+    update_user_and_commentary_win_array(user_console, guide_win, wait_message,
+     [log_progress.format(log_file)])
+    subprocess.call(['util/curation_script.sh', base_image_type, base_image_name, key_path, args,
+     attestation_required, ca_cert_path, env_required, envs, ef_required, encrypted_files,
+     gsc_image_with_debug], stdout=log_file_pointer, stderr=log_file_pointer)
     image = gsc_app_image
     if key_path == 'no-sign':
         image = gsc_app_image_unsigned
@@ -361,15 +384,17 @@ def main(stdscr, argv):
         if encryption_key:
             key_name_and_path = os.path.abspath(encryption_key).rsplit('/', 1)
             enc_keys_mount_str =  enc_keys_mount.format(key_name_and_path[0])
-        verifier_run_command = f'docker run --rm {host_net} --device=/dev/sgx/enclave ' \
-            f'{debug_enclave_env_ver_ext}' + verifier_cert_mount_str + ' ' + enc_keys_mount_str + \
-            ' -it verifier_image:latest'
-        run_command = f'{verifier_run_command} \n \n' \
-            f'{workload_run.format(host_net, verifier_server, gsc_app_image)}'
+
+        verifier_run_command = (f'docker run --rm {host_net} --device=/dev/sgx/enclave '
+         f'{debug_enclave_env_ver_ext}' + verifier_cert_mount_str + ' ' + enc_keys_mount_str
+         + ' -it verifier:latest')
+        run_command = (f'{verifier_run_command} \n \n'
+         f'{workload_run.format(host_net, verifier_server, gsc_app_image)}')
     else:
         run_command = run_command_no_att.format(host_net, gsc_app_image)
 
-    user_info = [image_ready_messg.format(gsc_app_image), commands_file + color_set, app_exit_messg]
+    user_info = [image_ready_messg.format(gsc_app_image), commands_file + color_set,
+     app_exit_messg]
     if key_path == 'no-sign':
         commands_fp.write(sign_instr.format(base_image_name))
     commands_fp.write(run_command)
@@ -379,7 +404,7 @@ def main(stdscr, argv):
                   extra_debug_instr.format(base_image_type)]
     update_user_and_commentary_win_array(user_console, guide_win, user_info, debug_help)
 
-#   Exit application with CTRL+G
+    # Exit application with CTRL+G
     while (user_console.getch() != CTRL_G):
         continue
 
