@@ -1,9 +1,12 @@
+# This file have basic set of values defined for graminizing PyTorch images. This manifest template
+# is used by `curation_script.sh` to create the user manifest file that will be passed to GSC.
+
 sgx.nonpie_binary = true
 sgx.enclave_size = "8G"
 sgx.thread_num = 128
 loader.pal_internal_mem_size = "128M"
 
+# This is required to run workload as non-root user, any random number works except 1000 which
+# is for root.
 loader.uid=999
 loader.gid=999
-
-# Based on user input the manifest file will automatically be modified after this line
