@@ -29,12 +29,12 @@ graminized image with docker.
 
 To generate a preconfigured test graminized image
 
-`$ sudo python3 ./curate.py redis/redis:7.0.0 test`
+`$ python3 ./curate.py redis/redis:7.0.0 test`
 
 To generate a custom graminized image, follow the below. This will launch an interactive application
 that will take inputs to create a curated graminized image.
 
-`$ sudo python3 ./curate.py redis/<your image>`
+`$ python3 ./curate.py redis/<your image>`
 
 ### Pytorch
 
@@ -45,12 +45,12 @@ the curation application `curate.py` as shown below.
 
 To generate a preconfigured test graminized image
 
-`$ sudo python3 ./curate.py pytorch/<base_image_with_pytorch> test`
+`$ python3 ./curate.py pytorch/<base_image_with_pytorch> test`
 
 To generate a custom graminized image, follow the below. This will launch an interactive application
 that will take inputs to create a curated graminized image.
 
-`$ sudo python3 ./curate.py pytorch/<base_image_with_pytorch>`
+`$ python3 ./curate.py pytorch/<base_image_with_pytorch>`
 
 
 ## Contents
