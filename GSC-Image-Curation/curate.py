@@ -1,4 +1,15 @@
 #!/usr/bin/python
+# This file will provide step-by-step guidance in creating your own custom containers protected
+# by Gramine. User will be prompted for input at every stage, and once the application has all
+# the details, it will call a separate curation script (util/curation_script.sh) that takes the
+# user provided inputs to create the graminized container image using GSC. This python file also
+# calls into a remote attestation verifier server generation script
+# (verifier/verifier_helper_script.sh) that will generate the verifier images, whose responsibility
+# would be to verify the SGX quotes sent by the graminized container image.
+# Following are the command line parameters accepted by this file
+#  '<type of workload>/<base image to be graminized>' For eg redis/redis:7.0.0
+#  'test' : to generate a test image (for learning purposes) with a test enclave signing key.
+#  'd'    : to generate a debug graminized container helpful for debugging issues.
 
 import curses
 import docker
