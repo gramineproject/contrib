@@ -1,12 +1,12 @@
 # Curate your own Gramine Shielded Container image
 
-This guide demonstrates how one can use a curation application transform any container image to a
-graminized one, packing features such as attestation and beyond, necessary for enabling end to end
-usescases securely. The curation application asks users for specific requirements, and submits the
-user inputs to the GSC tool. A list of workload examples are provided below for reference. One can
-easily extend these reference examples to supporting more workloads by inspecting the contents of
-any of the reference workloads (for e.g. /redis/), understand how they work, and then use them as
-the basis for their own workloads.
+This guide demonstrates how one can use a curation application to transform any container image to
+a graminized one, packing features such as attestation and beyond, necessary for enabling end to
+end usescases securely. The curation application asks users for specific requirements, and submits
+the user inputs to the GSC tool. A list of workload examples are provided below for reference. One
+can easily extend these reference examples to supporting more workloads by inspecting the contents
+of any of the reference workloads (for e.g. /redis/), understand how they work, and then use them
+as the basis for their own workloads.
 
 ## Prerequisites
 
@@ -22,7 +22,7 @@ $ pip3 install docker jinja2 toml pyyaml
 
 ### Redis
 
-Want to genenerate a preconfigured test graminized image for redis:7.0.0 dockerhub image? All you
+Want to genenerate a preconfigured test graminized image for `redis:7.0.0` dockerhub image? All you
 need to do is execute the GSC curation script as given below passing `test` as an argument to the
 curation application. At the end of the curation, the application will also advise how to run the
 graminized image with docker.
