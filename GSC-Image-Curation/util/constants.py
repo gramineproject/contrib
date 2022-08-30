@@ -39,10 +39,11 @@ introduction = ['This application will provide step-by-step guidance in creating
                 ' more context for each of the steps.', 'Do not resize this terminal window, Press'
                 ' CTRL+G to get started!']
 
-index = ['The target deployment environment is assumed to be an Azure Confidential compute instance'
-         ' with out of tree DCAP driver. Following stages are involved in the GSC image curation:',
-         'Enclave Signing Key', 'Attestation', 'Secret Provisioning', 'Runtime Arguments',
-         'Environment Variables', 'Encrypted Files', 'Execution & Debug']
+index = ['The target deployment environment is assumed to be an Azure Confidential compute instance '
+         'with out of tree DCAP driver.', 'The system config details can be modified at '
+         'util/config.yaml to suit your environment' + color_set,'Following stages are involved '
+         'in the GSC image curation:', 'Enclave Signing Key', 'Attestation', 'Secret Provisioning',
+         'Runtime Arguments', 'Environment Variables', 'Encrypted Files', 'Execution & Debug']
 
 key_prompt = ['>> Enclave signing key:' , '- Please provide path to your enclave signing key in the '
               'blue box, and press CTRL+G OR',

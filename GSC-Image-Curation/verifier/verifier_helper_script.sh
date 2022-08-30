@@ -1,5 +1,17 @@
 #!/bin/bash
 
+# This script takes input from GSC-Image-Curation/curate.py and creates verifier image.
+# The script is called only when attestation is required by the user.
+
+# The input parameters in sequence are below:
+#   Argument                      Expected
+#   number                         Value
+# -- arg1    : 'done' means user provided his own certs in verifier/ssl directory, else the default
+#               non-production ready certs will be used. The certs are finally copied to ssl_common
+#               directory for future use by gsc image and the verifier image.
+# -- arg2    :  encryption key path. When this variable is set, then `CMD ["key-path"]` will be
+#               appended to verifier.dockerfile
+
 rm -rf gramine >/dev/null 2>&1
 git clone --depth 1 https://github.com/gramineproject/gramine.git
 
