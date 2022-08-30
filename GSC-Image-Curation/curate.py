@@ -262,7 +262,7 @@ def main(stdscr, argv):
         if argv[index_for_test_flag_in_argv]:
             stdscr.addstr(test_image_mssg)
             stdscr.refresh()
-            subprocess.call(["./curation_script.sh", base_image_type, base_image_name, "test-key",
+            subprocess.call(["util/curation_script.sh", base_image_type, base_image_name, "test-key",
                 '', "test-image", gsc_image_with_debug], stdout=log_file_pointer, \
                     stderr=log_file_pointer)
             check_image_creation_success(stdscr, docker_socket,gsc_app_image,log_file)
