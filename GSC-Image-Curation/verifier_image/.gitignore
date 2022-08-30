@@ -1,4 +1,0 @@
-ca.crt
-ssl/*
-*.log
-ssl_common/*
