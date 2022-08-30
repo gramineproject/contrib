@@ -18,7 +18,7 @@ from glob import escape
 from os import path
 from sys import argv
 
-# ------- GUI curses interface --------------------------------------------------------------------
+# -------GUI curses interfaces--------------------------------------------------------------------
 def initwindows():
     curses.init_pair(1, curses.COLOR_WHITE, curses.COLOR_BLACK)
     curses.init_pair(2, curses.COLOR_WHITE, curses.COLOR_BLUE)
@@ -136,7 +136,7 @@ def update_run_win(text):
 
     editwin.refresh()
 
-# --------docker image curation interactions -----------------------------------------------------
+# --------docker image curation support interfaces------------------------------------------------
 def get_docker_image(docker_socket, image_name):
     try:
         docker_image = docker_socket.images.get(image_name)

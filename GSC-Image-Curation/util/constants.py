@@ -20,16 +20,16 @@ partition_y = 7
 
 color_set = '::reverse'
 
-test_image_mssg = 'Your test GSC image is being generated. This image is not supposed to be ' \
-                  'used in production \n\n'
-test_run_instr = 'Run the {} docker image in an Azure Confidential Compute ' \
-                 'instance using the below command. Host networking (--net=host) is optional\n\n' \
-                 'docker run --net=host --device=/dev/sgx/enclave -it {}.\n\n' \
-                 'Press any key to exit the app'
-image_not_found_warn = 'Warning: Cannot find application Docker image `{}`.\n' \
-                       'Fetching from Docker Hub ...\n\n'
+test_image_mssg = ('Your test GSC image is being generated. This image is not supposed to be'
+                  ' used in production \n\n')
+test_run_instr = ('Run the {} docker image in an Azure Confidential Compute'
+                 ' instance using the below command. Host networking (--net=host) is optional\n\n'
+                 'docker run --net=host --device=/dev/sgx/enclave -it {}.\n\n'
+                 'Press any key to exit the app')
+image_not_found_warn = ('Warning: Cannot find application Docker image `{}`.\n'
+                       'Fetching from Docker Hub ...\n\n')
 log_progress = 'You may monitor {} for detailed progress'
-title = "Curate  Your  Own  Gramine  Sheilded  Container (GSC) Image !!!"
+title = "Curate  Your  Own  Gramine  Shielded  Container (GSC) Image !!!"
 
 user_win_title = 'User Agent'
 help_win_title = 'Commentary'
@@ -51,7 +51,7 @@ key_prompt = ['>> Enclave signing key:' , '- Please provide path to your enclave
 signing_key_help = ['SGX requires RSA 3072 keys with public exponent equal to 3. You can generate '
                     'signing key for learning and testing purposes using this command:',
                     'openssl genrsa -3 -out enclave-key.pem 3072' + color_set,
-                    'You can also generate unsigned images incase you wish to sign them separately']
+                    'You can also generate unsigned images in case you wish to sign them separately']
 verifier_build_messg = 'Building the RA-TLS Verifier image, this might take couple of minutes'
 verifier_log_help = 'You may monitor verifier/{} for progress'
 attestation_prompt = ['>> Remote Attestation:' , 'To enable remote attestation using Azure DCAP '
@@ -71,7 +71,7 @@ attestation_help = ['This step enables the host enclave to communicate to a remo
                     'https://github.com/gramineproject/contrib/tree/master/Examples/aks-attestation/ssl',
                     'For further reading - ', 'https://gramine.readthedocs.io/en/stable/attestation.html']
 
-encrypted_files_prompt = ['>> Encrypted File System:', 'If the base image contain encrypted data, '
+encrypted_files_prompt = ['>> Encrypted File System:', 'If the base image contains encrypted data, '
                          'please provide the path to these files. Accepted format: file1:path_relative_path/file2:file3',
                          'E.g., for gsc_image_creation/pytorch/pytorch_with_encrypted_files/Dockerfile '
                          'based image, the encrypted files input would be --> ',
@@ -81,7 +81,7 @@ encypted_files_help = ["Gramine's Encrypted FS feature supports transparently de
                        " the encryption key that will be provisioned after successful attestation."]
 encryption_key_prompt = 'Please provide the path to the key used for the encryption.'
 arg_input = ['>> Runtime Arguments:', 'Specify docker run-time arguments here in a single string. '
-            'for eg, if your docker runtime is ', 'docker run -it bash -c ls' + color_set, 'then the '
+            'for e.g. if your docker runtime is ', 'docker run -it bash -c ls' + color_set, 'then the '
             'arg that needs to be provided here is', '-c ls' + color_set, 'Press CTRL+G when done']
 arg_help = ['Allowing an attacker to control executable arguments can break the security of the '
             'resulting enclave. Gramine will ignore any arguments provided at docker run-time, '
@@ -99,32 +99,32 @@ system_config_message = ['System config by default is assumed to be an Azure ins
                          ' system_config file']
 run_command_no_att = 'docker run {} --device=/dev/sgx/enclave -it {}'
 run_with_debug = 'python curate.py -d {}/{}' + color_set
-extra_debug_instr = "It's also possible that you may run into issues resulting from lack of " \
-                    'sufficient enclave memory pages, or insufficient number of threads. ' \
-                    'The {}.manifest can be modified to change the defaults.'
+extra_debug_instr = ("It's also possible that you may run into issues resulting from lack of"
+                    ' sufficient enclave memory pages, or insufficient number of threads.'
+                    ' The {}.manifest can be modified to change the defaults.')
 app_exit_messg = 'Press CTRL+G to exit the application'
-sign_instr = 'Please follow the below instructions to sign the gsc image with your ' \
-             'signing key:-\n' \
-             'git clone https://github.com/gramineproject/gsc.git\n' \
-             'cd gsc\n' \
-             './gsc sign-image {} <enclave-key.pem>\n\n' \
-             'Run the image(s) as shown below:\n'
-debug_run_messg = 'Run with debug (-d) enabled to get more information in the event of failures ' \
-                  'during runtime:'
+sign_instr = ('Please follow the below instructions to sign the GSC image with your'
+             ' signing key:-\n'
+             'git clone https://github.com/gramineproject/gsc.git\n'
+             'cd gsc\n'
+             './gsc sign-image {} <enclave-key.pem>\n\n'
+             'Run the image(s) as shown below:\n')
+debug_run_messg = ('Run with debug (-d) enabled to get more information in the event of failures'
+                  ' during runtime:')
 commands_file = 'commands.txt'
-image_ready_messg  = 'The curated GSC image {} is ready, please follow the instructions in the '\
-                     'below file to run your image(s).'
-image_ready_messg_att =  'The curated GSC image , and the remote attestation verifier ' \
-                         'image is ready, You can run the images using the instructions provided' \
-                         'in the below file.'
-workload_run = 'docker run --rm {} --device=/dev/sgx/enclave -e SECRET_PROVISION_SERVERS={} ' \
-               '-v /var/run/aesmd/aesm.socket:/var/run/aesmd/aesm.socket -it {}'
+image_ready_messg  = ('The curated GSC image {} is ready, please follow the instructions in the'
+                     ' below file to run your image(s).')
+image_ready_messg_att = ('The curated GSC image , and the remote attestation verifier'
+                         ' image is ready, You can run the images using the instructions provided'
+                         ' in the below file.')
+workload_run = ('docker run --rm {} --device=/dev/sgx/enclave -e SECRET_PROVISION_SERVERS={}'
+               ' -v /var/run/aesmd/aesm.socket:/var/run/aesmd/aesm.socket -it {}')
 enc_keys_mount = '-v {}:/keys'
 enc_key_path = '/keys/{}'
 ssl_folder_path_on_host = 'verifier/ssl_common'
 verifier_cert_mount = '-v {}:/ra-tls-secret-prov/ssl'
-debug_enclave_env_verifier = ' -e RA_TLS_ALLOW_DEBUG_ENCLAVE_INSECURE=1 -e ' \
-                                     'RA_TLS_ALLOW_OUTDATED_TCB_INSECURE=1 '
+debug_enclave_env_verifier = (' -e RA_TLS_ALLOW_DEBUG_ENCLAVE_INSECURE=1 -e'
+                                     ' RA_TLS_ALLOW_OUTDATED_TCB_INSECURE=1 ')
 azure_warning = ['Warning: You are building '
         'these images on a non Azure Confidential Compute instance' + color_set, 'Please ensure you run the '
         'final images on an Azure VM or in the AKS cluster only', 'Press CTRL+G to continue']
