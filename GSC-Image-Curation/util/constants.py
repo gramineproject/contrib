@@ -75,7 +75,7 @@ encrypted_files_prompt = ['>> Encrypted File System:', 'If the base image contai
                          'please provide the path to these files. Accepted format: file1:path_relative_path/file2:file3',
                          'E.g., for gsc_image_creation/pytorch/pytorch_with_encrypted_files/Dockerfile '
                          'based image, the encrypted files input would be --> ',
-                         'classes.txt:input.jpg:alexnet-pretrained.pt:app/result.txt' + color_set,
+                         'classes.txt:input.jpg:alexnet-pretrained.pt:result.txt' + color_set,
                          'Press CTRL+G when done']
 encypted_files_help = ["Gramine's Encrypted FS feature supports transparently decrypting data using"
                        " the encryption key that will be provisioned after successful attestation."]
