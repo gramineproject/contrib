@@ -252,7 +252,7 @@ def main(stdscr, argv):
     if '/' in base_image_input:
         base_image_type = base_image_input.split('/', maxsplit=1)[0]
         base_image_name = base_image_input.split('/', maxsplit=1)[1]
-        if base_image_type is '' or  base_image_name is '':
+        if base_image_type == '' or  base_image_name == '':
             print_correct_usage(argv[0])
     else:
          print_correct_usage(argv[0])
