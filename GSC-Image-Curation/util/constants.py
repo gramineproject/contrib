@@ -24,7 +24,7 @@ test_image_mssg = ('Your test GSC image is being generated. This image is not su
                   ' used in production \n\n')
 test_run_instr = ('Run the {} docker image in an Azure Confidential Compute'
                  ' instance using the below command. Host networking (--net=host) is optional\n\n'
-                 'docker run --net=host --device=/dev/sgx/enclave -it {}.\n\n'
+                 'docker run --net=host --device=/dev/sgx/enclave -it {}\n\n'
                  'Press any key to exit the app')
 image_not_found_warn = ('Warning: Cannot find application Docker image `{}`.\n'
                        'Fetching from Docker Hub ...\n\n')
