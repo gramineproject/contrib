@@ -234,7 +234,7 @@ def main(stdscr, argv):
     if len(argv) < 2:
         print_correct_usage(stdscr, argv[0])
 
-    gsc_image_with_debug='false'
+    gsc_image_with_debug = 'false'
     index_for_base_image_in_argv = 1
     index_for_test_flag_in_argv = 2
     # min length of argv is the length of argv without test flag
