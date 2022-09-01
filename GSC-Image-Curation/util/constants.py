@@ -45,6 +45,9 @@ index = ['The target deployment environment is assumed to be an Azure Confidenti
          'in the GSC image curation:', 'Enclave Signing Key', 'Attestation', 'Secret Provisioning',
          'Runtime Arguments', 'Environment Variables', 'Encrypted Files', 'Execution & Debug']
 
+distro_prompt = ['Provide your target Distro', '- Press 1 for Ubuntu 18.04', '- Press 2 for Ubuntu 20.04',
+                 'Any other option will default to Ubuntu 18.04. Press CTRL+G when done. ']
+distro_help = ['Tested distros are Ubuntu 18.04 and Ubuntu 20.04']
 key_prompt = ['>> Enclave signing key:' , '- Please provide path to your enclave signing key in the '
               'blue box, and press CTRL+G OR',
               "- Press n and CTRL+G if you don't want to sign the graminized image OR",

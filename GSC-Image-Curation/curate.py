@@ -296,6 +296,13 @@ def main(stdscr, argv):
         update_user_and_commentary_win_array(user_console, guide_win, azure_warning, azure_help)
         update_user_input()
 
+    # Obtain Distro version
+    update_user_and_commentary_win_array(user_console, guide_win, distro_prompt, distro_help)
+    distro_option = update_user_input()
+    distro = 'Ubuntu:18.04'
+    if distro_option == '2':
+        distro = 'Ubuntu:20.04'
+
     # Obtain enclave signing key
     update_user_and_commentary_win_array(user_console, guide_win, key_prompt, signing_key_help)
     key_path = get_enclave_signing_input(user_console)

@@ -55,7 +55,7 @@ image.
 
     .
     ├── curate.py               # Entry file for curation that the user runs as explained above
-    ├── redis/                  # Contents to help curate.py with GSC Redis curation.
+    ├── redis/                  # Contents to help curate.py with GSC Redis curation
     ├── pytorch/                # Contents to help curate.py with GSC PyTorch curation
     ├── util/                   # Helper scripts and files that curate.py uses
     ├── verifier/               # Contents to build attestaton verifier image
