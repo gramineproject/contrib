@@ -1,15 +1,16 @@
 #!/usr/bin/python
-# This file will provide step-by-step guidance in creating your own custom containers protected
-# by Gramine. User will be prompted for input at every stage, and once the application has all
+# This script will provide step-by-step guidance in creating your own custom Docker images protected
+# by Gramine. User will be prompted for input at every stage, and once the script has all
 # the details, it will call a separate curation script (util/curation_script.sh) that takes the
-# user provided inputs to create the graminized container image using GSC. This python file also
-# calls into a remote attestation verifier server generation script
-# (verifier/verifier_helper_script.sh) that will generate the verifier images, whose responsibility
-# would be to verify the SGX quotes sent by the graminized container image.
-# Following are the command line parameters accepted by this file
-#  '<type of workload>/<base image to be graminized>' For eg redis/redis:7.0.0
-#  'test' : to generate a test image (for learning purposes) with a test enclave signing key.
-#  'd'    : to generate a debug graminized container helpful for debugging issues.
+# user provided inputs to create the graminized Docker image using GSC. This script also calls into
+# a script to generate the verifier Docker image (for SGX remote attestation). The generated
+# verifier Docker image is supposed to be started together with the graminized Docker image, to
+# verify the SGX attestation evidence (SGX quote) sent by the latter image.
+
+# Following are the command line parameters accepted by this file:
+# - '<type of workload>/<base image to be graminized>' For eg redis/redis:7.0.0
+# - 'test' : to generate a test image (for learning purposes) with a test enclave signing key.
+# - '-d'    : to generate a debug graminized container helpful for debugging issues.
 
 import curses
 import docker
@@ -41,21 +42,21 @@ def initwindows():
     title_win = curses.newwin(title_height, title_width, 0, 0)
     user_console = curses.newwin(user_console_height, user_console_width, title_height, 0)
     guide_win = curses.newwin(guide_win_height, guide_win_width, title_height,
-     int (screen_width/2))
+                              int(screen_width/2))
     partition_win = curses.newwin(partition_height, partition_width, partition_y,
-     int (sub_title_width) - 2)
+                                  int(sub_title_width) - 2)
 
     title_win.addstr(0, 0, " " * title_width, WHITE_AND_BLUE)
-    title_win.addstr(0, int((title_width/2) - (len(title)/2)), title, WHITE_AND_BLUE
-     | curses.A_BOLD)
+    title_win.addstr(0, int((title_width/2) - (len(title)/2)), title,
+                     WHITE_AND_BLUE | curses.A_BOLD)
 
     sub_win_title = user_win_title
     sub_title_ind = 1
 
-    input_start_y, input_start_x = 2 , int((sub_title_ind * sub_title_width)
-     - (sub_title_width / 2) - len(sub_win_title)/2)
-    title_win.addstr(input_start_y, input_start_x, sub_win_title, WHITE_AND_BLACK | curses.A_BOLD
-     | curses.A_UNDERLINE)
+    input_start_y, input_start_x = 2 , int((sub_title_ind * sub_title_width) - (sub_title_width / 2)
+                                            - len(sub_win_title)/2)
+    title_win.addstr(input_start_y, input_start_x, sub_win_title,
+                     WHITE_AND_BLACK | curses.A_BOLD | curses.A_UNDERLINE)
 
     partition_win.bkgd(' ', curses.color_pair(2) | curses.A_BOLD)
     partition_win.refresh()
@@ -63,9 +64,9 @@ def initwindows():
     sub_win_title = help_win_title
     sub_title_ind = 2
     input_start_y, input_start_x = 2 , int((sub_title_ind * sub_title_width)
-     - (sub_title_width / 2) - len(sub_win_title)/2)
-    title_win.addstr(input_start_y, input_start_x, sub_win_title, WHITE_AND_BLACK | curses.A_BOLD
-     | curses.A_UNDERLINE)
+                                           - (sub_title_width / 2) - len(sub_win_title)/2)
+    title_win.addstr(input_start_y, input_start_x, sub_win_title,
+                     WHITE_AND_BLACK | curses.A_BOLD | curses.A_UNDERLINE)
     title_win.refresh()
     return(user_console, guide_win)
 
@@ -120,7 +121,6 @@ def update_user_and_commentary_win_array(user_console, guide_win, user_text_arr,
             help_text = help_text.replace(color_set , '')
         [y, x] = guide_win.getyx()
         guide_win.addstr(y + line_offset, 0, textwrap.fill(help_text, guide_win_width), color)
-
     user_console.refresh()
     guide_win.refresh()
 
@@ -141,8 +141,8 @@ def update_run_win(text):
 
     start = 0
     for text_input in text:
-        editwin.addstr(start, 0, textwrap.fill(text_input, user_input_width), curses.color_pair(2)
-         | curses.A_BOLD)
+        editwin.addstr(start, 0, textwrap.fill(text_input, user_input_width),
+                       curses.color_pair(2) | curses.A_BOLD)
         start = start + 2
 
     editwin.refresh()
@@ -191,10 +191,10 @@ def fetch_file_from_user(file, default, user_console):
     return file
 
 # User is expected to provide the path to a signing key, or either of the below
-# 'n' = amounts to 'no-sign' which means the curated GSC image will be an unsigned image, that
-# the user can sign later on.
-# No input will result in the generation of a test key. The image hence generated should not be
-# used in production.
+# - 'n' = amounts to 'no-sign' which means the curated GSC image will be an unsigned image, that
+#         the user can sign later on.
+# - no input will result in the generation of a test key. The image hence generated should not be
+#   used in production.
 def get_enclave_signing_input(user_console):
     sign_file = ''
     while not path.exists(sign_file):
