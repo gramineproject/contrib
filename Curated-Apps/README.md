@@ -23,14 +23,14 @@ encrypted files support.
 
 ## Interactive script usage:
 `python3 curate.py <workload type> <base image name> <optional args>`
-|----------------------------------------------------------------------------------------------------|
-| Required?| Argument           | Description/Possible values                                        |
-|----------|--------------------|--------------------------------------------------------------------|
-|    Yes   | `<Workload type>`  | Provide type of workload e.g., redis or pytorch etc..              |
-|    Yes   | `<base image name>`| Base image name to be graminized.                                  |
-| Optional | 'debug'            | To generate graminized image with debug symbols for debugging.     |
-| Optional | 'test'             | To generate no-production image with a test enclave signing key.   |
-|----------------------------------------------------------------------------------------------------|
+    |----------------------------------------------------------------------------------------------------|
+    | Required?| Argument           | Description/Possible values                                        |
+    |----------|--------------------|--------------------------------------------------------------------|
+    |    Yes   | `<Workload type>`  | Provide type of workload e.g., redis or pytorch etc..              |
+    |    Yes   | `<base image name>`| Base image name to be graminized.                                  |
+    | Optional | 'debug'            | To generate graminized image with debug symbols for debugging.     |
+    | Optional | 'test'             | To generate no-production image with a test enclave signing key.   |
+    |----------------------------------------------------------------------------------------------------|
 
 ## Sample Workloads
 
