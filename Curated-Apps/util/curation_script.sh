@@ -1,18 +1,16 @@
 #!/bin/bash
 
-# This script takes input from curate.py and creates gsc image.
-# The script can be called either for test image or for custom image.
+# This script takes input from curate.py and creates GSC image.
+# The script can be called either for creating a non-production test image or a custom GSC image.
 #
 # The test image is created when user runs `python ./curate.py <workload type> <user_image> test` command.
-# test image will create a gsc image for the user_image with test enclave key, debug enclave
-# and no attestation support.
+# The image hence created will be signed with a test enclave key, and will not support attestation.
 #
-# In case of test image, the script takes 6 input parameters, whereas in case of custom image 11
+# In case of test image, the script takes 7 input parameters, whereas in case of custom image 12
 # parameters are passed from curate.py.
 #
-# curate.py calls this script after taking all the user inputs. This script does
-# not interact with user, it just processes the input received from curate.py and produces the final
-# gsc image.
+# curate.py calls this script after taking all the user inputs. This script does not interact with
+# user, it just processes the input received from curate.py and produces the final GSC image.
 
 # The input parameters in sequence are below:
 # -- arg1    : workload type e.g., redis or pytorch
@@ -24,7 +22,7 @@
 # -- arg5    : string with command-line arguments (hard-coded in Docker image via Gramine manifest)
 # -- arg6    : 'test-image' string to create a non production GSC image
 # -- arg6    : y or n (whether attestation required or not)
-# -- arg7    : y or n (whether user want to build gsc with debug or not)
+# -- arg7    : y or n (whether user want to build GSC with debug or not)
 # -- arg8    : verifier's ca certificate path
 # -- arg9    : y or n (whether user has environment variables or not)
 # -- arg10   : Actual environment variable string
@@ -58,7 +56,7 @@ create_base_wrapper_image () {
 }
 
 create_gsc_image () {
-    # Download gsc that has dcap already enabled
+    # Download GSC that has dcap already enabled
     echo ""
     rm -rf gsc >/dev/null 2>&1
     git clone --depth 1 https://github.com/gramineproject/gsc.git
@@ -71,7 +69,7 @@ create_gsc_image () {
     cp ../util/config.yaml.template config.yaml
     sed -i 's|ubuntu:.*|'$distro'"|' config.yaml
 
-    # Delete already existing gsc image for the base image
+    # Delete already existing GSC image for the base image
     docker rmi -f gsc-$base_image >/dev/null 2>&1
     docker rmi -f gsc-$base_image-unsigned >/dev/null 2>&1
 

@@ -81,7 +81,7 @@ def resize_screen(screen_height, screen_width):
 
 def print_correct_usage(win, arg):
     win.addstr(f'\nInsufficient or incorrect arguments.\n')
-    win.addstr(f'Correct Usage: {arg} <Base image type> <Base image name>\n')
+    win.addstr(f'Correct Usage: {arg} <Workload type> <Base image name>\n')
     win.addstr(f'Example: `{arg} redis redis:7.0.0`\n')
     win.addstr(f'Optional argument `debug`  : To generate graminized image with debug symbols for debugging.\n')
     win.addstr(f'Optional argument `test`: To generate non-production image with a test enclave signing key\n')
@@ -198,11 +198,12 @@ def fetch_file_from_user(file, default, user_console):
         file = update_user_input()
     return file
 
-# User is expected to provide the path to a signing key, or either of the below
-# - 'n' = amounts to 'no-sign' which means the curated GSC image will be an unsigned image, that
-#         the user can sign later on.
-# - no input will result in the generation of a test key. The image hence generated should not be
-#   used in production.
+# User is expected to provide the path to a signing key as input, or either of the below:
+#
+# - 'n': expanded to 'no-sign', results in the curated GSC image will be an unsigned image, and
+#   the user can sign it later on.
+# - no input: expanded to 'test-key', results in the generation of a test key. The generated image
+#   should not be used in production!
 def get_enclave_signing_input(user_console):
     sign_file = ''
     while not path.exists(sign_file):
