@@ -23,6 +23,7 @@ encrypted files support.
 
 ## Interactive script usage:
 `python3 curate.py <workload type> <base image name> <optional args>`
+
     |----------------------------------------------------------------------------------------------------|
     | Required?| Argument           | Description/Possible values                                        |
     |----------|--------------------|--------------------------------------------------------------------|
