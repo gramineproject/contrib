@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# This script takes input from GSC-Image-Curation/curate.py and creates verifier image.
+# This script takes input from curate.py and creates verifier image.
 # The script is called only when attestation is required by the user.
 
 # The input parameters in sequence are below:
@@ -11,11 +11,13 @@
 #               directory for future use by gsc image and the verifier image.
 # -- arg2    :  encryption key path. When this variable is set, then `CMD ["key-path"]` will be
 #               appended to verifier.dockerfile
+echo printing args $0 $@
 
 rm -rf gramine >/dev/null 2>&1
-git clone --depth 1 https://github.com/gramineproject/gramine.git
+# TODO: After release of gramine v1.3, replace master with v1.3 in below line
+git clone --depth 1 https://github.com/gramineproject/gramine.git && cd gramine && git checkout master
 
-cd gramine/CI-Examples/ra-tls-secret-prov
+cd CI-Examples/ra-tls-secret-prov
 make clean && make ssl/server.crt >/dev/null 2>&1
 cd ../../../
 

@@ -8,9 +8,14 @@
 # verify the SGX attestation evidence (SGX quote) sent by the latter image.
 
 # Following are the command line parameters accepted by this file:
-# - '<type of workload>/<base image to be graminized>' For eg redis/redis:7.0.0
-# - 'test' : to generate a test image (for learning purposes) with a test enclave signing key.
-# - '-d'    : to generate a debug graminized container helpful for debugging issues.
+#|--------------------------------------------------------------------------------------------------|
+#| Required?| Argument         | Description/Possible values                                        |
+#|----------|------------------|--------------------------------------------------------------------|
+#|    Yes   | <Workload type>  | Provide type of workload e.g., redis or pytorch etc..              |
+#|    Yes   | <base image name>| Base image name to be graminized.                                  |
+#| Optional | 'debug'          | To generate graminized image with debug symbols for debugging.     |
+#| Optional | 'test'           | To generate no-production image with a test enclave signing key.   |
+#|--------------------------------------------------------------------------------------------------|
 
 import curses
 import docker
@@ -75,8 +80,11 @@ def resize_screen(screen_height, screen_width):
     time.sleep(0.35)
 
 def print_correct_usage(win, arg):
-    win.addstr(f'Usage: {arg} <redis/redis:7.0.0> (for custom image)\n')
-    win.addstr(f'Usage: {arg} <redis/redis:7.0.0> test (for test image)\n\n')
+    win.addstr(f'\nInsufficient or incorrect arguments.\n')
+    win.addstr(f'Correct Usage: {arg} <Base image type> <Base image name>\n')
+    win.addstr(f'Example: `{arg} redis redis:7.0.0`\n')
+    win.addstr(f'Optional argument `debug`  : To generate graminized image with debug symbols for debugging.\n')
+    win.addstr(f'Optional argument `test`: To generate non-production image with a test enclave signing key\n')
     win.addstr('Press any key to exit')
     win.getch()
     sys.exit(1)
@@ -113,7 +121,7 @@ def update_user_and_commentary_win_array(user_console, guide_win, user_text_arr,
         [y, x] = user_console.getyx()
         user_console.addstr(y + line_offset, 0, textwrap.fill(user_text, user_console_width),
          color)
-    
+
     for help_text in help_text_arr:
         color = 0
         if (help_text.find(color_set) >= 0):
@@ -227,35 +235,28 @@ def get_attestation_input(user_console):
         return attestation_input
 
 def main(stdscr, argv):
+
+    if len(argv) < 3:
+        print_correct_usage(stdscr, argv[0])
+
+    workload_type = argv[1]
+    base_image_name = argv[2]
+    debug_flag = 'n'
+    test_flag = ''
+    processed_args = 3
+    while processed_args < len(argv):
+        if argv[processed_args] == 'debug':
+            debug_flag = 'y'
+            processed_args += 1
+        elif argv[processed_args] == 'test':
+            test_flag = 'test'
+            processed_args += 1
+        else:
+            print_correct_usage(stdscr, argv[0])
+
     stdscr.clear()
     resize_screen(screen_height, screen_width)
     stdscr = curses.initscr()
-
-    if len(argv) < 2:
-        print_correct_usage(stdscr, argv[0])
-
-    gsc_image_with_debug = 'false'
-    index_for_base_image_in_argv = 1
-    index_for_test_flag_in_argv = 2
-    # min length of argv is the length of argv without test flag
-    min_length_of_argv = 2
-
-    # Checking if debug flag is specified by the user
-    if argv[1] == '-d':
-       gsc_image_with_debug ='true'
-       index_for_base_image_in_argv += 1
-       index_for_test_flag_in_argv += 1
-       min_length_of_argv += 1
-
-    # Acquiring Base image type and name from user input
-    base_image_input = argv[index_for_base_image_in_argv]
-    if '/' in base_image_input:
-        base_image_type = base_image_input.split('/', maxsplit=1)[0]
-        base_image_name = base_image_input.split('/', maxsplit=1)[1]
-        if base_image_type == '' or  base_image_name == '':
-            print_correct_usage(argv[0])
-    else:
-         print_correct_usage(argv[0])
 
     docker_socket = docker.from_env()
     base_image = get_docker_image(docker_socket, base_image_name)
@@ -267,24 +268,25 @@ def main(stdscr, argv):
             return 1
 
     log_file_name, n = re.subn('[:/]', '_', base_image_name)
-    log_file = f'{base_image_type}/{log_file_name}.log'
+    log_file = f'{workload_type}/{log_file_name}.log'
     log_file_pointer = open(log_file, 'w')
 
     gsc_app_image ='gsc-{}'.format(base_image_name)
     gsc_app_image_unsigned ='gsc-{}-unsigned'.format(base_image_name)
 
+    distro = 'ubuntu:18.04'
     # Generating Test Image
-    if len(argv) > min_length_of_argv:
-        if argv[index_for_test_flag_in_argv]:
-            stdscr.addstr(test_image_mssg)
-            stdscr.refresh()
-            subprocess.call(["util/curation_script.sh", base_image_type, base_image_name,
-             "test-key", '', "test-image", gsc_image_with_debug], stdout=log_file_pointer,
-              stderr=log_file_pointer)
-            check_image_creation_success(stdscr, docker_socket,gsc_app_image,log_file)
-            stdscr.addstr(test_run_instr.format(gsc_app_image, gsc_app_image))
-            stdscr.getch()
-            return 1
+    if test_flag:
+        stdscr.addstr(test_image_mssg)
+        stdscr.addstr(log_progress.format(log_file))
+        stdscr.refresh()
+        subprocess.call(["util/curation_script.sh", workload_type, base_image_name, distro,
+                         "test-key", '', "test-image", debug_flag], stdout=log_file_pointer,
+                         stderr=log_file_pointer)
+        check_image_creation_success(stdscr, docker_socket, gsc_app_image, log_file)
+        stdscr.addstr(test_run_instr.format(gsc_app_image, gsc_app_image))
+        stdscr.getch()
+        return 1
 
     user_console, guide_win = initwindows()
 
@@ -299,9 +301,13 @@ def main(stdscr, argv):
     # Obtain Distro version
     update_user_and_commentary_win_array(user_console, guide_win, distro_prompt, distro_help)
     distro_option = update_user_input()
-    distro = 'Ubuntu:18.04'
     if distro_option == '2':
-        distro = 'Ubuntu:20.04'
+        distro = 'ubuntu:20.04'
+    elif distro_option == '3':
+        distro = 'ubuntu:21.04'
+    elif distro_option == '4':
+        distro = 'centos:8'
+        
 
     # Obtain enclave signing key
     update_user_and_commentary_win_array(user_console, guide_win, key_prompt, signing_key_help)
@@ -363,17 +369,18 @@ def main(stdscr, argv):
         update_user_and_commentary_win_array(user_console, guide_win, [verifier_build_messg],
          [verifier_log_help.format(verifier_log_file)])
         subprocess.call(['./verifier_helper_script.sh', attestation_input,
-         enc_key_path_in_verifier], stdout=verifier_log_file_pointer,
-         stderr=verifier_log_file_pointer)
+                         enc_key_path_in_verifier], stdout=verifier_log_file_pointer,
+                         stderr=verifier_log_file_pointer)
         os.chdir('../')
         check_image_creation_success(user_console, docker_socket,'verifier:latest',
-         'verifier/'+verifier_log_file)
+                                     'verifier/'+verifier_log_file)
 
     update_user_and_commentary_win_array(user_console, guide_win, wait_message,
-     [log_progress.format(log_file)])
-    subprocess.call(['util/curation_script.sh', base_image_type, base_image_name, key_path, args,
-     attestation_required, ca_cert_path, env_required, envs, ef_required, encrypted_files,
-     gsc_image_with_debug], stdout=log_file_pointer, stderr=log_file_pointer)
+                                         [log_progress.format(log_file)])
+    subprocess.call(['util/curation_script.sh', workload_type, base_image_name, distro,
+                     key_path, args, attestation_required, debug_flag, ca_cert_path, env_required,
+                     envs, ef_required, encrypted_files], stdout=log_file_pointer,
+                     stderr=log_file_pointer)
     image = gsc_app_image
     if key_path == 'no-sign':
         image = gsc_app_image_unsigned
@@ -407,8 +414,8 @@ def main(stdscr, argv):
     commands_fp.write(run_command)
     commands_fp.close()
 
-    debug_help = [debug_run_messg, run_with_debug.format(base_image_type, base_image_name),
-                  extra_debug_instr.format(base_image_type)]
+    debug_help = [debug_run_messg, run_with_debug.format(workload_type, base_image_name),
+                  extra_debug_instr.format(workload_type)]
     update_user_and_commentary_win_array(user_console, guide_win, user_info, debug_help)
 
     # Exit application with CTRL+G

@@ -28,6 +28,8 @@ RUN apt-get update
 RUN apt-get install -y gramine-dcap
 
 RUN git clone --depth 1 https://github.com/gramineproject/gramine.git
+# TODO: After release of gramine v1.3, replace master with v1.3 in below line
+RUN cd gramine && git checkout master
 
 RUN cd gramine/CI-Examples/ra-tls-secret-prov/ \
     && make clean && make dcap >/dev/null 2>&1 \

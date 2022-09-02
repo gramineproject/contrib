@@ -45,9 +45,10 @@ index = ['The target deployment environment is assumed to be an Azure Confidenti
          'in the GSC image curation:', 'Enclave Signing Key', 'Attestation', 'Secret Provisioning',
          'Runtime Arguments', 'Environment Variables', 'Encrypted Files', 'Execution & Debug']
 
-distro_prompt = ['Provide your target Distro', '- Press 1 for Ubuntu 18.04', '- Press 2 for Ubuntu 20.04',
+distro_prompt = ['Provide the Distro of your base image', '- Press 1 for Ubuntu 18.04', '- Press 2 for Ubuntu 20.04',
+                 '- Press 3 for Ubuntu 21.04','- Press 4 for Centos 8',
                  'Any other option will default to Ubuntu 18.04. Press CTRL+G when done. ']
-distro_help = ['Tested distros are Ubuntu 18.04 and Ubuntu 20.04']
+distro_help = ['Tested distros are Ubuntu 18.04, Ubuntu 20.04, Ubuntu 20.04 and Centos 8']
 key_prompt = ['>> Enclave signing key:' , '- Please provide path to your enclave signing key in the '
               'blue box, and press CTRL+G OR',
               "- Press n and CTRL+G if you don't want to sign the graminized image OR",
@@ -109,7 +110,7 @@ extra_debug_instr = ("It's also possible that you may run into issues resulting 
 app_exit_messg = 'Press CTRL+G to exit the application'
 sign_instr = ('Please follow the below instructions to sign the GSC image with your'
              ' signing key:-\n'
-             'git clone https://github.com/gramineproject/gsc.git\n'
+             'git clone --depth 1 https://github.com/gramineproject/gsc.git\n'
              'cd gsc\n'
              './gsc sign-image {} <enclave-key.pem>\n\n'
              'Run the image(s) as shown below:\n')

@@ -13,7 +13,7 @@ if [[ "$1" == "encrypt" ]]; then
     gramine-sgx-pf-crypt encrypt -w wrap-key -i examples/pytorch/classes.txt -o classes.txt
     gramine-sgx-pf-crypt encrypt -w wrap-key -i examples/pytorch/alexnet-pretrained.pt -o alexnet-pretrained.pt
     mv examples/pytorch/pytorchexample.py ./
-    image_name="pytorch-base-"$1
+    image_name=$image_name"-"$1
 else
     mv input.jpg classes.txt alexnet-pretrained.pt pytorchexample.py ../../
     cd ../../
@@ -26,4 +26,4 @@ docker rmi -f $image_name >/dev/null 2>&1
 docker build -t $image_name .
 
 echo -e "\n\nCreated base image \`$image_name\`."
-echo -e "Please refer \`GSC-Image-Curation/README.md\` to curate the above image with GSC.\n"
+echo -e "Please refer \`Curated-Apps/README.md\` to curate the above image with GSC.\n"

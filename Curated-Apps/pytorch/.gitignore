@@ -1,4 +1,4 @@
-*.log
+/*.log
 /entry_script_pytorch.sh
 /pytorch-gsc.dockerfile
 /pytorch.manifest

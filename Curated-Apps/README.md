@@ -2,13 +2,13 @@
 
 The Gramine Curated applications project provides an interactive script that helps to transform any
 Docker image to a graminized one, packing features such as attestation and beyond, necessary for
-enabling end-to-end usescases securely. The interactive script asks users for specific
+enabling end-to-end use cases securely. The interactive script asks users for specific
 requirements, and submits the user inputs to the GSC tool https://github.com/gramineproject/gsc.
 A list of workload examples are provided below for reference. One can easily extend these reference
 examples to supporting more workloads by inspecting the contents of any of the reference workloads
 (for e.g. `redis/` directory), understand how they work, and then use them as the basis for their
 own workloads. The script also provides a `test` functionality where, with a single command, users
-can generate a test non-production Graminized image purely for experimentation and learning.
+can generate a non-production Graminized image purely for experimentation and learning.
 
 ## Prerequisites
 
