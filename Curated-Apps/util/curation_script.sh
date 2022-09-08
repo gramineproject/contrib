@@ -104,7 +104,7 @@ fetch_base_image_config () {
         base_image_config=$(echo $base_image_config | sed 's/[][]//g')
         IFS=',' # Setting comma as delimiter
         read -a base_image_config_list <<<"$base_image_config"
-        config_string=' '
+        config_string=''
         for i in "${base_image_config_list[@]}"
         do
             i=$(echo $i | sed "s/\"//g")
@@ -134,11 +134,17 @@ args=$5
 if [[ "$start" = "redis" ]]; then
     args+=" --protected-mode no --save ''"
 fi
+
 # Forming a complete binary string
-# (format: <Base image entrypoint> <Base image cmd> <user provided runtime args>)
 entrypoint_string=$(fetch_base_image_config "Entrypoint")
 cmd_string=$(fetch_base_image_config "Cmd")
-complete_binary_cmd=$entrypoint_string''$cmd_string''$args
+complete_binary_cmd=$entrypoint_string
+
+if [[ "$args" = "" ]]; then
+    complete_binary_cmd+=$cmd_string
+else
+    complete_binary_cmd+=$args
+fi
 
 # Creating entrypoint script file
 entrypoint_script=entry_script_$start.sh
@@ -167,7 +173,7 @@ if [ "$attestation_required" = "y" ]; then
     ca_cert_path=$8
 
     # Exiting $start directory as the path to the ca cert can be w.r.t to 
-    # gsc_image_curation directory
+    # Curated-Apps directory
     cd ../
     cp $ca_cert_path $start/ca.crt
     cd $start

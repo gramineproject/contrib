@@ -10,4 +10,4 @@ This directory contains artifacts which helps in creating curated GSC PyTorch im
   be passed to GSC.
 
 - `base_image_helper` directory contains artifacts which helps in generating a base image with
-  plaintext or encrypted files.
+  encrypted files.

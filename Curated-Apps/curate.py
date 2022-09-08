@@ -304,11 +304,6 @@ def main(stdscr, argv):
     distro_option = update_user_input()
     if distro_option == '2':
         distro = 'ubuntu:20.04'
-    elif distro_option == '3':
-        distro = 'ubuntu:21.04'
-    elif distro_option == '4':
-        distro = 'centos:8'
-        
 
     # Obtain enclave signing key
     update_user_and_commentary_win_array(user_console, guide_win, key_prompt, signing_key_help)
