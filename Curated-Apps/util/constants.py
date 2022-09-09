@@ -41,8 +41,8 @@ introduction = ['This application will provide step-by-step guidance for creatin
 
 index = ['The target deployment environment is assumed to be an Azure Confidential compute'
          ' instance having out of tree DCAP driver.','Following stages are involved in the'
-         ' GSC image curation:', '1. Enclave Signing Key', '2. Attestation',
-          '3. Secret Provisioning', '4. Runtime Arguments', '5. Environment Variables',
+         ' GSC image curation:', '1. Distro Selection', '2. Enclave Signing Key', '3. Attestation',
+          '4. Secret Provisioning', '5. Runtime Arguments', '6. Environment Variables',
            '7. Encrypted Files','8. Execution & Debug']
 
 distro_prompt = ['Provide the Distro of your base image', '- Press 1 for Ubuntu 18.04',

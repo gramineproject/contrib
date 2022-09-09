@@ -412,6 +412,8 @@ def main(stdscr, argv):
 
     debug_help = [debug_run_messg, run_with_debug.format(workload_type, base_image_name),
                   extra_debug_instr.format(workload_type)]
+    if debug_flag == 'y':
+        debug_help = [extra_debug_instr.format(workload_type)]
     update_user_and_commentary_win_array(user_console, guide_win, user_info, debug_help)
 
     # Exit application with CTRL+G
