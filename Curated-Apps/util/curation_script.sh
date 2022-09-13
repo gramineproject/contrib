@@ -61,7 +61,9 @@ create_gsc_image () {
     cd ..
     rm -rf gsc >/dev/null 2>&1
     git clone --depth 1 https://github.com/gramineproject/gsc.git
-    cp $signing_key_path gsc/enclave-key.pem
+    if [ $signing_key_path != 'no-sign' ]; then
+        cp $signing_key_path gsc/enclave-key.pem
+    fi
 
     # Delete the signing key created by the script
     rm enclave-key.pem >/dev/null 2>&1
@@ -85,16 +87,14 @@ create_gsc_image () {
 
     docker tag gsc-$app_image_x-unsigned gsc-$base_image-unsigned
     docker rmi gsc-$app_image_x-unsigned
+    docker rmi -f $app_image_x >/dev/null 2>&1
     if [ $signing_key_path != 'no-sign' ]; then
         ./gsc sign-image $base_image enclave-key.pem
+        docker rmi -f gsc-$base_image-unsigned >/dev/null 2>&1
     fi
 
     cd ../
     rm -rf gsc >/dev/null 2>&1
-
-    # Cleaning up intermediate images
-    docker rmi -f gsc-$app_image-unsigned >/dev/null 2>&1
-    docker rmi -f $app_image >/dev/null 2>&1
 }
 
 fetch_base_image_config () {
@@ -219,13 +219,12 @@ if [ "$encrypted_files_required" = "y" ]; then
 fi
 
 echo ""
-if [ "$attestation_required" = "y" ]; then
-    rm ca.crt
-fi
-
 if [[ "$7" = "y" && "$signing_key_path" != "test-key" && "$start" = "redis" ]]; then
     echo 'loader.pal_internal_mem_size = "192M"' >> $app_image_manifest
 fi
 
 create_base_wrapper_image
+if [ "$attestation_required" = "y" ]; then
+    rm ca.crt
+fi
 create_gsc_image $7
