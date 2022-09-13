@@ -59,12 +59,12 @@ create_gsc_image () {
     # Download GSC that has dcap already enabled
     echo ""
     cd ..
-    # rm -rf gsc >/dev/null 2>&1
-    # git clone --depth 1 https://github.com/gramineproject/gsc.git
+    rm -rf gsc >/dev/null 2>&1
+    git clone --depth 1 https://github.com/gramineproject/gsc.git
     cp $signing_key_path gsc/enclave-key.pem
 
     # Delete the signing key created by the script
-    # rm enclave-key.pem >/dev/null 2>&1
+    rm enclave-key.pem >/dev/null 2>&1
 
     cd gsc
     cp ../util/config.yaml.template config.yaml
@@ -90,7 +90,7 @@ create_gsc_image () {
     fi
 
     cd ../
-    # rm -rf gsc >/dev/null 2>&1
+    rm -rf gsc >/dev/null 2>&1
 
     # Cleaning up intermediate images
     docker rmi -f gsc-$app_image-unsigned >/dev/null 2>&1
