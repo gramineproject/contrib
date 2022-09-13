@@ -90,9 +90,9 @@ encypted_files_help = ["Gramine's Encrypted FS feature supports transparently de
                        " attestation."]
 encryption_key_prompt = 'Please provide the path to the key used for the encryption.'
 arg_input = ['>> Runtime Arguments:', 'Specify docker run-time arguments here in a single string.'
-             ' for e.g., if your docker runtime is ', 'docker run -it bash -c ls' + color_set,
-             'then the arguments that needs to be provided here is', '-c ls' + color_set,
-             'Press CTRL+G when done']
+             ' for e.g., if your docker runtime is ', 'docker run -it <image_name> arg1 arg2'
+             + color_set, 'then the arguments that needs to be provided here is', 'arg1 arg2'
+             + color_set, 'Press CTRL+G when done']
 arg_help = ['Allowing an attacker to control executable arguments can break the security of the'
             ' resulting enclave. Gramine will ignore any arguments provided at docker run-time,'
             ' so ensure those are provided here now']
@@ -126,7 +126,7 @@ image_ready_messg  = ('The curated GSC image {} is ready, please follow the inst
 image_ready_messg_att = ('The curated GSC image , and the remote attestation verifier'
                          ' image is ready, You can run the images using the instructions provided'
                          ' in the below file.')
-workload_run = ('docker run --rm {} --device=/dev/sgx/enclave -e SECRET_PROVISION_SERVERS={}'
+workload_run = ('docker run {} --device=/dev/sgx/enclave -e SECRET_PROVISION_SERVERS={}'
                 ' -v /var/run/aesmd/aesm.socket:/var/run/aesmd/aesm.socket -it {}')
 enc_keys_mount = '-v {}:/keys'
 enc_key_path = '/keys/{}'

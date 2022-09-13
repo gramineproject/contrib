@@ -395,7 +395,7 @@ def main(stdscr, argv):
             key_name_and_path = os.path.abspath(encryption_key).rsplit('/', 1)
             enc_keys_mount_str =  enc_keys_mount.format(key_name_and_path[0])
 
-        verifier_run_command = (f'docker run --rm {host_net} --device=/dev/sgx/enclave '
+        verifier_run_command = (f'docker run {host_net} --device=/dev/sgx/enclave '
          f'{debug_enclave_env_ver_ext}' + verifier_cert_mount_str + ' ' + enc_keys_mount_str
          + ' -it verifier:latest')
         run_command = (f'{verifier_run_command} \n \n'

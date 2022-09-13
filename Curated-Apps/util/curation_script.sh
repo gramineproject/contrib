@@ -58,12 +58,13 @@ create_base_wrapper_image () {
 create_gsc_image () {
     # Download GSC that has dcap already enabled
     echo ""
-    rm -rf gsc >/dev/null 2>&1
-    git clone --depth 1 https://github.com/gramineproject/gsc.git
+    cd ..
+    # rm -rf gsc >/dev/null 2>&1
+    # git clone --depth 1 https://github.com/gramineproject/gsc.git
     cp $signing_key_path gsc/enclave-key.pem
 
     # Delete the signing key created by the script
-    rm enclave-key.pem >/dev/null 2>&1
+    # rm enclave-key.pem >/dev/null 2>&1
 
     cd gsc
     cp ../util/config.yaml.template config.yaml
@@ -89,7 +90,7 @@ create_gsc_image () {
     fi
 
     cd ../
-    rm -rf gsc >/dev/null 2>&1
+    # rm -rf gsc >/dev/null 2>&1
 
     # Cleaning up intermediate images
     docker rmi -f gsc-$app_image-unsigned >/dev/null 2>&1
@@ -102,14 +103,7 @@ fetch_base_image_config () {
         config_string=''
     else
         base_image_config=$(echo $base_image_config | sed 's/[][]//g')
-        IFS=',' # Setting comma as delimiter
-        read -a base_image_config_list <<<"$base_image_config"
-        config_string=''
-        for i in "${base_image_config_list[@]}"
-        do
-            i=$(echo $i | sed "s/\"//g")
-            config_string+=$i' '
-        done
+        config_string=$(echo $base_image_config | sed 's/"\s*,\s*"/" "/g')
     fi
     echo $config_string
 }
@@ -119,12 +113,8 @@ echo ""
 signing_key_path="$4"
 if [ "$signing_key_path" = "test-key" ]; then
     echo "Generating signing key"
-
-    # Exit $start directory as we want enclave key to be present in $gsc_image_creation directory
-    cd ..
-    openssl genrsa -3 -out enclave-key.pem 3072
+    openssl genrsa -3 -out ../enclave-key.pem 3072
     signing_key_path="enclave-key.pem"
-    cd $start
     grep -qxF 'sgx.file_check_policy = "allow_all_but_log"' $app_image_manifest ||
      echo 'sgx.file_check_policy = "allow_all_but_log"' >> $app_image_manifest
 fi
@@ -162,7 +152,6 @@ if [ "$6" = "test-image" ]; then
      echo 'sgx.file_check_policy = "allow_all_but_log"' >> $app_image_manifest
     create_base_wrapper_image
     # Exit from $start directory
-    cd ..
     create_gsc_image $7
     exit 1
 fi
@@ -171,12 +160,7 @@ fi
 attestation_required=$6
 if [ "$attestation_required" = "y" ]; then
     ca_cert_path=$8
-
-    # Exiting $start directory as the path to the ca cert can be w.r.t to 
-    # Curated-Apps directory
-    cd ../
-    cp $ca_cert_path $start/ca.crt
-    cd $start
+    cp ../$ca_cert_path ca.crt
     sed -i 's|.*ca.crt.*|COPY ca.crt /ca.crt|' $wrapper_dockerfile
     echo '' >> $app_image_manifest
     echo '# Attestation related entries' >> $app_image_manifest
@@ -234,8 +218,6 @@ if [ "$encrypted_files_required" = "y" ]; then
     sed -i 's|.*SECRET_PROVISION_SET_KEY.*|loader.env.SECRET_PROVISION_SET_KEY = "default"|' $app_image_manifest
 fi
 
-# Generating wrapper for base image
-create_base_wrapper_image
 echo ""
 if [ "$attestation_required" = "y" ]; then
     rm ca.crt
@@ -245,6 +227,5 @@ if [[ "$7" = "y" && "$signing_key_path" != "test-key" && "$start" = "redis" ]]; 
     echo 'loader.pal_internal_mem_size = "192M"' >> $app_image_manifest
 fi
 
-# Exit from $start directory
-cd ..
+create_base_wrapper_image
 create_gsc_image $7
