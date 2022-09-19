@@ -13,14 +13,6 @@
 #               appended to verifier.dockerfile
 echo printing args $0 $@
 
-rm -rf gramine >/dev/null 2>&1
-# TODO: After release of gramine v1.3, replace master with v1.3 in below line
-git clone --depth 1 https://github.com/gramineproject/gramine.git && cd gramine && git checkout master
-
-cd CI-Examples/ra-tls-secret-prov
-make clean && make ssl/server.crt >/dev/null 2>&1
-cd ../../../
-
 rm -rf  ssl_common >/dev/null 2>&1
 mkdir -p ssl_common
 
@@ -29,19 +21,27 @@ if [ "$1" = "done" ]; then
     cp ca.crt server.crt server.key ../ssl_common
     cd ..
 else
-    cd gramine/CI-Examples/ra-tls-secret-prov/ssl
+    rm -rf gramine >/dev/null 2>&1
+    # TODO: After release of gramine v1.3, replace master with v1.3 in below line
+    git clone --depth 1 https://github.com/gramineproject/gramine.git && cd gramine && git checkout master
+
+    cd CI-Examples/ra-tls-secret-prov
+    make clean && make ssl/server.crt >/dev/null 2>&1
+    cd ssl
     cp ca.crt server.crt server.key ../../../../ssl_common
     cd ../../../../
+    rm -rf gramine >/dev/null 2>&1
 fi
 
 cp verifier.dockerfile.template verifier.dockerfile
 
-if [ ! -z "$2" ]; then
-    echo 'CMD ["'$2'"]' >> verifier.dockerfile
+if [ "$2" = "y" ]; then
+    sed -i 's|secret_prov_minimal|secret_prov_pf|g' verifier.dockerfile
+fi
+
+if [ ! -z "$3" ]; then
+    echo 'CMD ["'$3'"]' >> verifier.dockerfile
 fi
 
 docker rmi -f verifier_image >/dev/null 2>&1
 docker build -f verifier.dockerfile -t verifier .
-
-rm verifier.dockerfile 2>&1
-rm -rf gramine >/dev/null 2>&1

@@ -2,7 +2,7 @@
 # is used by `curation_script.sh` to create the user manifest file that will be passed to GSC.
 
 sgx.nonpie_binary = true
-sgx.enclave_size = "8G"
+sgx.enclave_size = "4G"
 sgx.thread_num = 128
 loader.pal_internal_mem_size = "128M"
 

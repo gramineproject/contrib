@@ -15,8 +15,6 @@ RUN apt-get update \
 RUN wget https://packages.microsoft.com/ubuntu/18.04/prod/pool/main/a/az-dcap-client/az-dcap-client_1.10_amd64.deb \
  && dpkg -i az-dcap-client_1.10_amd64.deb
 
-WORKDIR /ra-tls-secret-prov
-
 RUN echo 'deb [arch=amd64] https://download.01.org/intel-sgx/sgx_repo/ubuntu bionic main' \
     > /etc/apt/sources.list.d/intel-sgx.list \
     && wget https://download.01.org/intel-sgx/sgx_repo/ubuntu/intel-sgx-deb.key \
@@ -31,10 +29,13 @@ RUN git clone --depth 1 https://github.com/gramineproject/gramine.git
 # TODO: After release of gramine v1.3, replace master with v1.3 in below line
 RUN cd gramine && git checkout master
 
+RUN mkdir -p /ra-tls-secret-prov/secret_prov_minimal
 RUN cd gramine/CI-Examples/ra-tls-secret-prov/ \
     && make clean && make dcap >/dev/null 2>&1 \
-    && cp secret_prov_server_dcap /usr/local/bin
+    && cp secret_prov_minimal/server_dcap /ra-tls-secret-prov/secret_prov_minimal/
 
 RUN rm -rf gramine >/dev/null 2>&1
 
-ENTRYPOINT ["secret_prov_server_dcap"]
+WORKDIR /ra-tls-secret-prov/secret_prov_minimal
+
+ENTRYPOINT ["./server_dcap"]

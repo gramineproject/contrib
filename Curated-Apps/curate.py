@@ -205,7 +205,7 @@ def fetch_file_from_user(file, default, user_console):
 # - no input: expanded to 'test-key', results in the generation of a test key. The generated image
 #   should not be used in production!
 def get_enclave_signing_input(user_console):
-    sign_file = ''
+    sign_file = update_user_input()
     while not path.exists(sign_file):
         sign_file = update_user_input()
         if sign_file == 'n':
@@ -216,6 +216,7 @@ def get_enclave_signing_input(user_console):
             return key_path
         else:
             update_user_error_win(user_console, file_nf_error.format(sign_file))
+            sign_file = update_user_input()
     return sign_file
 
 def get_attestation_input(user_console):
@@ -364,7 +365,7 @@ def main(stdscr, argv):
         verifier_log_file_pointer = open(verifier_log_file, 'w')
         update_user_and_commentary_win_array(user_console, guide_win, [verifier_build_messg],
          [verifier_log_help.format(verifier_log_file)])
-        subprocess.call(['./verifier_helper_script.sh', attestation_input,
+        subprocess.call(['./verifier_helper_script.sh', attestation_input, ef_required,
                          enc_key_path_in_verifier], stdout=verifier_log_file_pointer,
                          stderr=verifier_log_file_pointer)
         os.chdir('../')
