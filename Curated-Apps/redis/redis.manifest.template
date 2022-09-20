@@ -10,4 +10,4 @@ sgx.thread_num = 8
 loader.uid=999
 loader.gid=999
 
-# Based on user input the manifest file will automatically be modified after this line
+sys.enable_extra_runtime_domain_names_conf = true

@@ -171,8 +171,6 @@ if [ "$attestation_required" = "y" ]; then
     echo 'loader.env.SECRET_PROVISION_CA_CHAIN_PATH = "/ca.crt"' >> $app_image_manifest
     echo '# loader.env.SECRET_PROVISION_SET_KEY = "default"' >> $app_image_manifest
     echo '' >> $app_image_manifest
-    allowed_files=$'sgx.allowed_files = [\n"file:/etc/resolv.conf",\n]'
-    echo "$allowed_files">> $app_image_manifest
 fi
 
 # Environment Variables:

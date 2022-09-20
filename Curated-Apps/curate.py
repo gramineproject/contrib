@@ -207,7 +207,6 @@ def fetch_file_from_user(file, default, user_console):
 def get_enclave_signing_input(user_console):
     sign_file = update_user_input()
     while not path.exists(sign_file):
-        sign_file = update_user_input()
         if sign_file == 'n':
             key_path = 'no-sign'
             return key_path

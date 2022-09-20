@@ -10,3 +10,5 @@ loader.pal_internal_mem_size = "128M"
 # is for root.
 loader.uid=999
 loader.gid=999
+
+sys.enable_extra_runtime_domain_names_conf = true
