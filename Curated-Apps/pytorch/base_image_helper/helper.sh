@@ -7,10 +7,10 @@ cd examples/pytorch
 python3 download-pretrained-model.py
 cd ../../
 
-# Encrypt files using given encryption key in file `wrap-key`
-gramine-sgx-pf-crypt encrypt -w wrap-key -i examples/pytorch/input.jpg -o input.jpg
-gramine-sgx-pf-crypt encrypt -w wrap-key -i examples/pytorch/classes.txt -o classes.txt
-gramine-sgx-pf-crypt encrypt -w wrap-key -i examples/pytorch/alexnet-pretrained.pt -o alexnet-pretrained.pt
+# Encrypt files using given encryption key in file `wrap_key`
+gramine-sgx-pf-crypt encrypt -w wrap_key -i examples/pytorch/input.jpg -o input.jpg
+gramine-sgx-pf-crypt encrypt -w wrap_key -i examples/pytorch/classes.txt -o classes.txt
+gramine-sgx-pf-crypt encrypt -w wrap_key -i examples/pytorch/alexnet-pretrained.pt -o alexnet-pretrained.pt
 
 mv examples/pytorch/pytorchexample.py ./
 rm -rf examples

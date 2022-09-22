@@ -6,7 +6,7 @@ This directory contains steps and artifacts to create a docker image with encryp
   on your machine.
 - File Encryption is done using `gramine-sgx-pf-crypt` tool which is part of
   [gramine installation](https://gramine.readthedocs.io/en/latest/quickstart.html#install-gramine).
-- Encryption key. We have added an encryption key in `wrap-key` file for test purpose.
+- Encryption key. We have added an encryption key in `wrap_key` file for test purpose.
 
 # Base docker image creation
 

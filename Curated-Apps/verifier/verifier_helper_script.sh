@@ -35,8 +35,11 @@ fi
 
 cp verifier.dockerfile.template verifier.dockerfile
 
+args=''
+# Use `secret_prov_pf` if base image have encrypted files
 if [ "$2" = "y" ]; then
     sed -i 's|secret_prov_minimal|secret_prov_pf|g' verifier.dockerfile
+    args="--build-arg server_dcap_pf=y"
 fi
 
 if [ ! -z "$3" ]; then
@@ -44,4 +47,4 @@ if [ ! -z "$3" ]; then
 fi
 
 docker rmi -f verifier_image >/dev/null 2>&1
-docker build -f verifier.dockerfile -t verifier .
+docker build -f verifier.dockerfile -t verifier $args .

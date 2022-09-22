@@ -395,7 +395,32 @@ def main(stdscr, argv):
             key_name_and_path = os.path.abspath(encryption_key).rsplit('/', 1)
             enc_keys_mount_str =  enc_keys_mount.format(key_name_and_path[0])
 
+        mr_enclave = "<mr_enclave>"
+        mr_signer = "<mr_signer>"
+        isv_prod_id = "<isv_prod_id>"
+        isv_svn = "<isv_svn>"
+
+        if key_path != 'no-sign':
+            with open(log_file, "r") as pfile:
+                lines = pfile.read()
+            pattern_enclave = re.compile('mr_enclave = \"(.*)\"')
+            pattern_signer = re.compile('mr_signer = \"(.*)\"')
+            pattern_isv_prod_id = re.compile('isv_prod_id = (.*)')
+            pattern_isv_svn = re.compile('isv_svn = (.*)')
+
+            mr_enclave_list = pattern_enclave.findall(lines)
+            mr_signer_list = pattern_signer.findall(lines)
+            isv_prod_id_list = pattern_isv_prod_id.findall(lines)
+            isv_svn_list = pattern_isv_svn.findall(lines)
+
+            if len(mr_enclave_list) > 0: mr_enclave = mr_enclave_list[0]
+            if len(mr_signer_list) > 0: mr_signer = mr_signer_list[0]
+            if len(isv_prod_id_list) > 0: isv_prod_id = isv_prod_id_list[0]
+            if len(isv_svn_list) > 0: isv_svn = isv_svn_list[0]
+
         verifier_run_command = (f'docker run {host_net} --device=/dev/sgx/enclave '
+        f'-e RA_TLS_MRENCLAVE={mr_enclave} -e RA_TLS_MRSIGNER={mr_signer} '
+        f'-e RA_TLS_ISV_PROD_ID={isv_prod_id} -e RA_TLS_ISV_SVN={isv_svn} '
          f'{debug_enclave_env_ver_ext}' + verifier_cert_mount_str + ' ' + enc_keys_mount_str
          + ' -it verifier:latest')
         run_command = (f'{verifier_run_command} \n \n'
@@ -406,7 +431,7 @@ def main(stdscr, argv):
     user_info = [image_ready_messg.format(gsc_app_image), commands_file + color_set,
      app_exit_messg]
     if key_path == 'no-sign':
-        commands_fp.write(sign_instr.format(base_image_name))
+        commands_fp.write(sign_instr.format(base_image_name, base_image_name))
     commands_fp.write(run_command)
     commands_fp.close()
 

@@ -91,6 +91,7 @@ create_gsc_image () {
     if [ $signing_key_path != 'no-sign' ]; then
         ./gsc sign-image $base_image enclave-key.pem
         docker rmi -f gsc-$base_image-unsigned >/dev/null 2>&1
+        ./gsc info-image gsc-$base_image
     fi
 
     cd ../
