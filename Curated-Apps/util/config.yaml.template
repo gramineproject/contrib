@@ -1,4 +1,7 @@
-# Specify the OS distro. For Eg. ``ubuntu:18.04``, ``ubuntu:20.04``.
+# DO NOT CHANGE! BELOW WILL BE REPLACED BY THE CURATION SCRIPT!
+# - ubuntu:18.04, ubuntu:20.04, ubuntu:21.04
+# - debian:10, debian:11
+
 Distro: "ubuntu:18.04"
 
 # If the image has a specific registry, define it here.

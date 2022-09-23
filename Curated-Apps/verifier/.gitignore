@@ -2,3 +2,4 @@
 /ca.crt
 /ssl/*
 /ssl_common/*
+/verifier.dockerfile
