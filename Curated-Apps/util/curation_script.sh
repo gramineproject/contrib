@@ -28,6 +28,7 @@
 # -- arg10   : Actual environment variable string
 # -- arg11   : y or n (whether user has encrypted files as part of base image or not)
 # -- arg12   : Path to the encrypted files in the image
+# -- arg13   : Passphrase to the enclave signing key (if applicable)
 
 echo printing args $0 $@
 
@@ -60,7 +61,8 @@ create_gsc_image () {
     echo ""
     cd ..
     rm -rf gsc >/dev/null 2>&1
-    git clone --depth 1 https://github.com/gramineproject/gsc.git
+    # TODO : Change to master once PR https://github.com/gramineproject/gsc/pull/88 is merged
+    git clone https://github.com/aneessahib/gsc.git
     if [ $signing_key_path != 'no-sign' ]; then
         cp $signing_key_path gsc/enclave-key.pem
     fi
@@ -69,6 +71,8 @@ create_gsc_image () {
     rm enclave-key.pem >/dev/null 2>&1
 
     cd gsc
+    # TODO : Change to master once PR https://github.com/gramineproject/gsc/pull/88 is merged
+    git checkout aneessahib/sign_with_pw
     cp ../util/config.yaml.template config.yaml
     sed -i 's|ubuntu:.*|'$distro'"|' config.yaml
 
@@ -89,7 +93,7 @@ create_gsc_image () {
     docker rmi gsc-$app_image_x-unsigned
     docker rmi -f $app_image_x >/dev/null 2>&1
     if [ $signing_key_path != 'no-sign' ]; then
-        ./gsc sign-image $base_image enclave-key.pem
+        ./gsc sign-image $base_image enclave-key.pem -p $2
         docker rmi -f gsc-$base_image-unsigned >/dev/null 2>&1
         ./gsc info-image gsc-$base_image
     fi
@@ -226,4 +230,4 @@ create_base_wrapper_image
 if [ "$attestation_required" = "y" ]; then
     rm ca.crt
 fi
-create_gsc_image $7
+create_gsc_image $7 ${13}

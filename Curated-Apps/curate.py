@@ -89,11 +89,20 @@ def print_correct_usage(win, arg):
     win.getch()
     sys.exit(1)
 
-def update_user_input():
+def update_user_input(secure=False):
     editwin = curses.newwin(user_input_height, user_input_width, user_input_start_y, 0)
     editwin.bkgd(' ', curses.color_pair(2) | curses.A_BOLD)
     box = Textbox(editwin)
-    box.edit()
+    while 1:
+        ch = box.win.getch()
+        if not ch:
+            continue
+        if not box.do_command(ch):
+            break
+        if secure:
+            [y, x] = box.win.getyx()
+            box.win.addstr(y, x - 1, '*')
+            box.win.refresh()
     editwin.refresh()
     user_input = box.gather().strip().replace("\n", "")
     editwin.erase()
@@ -294,7 +303,7 @@ def main(stdscr, argv):
     update_user_and_commentary_win_array(user_console, guide_win, introduction, index)
     update_user_input()
 
-    kernel_name=subprocess.check_output(["uname -r"],encoding='utf8',shell=True)
+    kernel_name=subprocess.check_output(["uname -r"], encoding='utf8', shell=True)
     if 'azure' not in kernel_name:
         update_user_and_commentary_win_array(user_console, guide_win, azure_warning, azure_help)
         update_user_input()
@@ -311,6 +320,9 @@ def main(stdscr, argv):
     config = ''
     if key_path == 'test-key':
         config = 'test'
+    else:
+        edit_user_win(user_console, ">> Please enter the passphrase for the signing key")
+        passphrase = update_user_input(secure=True)
 
     # Remote Attestation with RA-TLS
     update_user_and_commentary_win_array(user_console, guide_win, attestation_prompt,
@@ -375,7 +387,7 @@ def main(stdscr, argv):
                                          [log_progress.format(log_file)])
     subprocess.call(['util/curation_script.sh', workload_type, base_image_name, distro,
                      key_path, args, attestation_required, debug_flag, ca_cert_path, env_required,
-                     envs, ef_required, encrypted_files], stdout=log_file_pointer,
+                     envs, ef_required, encrypted_files, passphrase], stdout=log_file_pointer,
                      stderr=log_file_pointer)
     image = gsc_app_image
     if key_path == 'no-sign':
