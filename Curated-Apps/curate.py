@@ -29,7 +29,7 @@ import time
 
 from cProfile import label
 from util.constants import *
-from curses import wrapper
+from curses import KEY_BACKSPACE, wrapper
 from curses.textpad import Textbox, rectangle
 from glob import escape
 from os import path
@@ -93,21 +93,36 @@ def update_user_input(secure=False):
     editwin = curses.newwin(user_input_height, user_input_width, user_input_start_y, 0)
     editwin.bkgd(' ', curses.color_pair(2) | curses.A_BOLD)
     box = Textbox(editwin)
+    if secure:
+        user_input = secure_box_edit(box)
+    else:
+        box.edit()
+        editwin.refresh()
+        user_input = box.gather().strip().replace("\n", "")
+        editwin.erase()
+        editwin.refresh()
+    return(user_input)
+
+def secure_box_edit(box):
+    user_inp_arr = []
     while 1:
         ch = box.win.getch()
+        if ch == CTRL_G:
+            break
+        if ch == KEY_BACKSPACE:
+            if len(user_inp_arr) > 0:
+                user_inp_arr.pop()
+        else:
+            user_inp_arr.append(chr(ch))
         if not ch:
             continue
         if not box.do_command(ch):
             break
-        if secure:
-            [y, x] = box.win.getyx()
-            box.win.addstr(y, x - 1, '*')
-            box.win.refresh()
-    editwin.refresh()
-    user_input = box.gather().strip().replace("\n", "")
-    editwin.erase()
-    editwin.refresh()
-    return(user_input)
+        [y, x] = box.win.getyx()
+        if x > 0:
+            box.win.addstr(y, int(x - 1), '*')
+        box.win.refresh()
+    return ''.join(user_inp_arr)
 
 def update_user_and_commentary_win(user_console, guide_win, user_text, help_text, offset):
     user_console.erase()
