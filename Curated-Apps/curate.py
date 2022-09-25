@@ -2,28 +2,20 @@
 # SPDX-License-Identifier: LGPL-3.0-or-later
 # Copyright (C) 2022 Intel Corporation
 
-# This script will provide step-by-step guidance in creating your own custom Docker images protected
-# by Gramine. User will be prompted for input at every stage, and once the script has all
+# This script will provide step-by-step guidance in creating your own custom Docker images
+# protected by Gramine. User will be prompted for input at every stage, and once the script has all
 # the details, it will call a separate curation script (util/curation_script.sh) that takes the
 # user provided inputs to create the graminized Docker image using GSC. This script also calls into
-# a script to generate the verifier Docker image (for SGX remote attestation). The generated
-# verifier Docker image is supposed to be started together with the graminized Docker image, to
-# verify the SGX attestation evidence (SGX quote) sent by the latter image.
-
-# Following are the command line parameters accepted by this file:
-#|--------------------------------------------------------------------------------------------------|
-#| Required?| Argument         | Description/Possible values                                        |
-#|----------|------------------|--------------------------------------------------------------------|
-#|    Yes   | <Workload type>  | Provide type of workload e.g., redis or pytorch etc..              |
-#|    Yes   | <base image name>| Base image name to be graminized.                                  |
-#| Optional | 'debug'          | To generate graminized image with debug symbols for debugging.     |
-#| Optional | 'test'           | To generate no-production image with a test enclave signing key.   |
-#|--------------------------------------------------------------------------------------------------|
+# another script (verifier/helper.sh) to generate the verifier Docker image (for SGX remote
+# attestation). The generated verifier Docker image has to be started on a trusted remote
+# system before the graminized Docker image is deployed at the target system, to verify the SGX
+# attestation evidence (SGX quote) sent by the latter image.
 
 import curses
 import docker
 import os
 import os.path
+import platform;
 import re
 import subprocess
 import sys
@@ -38,6 +30,17 @@ from glob import escape
 from os import path
 from sys import argv
 
+# Following are the command line parameters accepted by this file:
+usage = '''
+|---------------------------------------------------------------------------------------------|
+| Required?| Argument         | Description/Possible values                                   |
+|----------|------------------|---------------------------------------------------------------|
+|    Yes   | <Workload type>  | Provide type of workload e.g., redis or pytorch etc..         |
+|    Yes   | <base image name>| Base image name to be graminized.                             |
+| Optional | 'debug'          | To generate an insecure graminized image with debug symbols.  |
+| Optional | 'test'           | To generate an insecure image with a test enclave signing key.|
+|---------------------------------------------------------------------------------------------|
+'''
 # -------GUI curses interfaces--------------------------------------------------------------------
 def initwindows():
     curses.init_pair(1, curses.COLOR_WHITE, curses.COLOR_BLACK)
@@ -54,7 +57,7 @@ def initwindows():
     partition_win = curses.newwin(partition_height, partition_width, partition_y,
                                   int(sub_title_width) - 2)
 
-    title_win.addstr(0, 0, " " * title_width, WHITE_AND_BLUE)
+    title_win.addstr(0, 0, ' ' * title_width, WHITE_AND_BLUE)
     title_win.addstr(0, int((title_width/2) - (len(title)/2)), title,
                      WHITE_AND_BLUE | curses.A_BOLD)
 
@@ -79,15 +82,11 @@ def initwindows():
     return(user_console, guide_win)
 
 def resize_screen(screen_height, screen_width):
-    subprocess.call(["echo","-e",f"\x1b[8;{screen_height};{screen_width}t"])
+    subprocess.call(['echo','-e',f'\x1b[8;{screen_height};{screen_width}t'])
     time.sleep(0.35)
 
 def print_correct_usage(win, arg):
-    win.addstr(f'\nInsufficient or incorrect arguments.\n')
-    win.addstr(f'Correct Usage: {arg} <Workload type> <Base image name>\n')
-    win.addstr(f'Example: `{arg} redis redis:7.0.0`\n')
-    win.addstr(f'Optional argument `debug`  : To generate graminized image with debug symbols for debugging.\n')
-    win.addstr(f'Optional argument `test`: To generate non-production image with a test enclave signing key\n')
+    win.addstr(usage)
     win.addstr('Press any key to exit')
     win.getch()
     sys.exit(1)
@@ -101,10 +100,10 @@ def update_user_input(secure=False):
     else:
         box.edit()
         editwin.refresh()
-        user_input = box.gather().strip().replace("\n", "")
+        user_input = box.gather().strip().replace('\n', '')
     editwin.erase()
     editwin.refresh()
-    return(user_input)
+    return user_input
 
 def secure_box_edit(box):
     user_inp_arr = []
@@ -142,16 +141,15 @@ def update_user_and_commentary_win_array(user_console, guide_win, user_text_arr,
 
     for user_text in user_text_arr:
         color = 0
-        if (user_text.find(color_set) >= 0):
+        if user_text.find(color_set) >= 0:
             color = curses.color_pair(2) | curses.A_REVERSE
             user_text = user_text.replace(color_set , '')
         [y, x] = user_console.getyx()
         user_console.addstr(y + line_offset, 0, textwrap.fill(user_text, user_console_width),
-         color)
-
+                            color)
     for help_text in help_text_arr:
         color = 0
-        if (help_text.find(color_set) >= 0):
+        if help_text.find(color_set) >= 0:
             color = curses.color_pair(2) | curses.A_REVERSE
             help_text = help_text.replace(color_set , '')
         [y, x] = guide_win.getyx()
@@ -194,7 +192,7 @@ def check_image_creation_success(win, docker_socket, image_name, log_file):
     image = get_docker_image(docker_socket, image_name)
     if image is None:
         win.addstr(f'\n\n\n`{image_name}` creation failed, exiting....')
-        win.addstr(f'For more info, look at the logs file here: {log_file}')
+        win.addstr(f'For more info, look at the log file here: {log_file}')
         win.getch()
         sys.exit(-1)
 
@@ -203,8 +201,8 @@ def pull_docker_image(win, docker_socket, image_name):
         docker_image = docker_socket.images.pull(image_name)
         return 0
     except (docker.errors.ImageNotFound, docker.errors.APIError):
-        win.addstr(f'Error: Could not fetch `{image_name}` image from dockerhub \n')
-        win.addstr('Please check the image name is correct and try again.')
+        win.addstr(f'Error: Could not fetch `{image_name}` image from DockerHub.\n')
+        win.addstr('Please check if the image name is correct and try again.')
         win.refresh()
         return -1
 
@@ -221,7 +219,7 @@ def get_encryption_key_input(user_console, guide_win):
 # User is expected to provide the path to a signing key as input, or either of the below:
 #
 # - no input: expanded to 'test-key', results in the generation of a test key. The generated image
-#   should not be used in production!
+#   is insecure for use in production!
 def get_enclave_signing_input(user_console, guide_win):
     sign_file = update_user_input()
     while not path.isfile(sign_file):
@@ -245,9 +243,9 @@ def get_attestation_input(user_console, guide_win):
             update_user_error_win(user_console, 'Invalid option specified')
             attestation_input = update_user_input()
         if attestation_input == 'done':
-            if (path.isfile('verifier/ssl/ca.crt')
-             and path.isfile('verifier/ssl/server.crt')
-             and path.isfile('verifier/ssl/server.key')):
+            if (path.isfile('verifier/ssl/ca.crt') and
+                path.isfile('verifier/ssl/server.crt') and
+                path.isfile('verifier/ssl/server.key')):
                 return attestation_input
             user_console.erase()
             update_user_and_commentary_win_array(user_console, guide_win, attestation_prompt,
@@ -304,8 +302,8 @@ def main(stdscr, argv):
         stdscr.addstr(test_image_mssg)
         stdscr.addstr(log_progress.format(log_file))
         stdscr.refresh()
-        subprocess.call(["util/curation_script.sh", workload_type, base_image_name, distro,
-                         "test-key", '', "test-image", debug_flag], stdout=log_file_pointer,
+        subprocess.call(['util/curation_script.sh', workload_type, base_image_name, distro,
+                         'test-key', '', 'test-image', debug_flag], stdout=log_file_pointer,
                          stderr=log_file_pointer)
         check_image_creation_success(stdscr, docker_socket, gsc_app_image, log_file)
         stdscr.addstr(test_run_instr.format(gsc_app_image, gsc_app_image))
@@ -317,7 +315,7 @@ def main(stdscr, argv):
     update_user_and_commentary_win_array(user_console, guide_win, introduction, index)
     update_user_input()
 
-    kernel_name=subprocess.check_output(["uname -r"], encoding='utf8', shell=True)
+    kernel_name = platform.platform()
     if 'azure' not in kernel_name:
         update_user_and_commentary_win_array(user_console, guide_win, azure_warning, azure_help)
         update_user_input()
@@ -393,7 +391,7 @@ def main(stdscr, argv):
     else:
         user_console.erase()
         update_user_and_commentary_win_array(user_console, guide_win, key_prompt, signing_key_help)
-        edit_user_win(user_console, ">> Please enter the passphrase for the signing key"
+        edit_user_win(user_console, '>> Please enter the passphrase for the signing key'
         ' (no input will assume a passphrase-less key)                   Press CTRL+G to continue')
         passphrase = update_user_input(secure=True)
 
@@ -403,7 +401,7 @@ def main(stdscr, argv):
         verifier_log_file_pointer = open(verifier_log_file, 'w')
         update_user_and_commentary_win_array(user_console, guide_win, [verifier_build_messg],
          [verifier_log_help.format(verifier_log_file)])
-        subprocess.call(['./verifier_helper_script.sh', attestation_input, ef_required,
+        subprocess.call(['./helper.sh', attestation_input, ef_required,
                          enc_key_path_in_verifier], stdout=verifier_log_file_pointer,
                          stderr=verifier_log_file_pointer)
         os.chdir('../')
@@ -433,12 +431,12 @@ def main(stdscr, argv):
             key_name_and_path = os.path.abspath(encryption_key).rsplit('/', 1)
             enc_keys_mount_str =  enc_keys_mount.format(key_name_and_path[0])
 
-        mr_enclave = "<mr_enclave>"
-        mr_signer = "<mr_signer>"
-        isv_prod_id = "<isv_prod_id>"
-        isv_svn = "<isv_svn>"
+        mr_enclave = '<mr_enclave>'
+        mr_signer = '<mr_signer>'
+        isv_prod_id = '<isv_prod_id>'
+        isv_svn = '<isv_svn>'
 
-        with open(log_file, "r") as pfile:
+        with open(log_file, 'r') as pfile:
             lines = pfile.read()
         pattern_enclave = re.compile('mr_enclave = \"(.*)\"')
         pattern_signer = re.compile('mr_signer = \"(.*)\"')
@@ -455,14 +453,18 @@ def main(stdscr, argv):
         if len(isv_prod_id_list) > 0: isv_prod_id = isv_prod_id_list[0]
         if len(isv_svn_list) > 0: isv_svn = isv_svn_list[0]
 
-        verifier_run_command = (f'Execute below command to start verifier on Trusted machine:-\n'
-        f'docker run {host_net} --device=/dev/sgx/enclave '
+        verifier_run_command = (f'Execute below command to start verifier on a Trusted system:-\n'
+        f'$ docker run {host_net} --device=/dev/sgx/enclave '
         f'-e RA_TLS_MRENCLAVE={mr_enclave} -e RA_TLS_MRSIGNER={mr_signer} '
         f'-e RA_TLS_ISV_PROD_ID={isv_prod_id} -e RA_TLS_ISV_SVN={isv_svn} '
          f'{debug_enclave_env_ver_ext}' + verifier_cert_mount_str + ' ' + enc_keys_mount_str
-         + ' verifier:latest')
+         + ' -it verifier:latest')
+        custom_cmd_info = ''
+        if config != 'test':
+            custom_cmd_info = (' Assign the correct DNS information of the verifier server to the'
+                               ' environment variable SECRET_PROVISION_SERVERS')
         run_command = (f'{verifier_run_command} \n \n'
-         f'Execute below command to deploy curated GSC image:-\n'
+         f'Execute below command to deploy the curated GSC image.{custom_cmd_info}:-\n'
          f'{workload_run.format(host_net, verifier_server, gsc_app_image)}')
     else:
         run_command = run_command_no_att.format(host_net, gsc_app_image)

@@ -34,12 +34,12 @@
 echo printing args $0 $@
 
 start=$1
-wrapper_dockerfile=$start"-gsc.dockerfile"
-app_image_manifest=$start".manifest"
+wrapper_dockerfile=$start'-gsc.dockerfile'
+app_image_manifest=$start'.manifest'
 
 cd $start
-cp $wrapper_dockerfile".template" $wrapper_dockerfile
-cp $app_image_manifest".template" $app_image_manifest
+cp $wrapper_dockerfile'.template' $wrapper_dockerfile
+cp $app_image_manifest'.template' $app_image_manifest
 
 base_image="$2"
 distro="$3"
@@ -77,7 +77,7 @@ add_encrypted_files_to_manifest(){
 
 create_gsc_image () {
     # Download GSC that has dcap already enabled
-    echo ""
+    echo
     cd ..
     rm -rf gsc >/dev/null 2>&1
     # TODO : Change to master once PR https://github.com/gramineproject/gsc/pull/88 is merged
@@ -103,8 +103,7 @@ create_gsc_image () {
         ./gsc build $app_image_x ../$start/$app_image_manifest
     fi
 
-    echo ""
-
+    echo
     docker tag gsc-$app_image_x-unsigned gsc-$base_image-unsigned
     password_arg=''
     if [[ "$signing_input" != "test-key" && "$2" != "" ]]; then
@@ -114,7 +113,6 @@ create_gsc_image () {
     docker rmi -f gsc-$base_image-unsigned >/dev/null 2>&1
     docker rmi gsc-$app_image_x-unsigned
     docker rmi -f $app_image_x >/dev/null 2>&1
-
     ./gsc info-image gsc-$base_image
 
     cd ../
@@ -136,9 +134,9 @@ fetch_base_image_config () {
 echo ""
 read -r signing_input signing_key_path <<<$(echo "$4 $4")
 if [ "$signing_input" = "test-key" ]; then
-    echo "Generating signing key"
+    echo 'Generating signing key'
     openssl genrsa -3 -out ../enclave-key.pem 3072
-    signing_key_path="enclave-key.pem"
+    signing_key_path='enclave-key.pem'
     grep -qxF 'sgx.file_check_policy = "allow_all_but_log"' $app_image_manifest ||
      echo 'sgx.file_check_policy = "allow_all_but_log"' >> $app_image_manifest
 fi
@@ -166,9 +164,9 @@ rm -f $entrypoint_script >/dev/null 2>&1
 touch $entrypoint_script
 
 # Copying the complete binary string to the entrypoint script file
-echo "#!/bin/bash" >> $entrypoint_script
-echo "" >> $entrypoint_script
-echo "$complete_binary_cmd" >> $entrypoint_script
+echo '#!/bin/bash' >> $entrypoint_script
+echo '' >> $entrypoint_script
+echo $complete_binary_cmd >> $entrypoint_script
 
 # Test image creation
 if [ "$6" = "test-image" ]; then
@@ -176,7 +174,7 @@ if [ "$6" = "test-image" ]; then
      echo 'sgx.file_check_policy = "allow_all_but_log"' >> $app_image_manifest
 
     if [[ "$start" = "pytorch" ]]; then
-        encrypted_files="classes.txt:input.jpg:alexnet-pretrained.pt:result.txt"
+        encrypted_files='classes.txt:input.jpg:alexnet-pretrained.pt:result.txt'
         add_encrypted_files_to_manifest $encrypted_files
         echo 'fs.insecure__keys.default = "ffeeddccbbaa99887766554433221100"' >> $app_image_manifest
     fi
