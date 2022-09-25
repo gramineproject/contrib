@@ -21,5 +21,5 @@ rm -rf examples
 docker rmi -f $image_name >/dev/null 2>&1
 docker build -t $image_name .
 
-echo -e '\n\nCreated base image \`$image_name\`.'
-echo -e 'Please refer \`Curated-Apps/README.md\` to curate the above image with GSC.\n'
+echo -e '\n\nCreated base image `$image_name`.'
+echo -e 'Please refer `Curated-Apps/README.md` to curate the above image with GSC.\n'

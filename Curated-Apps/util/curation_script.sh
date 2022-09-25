@@ -44,7 +44,7 @@ cp $app_image_manifest'.template' $app_image_manifest
 base_image="$2"
 distro="$3"
 # Set base image name in the dockerfile
-sed -i 's|From.*|From '$base_image'|' $wrapper_dockerfile
+sed -i 's|^From <base_image_name>$|From '$base_image'|' $wrapper_dockerfile
 
 if [[ "$base_image" == *":"* ]]; then
     app_image_x=$(echo $base_image | sed "s/:/_x:/")
