@@ -35,7 +35,7 @@ usage = '''
 |---------------------------------------------------------------------------------------------|
 | Required?| Argument         | Description/Possible values                                   |
 |----------|------------------|---------------------------------------------------------------|
-|    Yes   | <Workload type>  | Provide type of workload e.g., redis or pytorch etc..         |
+|    Yes   | <Workload type>  | Provide type of workload e.g. redis or pytorch                |
 |    Yes   | <base image name>| Base image name to be graminized.                             |
 | Optional | 'debug'          | To generate an insecure graminized image with debug symbols.  |
 | Optional | 'test'           | To generate an insecure image with a test enclave signing key.|

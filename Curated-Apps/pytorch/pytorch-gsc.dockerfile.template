@@ -2,6 +2,7 @@
 # `pytorch-gsc.dockerfile` that includes user provided inputs such as `ca.cert`
 # file and run-time arguments into the graminized PyTorch image.
 
+# The curation script fills the base image name after `From` during curation.
 From
 
 # COPY ca.crt /ca.crt

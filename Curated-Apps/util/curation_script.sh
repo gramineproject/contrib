@@ -15,9 +15,9 @@
 # user, it just processes the input received from curate.py and produces the final GSC image.
 
 # The input parameters in sequence are below:
-# -- arg1    : workload type e.g., redis or pytorch
-# -- arg2    : base_image_name e.g., name of the base image to be graminized
-# -- arg3    : distro e.g., ubuntu:18.04 or ubuntu:20.04
+# -- arg1    : workload type e.g. redis or pytorch
+# -- arg2    : base_image_name e.g. name of the base image to be graminized
+# -- arg3    : distro e.g. ubuntu:18.04 or ubuntu:20.04
 # -- arg4    : path to the enclave signing key or
 #              'test-key' string to generate test signing key
 # -- arg5    : string with command-line arguments (hard-coded in Docker image via Gramine manifest)

@@ -87,7 +87,7 @@ encrypted_files_prompt = ['>> Encrypted File System:', 'Please provide path of t
                           ' relative to the working directory:', '1. Encrypted files in the base'
                           ' image used by the application, if any.', '2. Files created at runtime,'
                           ' if any.', 'Accepted format: `file_path1:file_path2:file_path3`',
-                          'E.g., for pytorch/base_image_helper/Dockerfile based image, the'
+                          'e.g. for pytorch/base_image_helper/Dockerfile based image, the'
                           ' encrypted files input would be --> ',
                           'classes.txt:input.jpg:alexnet-pretrained.pt:result.txt' + color_set,
                           'Press CTRL+G when done']

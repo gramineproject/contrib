@@ -6,7 +6,7 @@ enabling end-to-end use cases securely. The interactive script asks users for sp
 requirements, and submits the user inputs to the [GSC tool](https://github.com/gramineproject/gsc).
 A list of workload examples are provided below for reference. One can easily extend these reference
 examples to support more workloads by inspecting the contents of any of the reference workloads
-(e.g., `redis/` directory), understand how they work, and then use them as the basis for their
+(e.g. `redis/` directory), understand how they work, and then use them as the basis for their
 own workloads. The script also provides a `test` feature where, with a single command, users
 can generate a non-production GSC image, signed with a dummy key, purely for experimentation and
 learning.
@@ -27,7 +27,7 @@ encrypted files support.
     |---------------------------------------------------------------------------------------------|
     | Required?| Argument         | Description/Possible values                                   |
     |----------|------------------|---------------------------------------------------------------|
-    |    Yes   | <Workload type>  | Provide type of workload e.g., redis or pytorch etc..         |
+    |    Yes   | <Workload type>  | Provide type of workload e.g. redis or pytorch                |
     |    Yes   | <base image name>| Base image name to be graminized.                             |
     | Optional | 'debug'          | To generate an insecure graminized image with debug symbols.  |
     | Optional | 'test'           | To generate an insecure image with a test enclave signing key.|
