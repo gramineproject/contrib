@@ -1,5 +1,6 @@
 /*.log
 /ca.crt
 /ssl/*
+!/ssl/.gitkeep
 /ssl_common/*
 /verifier.dockerfile

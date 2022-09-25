@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: LGPL-3.0-or-later
+# Copyright (C) 2022 Intel Corporation
 
 image_name="pytorch-encrypted"
 git clone --depth 1 https://github.com/gramineproject/examples.git

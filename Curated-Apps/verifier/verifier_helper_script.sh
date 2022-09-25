@@ -1,11 +1,11 @@
 #!/bin/bash
+# SPDX-License-Identifier: LGPL-3.0-or-later
+# Copyright (C) 2022 Intel Corporation
 
 # This script takes input from curate.py and creates verifier image.
 # The script is called only when attestation is required by the user.
 
 # The input parameters in sequence are below:
-#   Argument                      Expected
-#   number                         Value
 # -- arg1    : 'done' means user provided his own certs in verifier/ssl directory, else the default
 #               non-production ready certs will be used. The certs are finally copied to ssl_common
 #               directory for future use by gsc image and the verifier image.
