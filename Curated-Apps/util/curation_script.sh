@@ -9,7 +9,7 @@
 # command. The image hence created will be signed with a test enclave key, and will not support
 # attestation.
 #
-# In case of test image, the script takes 7 input parameters, whereas in case of custom image 12
+# In case of test image, the script takes 7 input parameters, whereas in case of custom image 13
 # parameters are passed from curate.py.
 #
 # curate.py calls this script after taking all the user inputs. This script does not interact with

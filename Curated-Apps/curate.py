@@ -332,7 +332,7 @@ def main(stdscr, argv):
         update_user_and_commentary_win_array(user_console, guide_win, azure_warning, azure_help)
         update_user_input()
 
-    # 1 Obtain distro version
+    # 1. Obtain distro version
     update_user_and_commentary_win_array(user_console, guide_win, distro_prompt, distro_help)
     distro_option = update_user_input()
     if distro_option == '2':
