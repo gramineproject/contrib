@@ -11,9 +11,10 @@ Registry: ""
 
 # If you're using your own fork and branch of Gramine, specify the GitHub link and the branch name
 # below; typically, you want to keep the default values though
+# TODO: After release of gramine v1.3, replace commit SHA with v1.3 in below line
 Gramine:
     Repository: "https://github.com/gramineproject/gramine.git"
-    Branch:     "master"
+    Branch:     "4f259b80ed4c40e7cccde70e822d378754dacb97"
 
 # Specify the Intel SGX driver installed on your target machine (more specifically, on the machine
 # where the graminized Docker container will run); Default assumption is DCAP out-of-tree driver,

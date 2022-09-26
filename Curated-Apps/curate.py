@@ -476,12 +476,13 @@ def main(stdscr, argv):
                                 f'-e RA_TLS_ISV_PROD_ID={isv_prod_id} -e RA_TLS_ISV_SVN={isv_svn} '
                                 f'{debug_enclave_env_ver_ext}' + verifier_cert_mount_str + ' ' +
                                 enc_keys_mount_str + ' -it verifier:latest')
-        custom_cmd_info = ''
+        custom_image_dns_info = ''
         if config != 'test':
-            custom_cmd_info = (' Assign the correct DNS information of the verifier server to the'
-                               ' environment variable SECRET_PROVISION_SERVERS')
+            custom_image_dns_info = ('Assign the correct DNS information of the verifier server to'
+                                     ' the environment variable SECRET_PROVISION_SERVERS')
         run_command = (f'{verifier_run_command} \n \n'
-                       f'Execute below command to deploy the curated GSC image.{custom_cmd_info}:\n'
+                       f'Execute below command to deploy the curated GSC image.'
+                       f'{custom_image_dns_info}:\n'
                        f'{workload_run.format(host_net, verifier_server, gsc_app_image)}')
     else:
         run_command = run_command_no_att.format(host_net, gsc_app_image)

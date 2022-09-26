@@ -22,8 +22,9 @@ if [ "$1" = "done" ]; then
     cd ..
 else
     rm -rf gramine >/dev/null 2>&1
-    # TODO: After release of gramine v1.3, replace master with v1.3 in below line
-    git clone --depth 1 --branch master https://github.com/gramineproject/gramine.git && cd gramine
+    # TODO: After release of gramine v1.3, replace commit SHA with v1.3 in below line
+    git clone https://github.com/gramineproject/gramine.git && cd gramine &&
+    git checkout 4f259b80ed4c40e7cccde70e822d378754dacb97
 
     cd CI-Examples/ra-tls-secret-prov
     make clean && make ssl/server.crt >/dev/null 2>&1

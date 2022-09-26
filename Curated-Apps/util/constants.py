@@ -26,8 +26,10 @@ test_image_mssg = ('Your test GSC image is being generated. This image is not su
                    ' used in production \n\n')
 
 test_run_instr = ('Run the {} docker image in an Azure Confidential Compute'
-                  ' instance using the below command.\n\nHost networking (--net=host) is optional\n\n'
-                  '{}\n\nAbove command is saved to command.txt as well. Press any key to exit the app')
+                  ' instance using the below command.\n\n'
+                  'Host networking (--net=host) is optional\n\n{}\n\n'
+                  'Above command is saved to command.txt as well.'
+                  ' Press any key to exit the app')
 test_run_cmd = ('$ docker run --net=host --device=/dev/sgx/enclave -it {}')
 image_not_found_warn = ('Warning: Cannot find application Docker image `{}`.\n'
                         'Fetching from Docker Hub ...\n\n')
@@ -44,7 +46,7 @@ introduction = ['This application will provide step-by-step guidance for creatin
 
 index = ['The target deployment environment is assumed to be an Azure Confidential compute'
          ' instance.','Following stages are involved in the GSC image curation:',
-         '1. Distro Selection',
+         '1. Distro selection',
          '2. Command-line arguments',
          '3. Environment variables',
          '4. Encrypted files and key provisioning',
@@ -95,8 +97,8 @@ encrypted_files_prompt = ['>> Encrypted files and key provisioning:', 'Please pr
                           ' these files relative to the working directory:', '1. Encrypted files'
                           ' in the base image used by the application, if any.', '2. Files created'
                           ' at runtime, if any.', 'Accepted format: `file_path1:file_path2`',
-                          'e.g. for workloads/pytorch/base_image_helper/Dockerfile based image, the'
-                          ' encrypted files input would be --> ',
+                          'e.g. for workloads/pytorch/base_image_helper/Dockerfile based image,'
+                          ' the encrypted files input would be --> ',
                           'classes.txt:input.jpg:alexnet-pretrained.pt:result.txt' + color_set,
                           'Press CTRL+G when done']
 encypted_files_help = ["Gramine's Encrypted FS feature supports transparently decrypting data"

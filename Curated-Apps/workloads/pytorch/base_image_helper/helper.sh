@@ -1,6 +1,9 @@
 # SPDX-License-Identifier: LGPL-3.0-or-later
 # Copyright (C) 2022 Intel Corporation
 
+# exit when any command fails
+set -e
+
 CUR_DIR=$(pwd)
 MY_PATH=$(dirname "$0")
 cd $MY_PATH
