@@ -13,7 +13,7 @@ learning.
 
 ## Prerequisites
 
-### for building curated GSC image
+### For building curated GSC image
 - No hardware requirements.
 - Any regular system with a Linux distribution is sufficient.
 - Install the necessary build dependencies as shown below (for Ubuntu).
@@ -23,7 +23,7 @@ learning.
  $ sudo chown $USER /var/run/docker.sock
 ```
 
-### for running the curated GSC image
+### For running the curated GSC image
 1. [Create an Intel SGX VM from the Azure portal](https://learn.microsoft.com/en-us/azure/confidential-computing/quick-create-portal).
    The tested distros are Ubuntu and Debian. Selection of a VM must factor in the EPC size that
    suits the application.
@@ -54,15 +54,13 @@ learning.
     |---------------------------------------------------------------------------------------------|
 
 ## Sample Workloads
-worloads/ subdirectory contains relevant instructions and support files to curate a selected set of
+`worloads/` subdirectory contains relevant instructions and support files to curate a selected set of
 applications with Gramine.
 
 ## Contents
 
     .
     +-- curate.py               # Entry file for curation that the user runs as explained above
-    +-- redis/                  # Contents to help curate.py with GSC Redis curation
-    +-- pytorch/                # Contents to help curate.py with GSC PyTorch curation
     +-- util/                   # Helper scripts and files that curate.py uses
     +-- verifier/               # Contents to build attestaton verifier image
     +-- workloads/              # Sample curated applications for select set of workloads
