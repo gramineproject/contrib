@@ -1,6 +1,6 @@
 # Gramine Curated Redis
 In the following two sections, we explain how a Docker image for the protected Redis version can be
-build and how the image can be executed.
+built and how the image can be executed.
 
 ## Build a confidential compute image for Redis
 The following description assumes that the [prerequisites](https://github.com/gramineproject/contrib.git/Curated-Apps/README.md)
@@ -15,7 +15,7 @@ corresponding VM.
 
        $ cd contrib/Curated-Apps
 
-3. To generate a preconfigured confidential compute image for redis, execute the following script:
+3. To generate a preconfigured confidential compute image for Redis, execute the following script:
 
        $ python3 ./curate.py redis redis:7.0.0 test
 
@@ -37,8 +37,8 @@ below:
     |-- redis-gsc.dockerfile.template      # Template used by `curation_script.sh` to create a
     |                                        wrapper dockerfile `redis-gsc.dockerfile` that
     |                                        includes user-provided inputs such as `ca.cert`
-    |                                        file and run-time arguments into the graminized Redis
-    |                                        image.
+    |                                        file and command-line arguments into the graminized
+    |                                        Redis image.
     |-- redis.manifest.template            # Template used by `curation_script.sh` to create a
     |                                        user manifest file (with basic set of values defined
     |                                        for graminizing Redis images), that will be passed to
