@@ -297,7 +297,7 @@ def main(stdscr, argv):
             return -1
 
     log_file_name, n = re.subn('[:/]', '_', base_image_name)
-    log_file = f'{workload_type}/{log_file_name}.log'
+    log_file = f'workloads/{workload_type}/{log_file_name}.log'
     log_file_pointer = open(log_file, 'w')
 
     gsc_app_image ='gsc-{}'.format(base_image_name)

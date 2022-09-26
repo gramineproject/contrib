@@ -1,7 +1,12 @@
 # SPDX-License-Identifier: LGPL-3.0-or-later
 # Copyright (C) 2022 Intel Corporation
 
+CUR_DIR=$(pwd)
+MY_PATH=$(dirname "$0")
+cd $MY_PATH
+
 image_name='pytorch-encrypted'
+rm -rf examples
 git clone --depth 1 https://github.com/gramineproject/examples.git
 cd examples/pytorch
 
@@ -18,11 +23,15 @@ gramine-sgx-pf-crypt encrypt -w encryption_key -i examples/pytorch/alexnet-pretr
 alexnet-pretrained.pt
 
 mv examples/pytorch/pytorchexample.py ./
-rm -rf examples
 
 # Build pytorch base image
 docker rmi -f $image_name >/dev/null 2>&1
 docker build -t $image_name .
 
+rm -rf examples
+rm pytorchexample.py input.jpg classes.txt alexnet-pretrained.pt
+cd $CUR_DIR
+
 echo -e '\n\nCreated base image `'$image_name'`.'
-echo -e 'Please refer to `Curated-Apps/README.md` to curate the above image with GSC.\n'
+echo -e 'Please refer to `Curated-Apps/workloads/pytorch/README.md` to curate the above image' \
+' with GSC.\n'

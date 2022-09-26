@@ -39,7 +39,11 @@ start=$1
 wrapper_dockerfile=$start'-gsc.dockerfile'
 app_image_manifest=$start'.manifest'
 
-cd $start
+CUR_DIR=$(pwd)
+WORKLOAD_DIR=$CUR_DIR'/workloads/'$start
+cd $WORKLOAD_DIR
+mkdir $CUR_DIR'/test' >/dev/null 2>&1
+
 cp $wrapper_dockerfile'.template' $wrapper_dockerfile
 cp $app_image_manifest'.template' $app_image_manifest
 
@@ -80,13 +84,10 @@ add_encrypted_files_to_manifest(){
 create_gsc_image () {
     # Download GSC that has dcap already enabled
     echo
-    cd ..
+    cd $CUR_DIR
     rm -rf gsc >/dev/null 2>&1
     git clone https://github.com/gramineproject/gsc.git
     cp $signing_key_path gsc/enclave-key.pem
-
-    # Delete the signing key created by the script
-    rm enclave-key.pem >/dev/null 2>&1
 
     cd gsc
     cp ../util/config.yaml.template config.yaml
@@ -97,9 +98,9 @@ create_gsc_image () {
     docker rmi -f gsc-$base_image-unsigned >/dev/null 2>&1
 
     if [ "$1" = "y" ]; then
-        ./gsc build -d $app_image_x  ../$start/$app_image_manifest
+        ./gsc build -d $app_image_x  $WORKLOAD_DIR/$app_image_manifest
     else
-        ./gsc build $app_image_x ../$start/$app_image_manifest
+        ./gsc build $app_image_x $WORKLOAD_DIR/$app_image_manifest
     fi
 
     echo
@@ -116,6 +117,7 @@ create_gsc_image () {
 
     cd ../
     rm -rf gsc >/dev/null 2>&1
+    rm -rf $CUR_DIR'/test' >/dev/null 2>&1
 }
 
 fetch_base_image_config () {
@@ -135,8 +137,8 @@ echo ""
 read -r signing_input signing_key_path <<<$(echo "$4 $4")
 if [ "$signing_input" = "test" ]; then
     echo 'Generating signing key'
-    openssl genrsa -3 -out ../enclave-key.pem 3072
-    signing_key_path='enclave-key.pem'
+    openssl genrsa -3 -out $CUR_DIR'/test/enclave-key.pem' 3072
+    signing_key_path=$CUR_DIR'/test/enclave-key.pem'
     grep -qxF 'sgx.file_check_policy = "allow_all_but_log"' $app_image_manifest ||
      echo 'sgx.file_check_policy = "allow_all_but_log"' >> $app_image_manifest
 fi
@@ -189,7 +191,7 @@ fi
 attestation_required=$6
 if [ "$attestation_required" = "y" ]; then
     ca_cert_path=$8
-    cp ../$ca_cert_path ca.crt
+    cp $CUR_DIR/$ca_cert_path ca.crt
     sed -i 's|.*ca.crt.*|COPY ca.crt /ca.crt|' $wrapper_dockerfile
     echo '' >> $app_image_manifest
     echo '# Attestation related entries' >> $app_image_manifest
