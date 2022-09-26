@@ -60,7 +60,7 @@ applications with Gramine.
 ## Contents
 
     .
-    +-- curate.py               # Entry file for curation that the user runs as explained above
-    +-- util/                   # Helper scripts and files that curate.py uses
-    +-- verifier/               # Contents to build attestaton verifier image
-    +-- workloads/              # Sample curated applications for select set of workloads
+    |-- curate.py               # Entry file for curation that the user runs as explained above
+    |-- util/                   # Helper scripts and files that curate.py uses
+    |-- verifier/               # Contents to build attestaton verifier image
+    |-- workloads/              # Sample curated applications for select set of workloads

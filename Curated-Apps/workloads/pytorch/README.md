@@ -46,14 +46,14 @@ This sub-directory contains artifacts which help in creating curated GSC PyTorch
 below:
 
     .
-    +-- pytorch-gsc.dockerfile.template   # Template used by `curation_script.sh` to create a
+    |-- pytorch-gsc.dockerfile.template   # Template used by `curation_script.sh` to create a
     |                                       wrapper dockerfile `pytorch-gsc.dockerfile` that
     |                                       includes user-provided inputs such as `ca.cert`
     |                                       file and command-line arguments into the graminized
     |                                       PyTorch image.
-    +-- pytorch.manifest.template           # Template used by `curation_script.sh` to create a
+    |-- pytorch.manifest.template           # Template used by `curation_script.sh` to create a
     |                                       user manifest file (with basic set of values defined
     |                                       for graminizing PyTorch images), that will be passed to
     |                                       GSC.
-    +-- base_image_helper/                # `base_image_helper` directory contains artifacts which
+    |-- base_image_helper/                # `base_image_helper` directory contains artifacts which
     |                                       helps in generating a base image with encrypted files.

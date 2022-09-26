@@ -34,12 +34,12 @@ This sub-directory contains artifacts which help in creating curated GSC Redis i
 below:
 
     .
-    +-- redis-gsc.dockerfile.template      # Template used by `curation_script.sh` to create a
+    |-- redis-gsc.dockerfile.template      # Template used by `curation_script.sh` to create a
     |                                        wrapper dockerfile `redis-gsc.dockerfile` that
     |                                        includes user-provided inputs such as `ca.cert`
     |                                        file and run-time arguments into the graminized Redis
     |                                        image.
-    +-- redis.manifest.template            # Template used by `curation_script.sh` to create a
+    |-- redis.manifest.template            # Template used by `curation_script.sh` to create a
     |                                        user manifest file (with basic set of values defined
     |                                        for graminizing Redis images), that will be passed to
     |                                        GSC.
