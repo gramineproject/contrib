@@ -15,7 +15,6 @@ import curses
 import docker
 import os
 import os.path
-import platform;
 import re
 import subprocess
 import sys
@@ -30,12 +29,12 @@ from glob import escape
 from os import path
 from sys import argv
 
-# Following are the command line parameters accepted by this file:
+# Following are the command line parameters accepted by this script:
 usage = '''
 |---------------------------------------------------------------------------------------------|
 | Required?| Argument         | Description/Possible values                                   |
 |----------|------------------|---------------------------------------------------------------|
-|    Yes   | <Workload type>  | Provide type of workload e.g. redis or pytorch                |
+|    Yes   | <workload type>  | Provide type of workload e.g. redis or pytorch                |
 |    Yes   | <base image name>| Base image name to be graminized.                             |
 | Optional | 'debug'          | To generate an insecure graminized image with debug symbols.  |
 | Optional | 'test'           | To generate an insecure image with a test enclave signing key.|
@@ -160,7 +159,7 @@ def update_user_and_commentary_win_array(user_console, guide_win, user_text_arr,
 def update_user_error_win(user_console, error_text):
     [y, _] = user_console.getyx()
     user_console.addstr(y + 2, 0, textwrap.fill(error_text, user_console_width), curses.A_BOLD
-     | curses.color_pair(3))
+                        | curses.color_pair(3))
     user_console.refresh()
 
 def edit_user_win(user_console, error_text):
@@ -194,7 +193,7 @@ def check_image_creation_success(win, docker_socket, image_name, log_file):
         win.addstr(f'\n\n\n`{image_name}` creation failed, exiting....')
         win.addstr(f'For more info, look at the log file here: {log_file}')
         win.getch()
-        sys.exit(-1)
+        sys.exit(1)
 
 def pull_docker_image(win, docker_socket, image_name):
     try:
@@ -211,26 +210,25 @@ def get_encryption_key_input(user_console, guide_win):
     while not path.isfile(file):
         user_console.erase()
         update_user_and_commentary_win_array(user_console, guide_win, encrypted_files_prompt,
-         encypted_files_help)
+                                             encypted_files_help)
+        edit_user_win(user_console, encryption_key_prompt)
         update_user_error_win(user_console, file_not_found_error.format(file))
         file = update_user_input()
     return file
 
-# User is expected to provide the path to a signing key as input, or either of the below:
-#
-# - no input: expanded to 'test-key', results in the generation of a test key. The generated image
-#   is insecure for use in production!
+# User is expected to provide the path to a signing key or `test` as input.
+# `test`as an input will result in generating a test signing key which is insecure for use in
+# production!
 def get_enclave_signing_input(user_console, guide_win):
     sign_file = update_user_input()
-    while not path.isfile(sign_file):
-        if sign_file == '':
-            key_path = 'test-key'
-            return key_path
-        else:
-            user_console.erase()
-            update_user_and_commentary_win_array(user_console, guide_win, key_prompt, signing_key_help)
-            update_user_error_win(user_console, file_not_found_error.format(sign_file))
-            sign_file = update_user_input()
+    while not path.isfile(sign_file) and sign_file != 'test':
+        error = "Please provide a valid input"
+        if sign_file != '':
+            error = file_not_found_error.format(sign_file)
+        user_console.erase()
+        update_user_and_commentary_win_array(user_console, guide_win, key_prompt, signing_key_help)
+        update_user_error_win(user_console, error)
+        sign_file = update_user_input()
     return sign_file
 
 def get_attestation_input(user_console, guide_win):
@@ -239,7 +237,7 @@ def get_attestation_input(user_console, guide_win):
         while (attestation_input not in ['test', 'done', '']):
             user_console.erase()
             update_user_and_commentary_win_array(user_console, guide_win, attestation_prompt,
-             attestation_help)
+                                                 attestation_help)
             update_user_error_win(user_console, 'Invalid option specified')
             attestation_input = update_user_input()
         if attestation_input == 'done':
@@ -249,12 +247,21 @@ def get_attestation_input(user_console, guide_win):
                 return attestation_input
             user_console.erase()
             update_user_and_commentary_win_array(user_console, guide_win, attestation_prompt,
-             attestation_help)
+                                                 attestation_help)
             update_user_error_win(user_console, 'One or more files does not exist at'
-            ' verifier/ssl/ directory')
+                                  ' verifier/ssl/ directory')
             attestation_input = update_user_input()
             continue
         return attestation_input
+
+def is_azure_instance():
+    service_cmd = "systemctl --type=service --state=running"
+    service_output = subprocess.run(service_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                                    universal_newlines=True, shell=True)
+    re_pattern='wa.*?agent.service.*?Azure.*'
+    rec_pattern = re.compile(re_pattern, re.VERBOSE)
+
+    return len(rec_pattern.findall(service_output.stdout)) > 0
 
 def main(stdscr, argv):
 
@@ -297,16 +304,22 @@ def main(stdscr, argv):
     gsc_app_image_unsigned ='gsc-{}-unsigned'.format(base_image_name)
 
     distro = 'ubuntu:18.04'
-    # Generating Test Image
+    # Generating test image
     if test_flag:
         stdscr.addstr(test_image_mssg)
         stdscr.addstr(log_progress.format(log_file))
         stdscr.refresh()
         subprocess.call(['util/curation_script.sh', workload_type, base_image_name, distro,
-                         'test-key', '', 'test-image', debug_flag], stdout=log_file_pointer,
+                         'test', '', 'test-image', debug_flag], stdout=log_file_pointer,
                          stderr=log_file_pointer)
         check_image_creation_success(stdscr, docker_socket, gsc_app_image, log_file)
-        stdscr.addstr(test_run_instr.format(gsc_app_image, gsc_app_image))
+        string_t = test_run_cmd.format(gsc_app_image)
+        stdscr.addstr(test_run_instr.format(gsc_app_image, string_t))
+
+        commands_fp = open(commands_file, 'w')
+        commands_fp.write(test_run_cmd.format(gsc_app_image))
+        commands_fp.close()
+
         stdscr.getch()
         return 0
 
@@ -315,18 +328,21 @@ def main(stdscr, argv):
     update_user_and_commentary_win_array(user_console, guide_win, introduction, index)
     update_user_input()
 
-    kernel_name = platform.platform()
-    if 'azure' not in kernel_name:
+    if not is_azure_instance():
         update_user_and_commentary_win_array(user_console, guide_win, azure_warning, azure_help)
         update_user_input()
 
-    # 1 Obtain Distro version
+    # 1 Obtain distro version
     update_user_and_commentary_win_array(user_console, guide_win, distro_prompt, distro_help)
     distro_option = update_user_input()
     if distro_option == '2':
         distro = 'ubuntu:20.04'
+    elif distro_option == '3':
+        distro = 'debian:10'
+    elif distro_option == '4':
+        distro = 'debian:11'
 
-    # 2. Provide arguments
+    # 2. Provide command-line arguments
     update_user_and_commentary_win_array(user_console, guide_win, arg_input, arg_help)
     args = update_user_input()
 
@@ -337,13 +353,13 @@ def main(stdscr, argv):
     if envs:
         env_required = 'y'
 
-    # 4. Provide encrypted files and Key Provisioning
+    # 4. Provide encrypted files and key provisioning
     ef_required = 'n'
     encryption_key = ''
     enc_key_path_in_verifier = ''
     encrypted_files = ''
     update_user_and_commentary_win_array(user_console, guide_win, encrypted_files_prompt,
-        encypted_files_help)
+                                         encypted_files_help)
     encrypted_files = update_user_input()
 
     if encrypted_files:
@@ -355,11 +371,12 @@ def main(stdscr, argv):
 
     # 5. Remote Attestation with RA-TLS
     ca_cert_path = ''
+    config = ''
     verifier_server = '<verifier-dns-name:port>'
     attestation_required = 'n'
     host_net = ''
     update_user_and_commentary_win_array(user_console, guide_win, attestation_prompt,
-     attestation_help)
+                                         attestation_help)
     while True:
         attestation_input = get_attestation_input(user_console, guide_win)
         if attestation_input == 'done':
@@ -374,7 +391,7 @@ def main(stdscr, argv):
         if ef_required == 'y' and attestation_required == 'n':
             user_console.erase()
             update_user_and_commentary_win_array(user_console, guide_win, attestation_prompt,
-             attestation_help)
+                                                 attestation_help)
             error = ('You require Remote Attestation to provision the key for encrypted files.')
             update_user_error_win(user_console, error)
             continue
@@ -384,23 +401,23 @@ def main(stdscr, argv):
     # 6. Obtain enclave signing key
     update_user_and_commentary_win_array(user_console, guide_win, key_prompt, signing_key_help)
     key_path = get_enclave_signing_input(user_console, guide_win)
-    config = ''
     passphrase = ''
-    if key_path == 'test-key':
+    if key_path == 'test':
         config = 'test'
     else:
         user_console.erase()
         update_user_and_commentary_win_array(user_console, guide_win, key_prompt, signing_key_help)
         edit_user_win(user_console, '>> Please enter the passphrase for the signing key'
-        ' (no input will assume a passphrase-less key)                   Press CTRL+G to continue')
+                      ' (no input will assume a passphrase-less key)'
+                      '                   Press CTRL+G to continue')
         passphrase = update_user_input(secure=True)
 
-    # 7. Generation of the final curated GSC image
+    # 7. Generation of the final curated images
     if attestation_required == 'y':
         os.chdir('verifier')
         verifier_log_file_pointer = open(verifier_log_file, 'w')
         update_user_and_commentary_win_array(user_console, guide_win, [verifier_build_messg],
-         [verifier_log_help.format(verifier_log_file)])
+                                             [verifier_log_help.format(verifier_log_file)])
         subprocess.call(['./helper.sh', attestation_input, ef_required,
                          enc_key_path_in_verifier], stdout=verifier_log_file_pointer,
                          stderr=verifier_log_file_pointer)
@@ -417,7 +434,7 @@ def main(stdscr, argv):
     image = gsc_app_image
     check_image_creation_success(user_console, docker_socket, image, log_file)
 
-    # 8. Generation of docker run command(s)
+    # 8. Generation of docker run commands
     commands_fp = open(commands_file, 'w')
     if attestation_required == 'y':
         debug_enclave_env_ver_ext = ''
@@ -453,24 +470,24 @@ def main(stdscr, argv):
         if len(isv_prod_id_list) > 0: isv_prod_id = isv_prod_id_list[0]
         if len(isv_svn_list) > 0: isv_svn = isv_svn_list[0]
 
-        verifier_run_command = (f'Execute below command to start verifier on a Trusted system:-\n'
-        f'$ docker run {host_net} --device=/dev/sgx/enclave '
-        f'-e RA_TLS_MRENCLAVE={mr_enclave} -e RA_TLS_MRSIGNER={mr_signer} '
-        f'-e RA_TLS_ISV_PROD_ID={isv_prod_id} -e RA_TLS_ISV_SVN={isv_svn} '
-         f'{debug_enclave_env_ver_ext}' + verifier_cert_mount_str + ' ' + enc_keys_mount_str
-         + ' -it verifier:latest')
+        verifier_run_command = (f'Execute below command to start verifier on a trusted system:\n'
+                                f'$ docker run {host_net} --device=/dev/sgx/enclave '
+                                f'-e RA_TLS_MRENCLAVE={mr_enclave} -e RA_TLS_MRSIGNER={mr_signer} '
+                                f'-e RA_TLS_ISV_PROD_ID={isv_prod_id} -e RA_TLS_ISV_SVN={isv_svn} '
+                                f'{debug_enclave_env_ver_ext}' + verifier_cert_mount_str + ' ' +
+                                enc_keys_mount_str + ' -it verifier:latest')
         custom_cmd_info = ''
         if config != 'test':
             custom_cmd_info = (' Assign the correct DNS information of the verifier server to the'
                                ' environment variable SECRET_PROVISION_SERVERS')
         run_command = (f'{verifier_run_command} \n \n'
-         f'Execute below command to deploy the curated GSC image.{custom_cmd_info}:-\n'
-         f'{workload_run.format(host_net, verifier_server, gsc_app_image)}')
+                       f'Execute below command to deploy the curated GSC image.{custom_cmd_info}:\n'
+                       f'{workload_run.format(host_net, verifier_server, gsc_app_image)}')
     else:
         run_command = run_command_no_att.format(host_net, gsc_app_image)
 
     user_info = [image_ready_messg.format(gsc_app_image), commands_file + color_set,
-     app_exit_messg]
+                app_exit_messg]
     commands_fp.write(run_command)
     commands_fp.close()
 

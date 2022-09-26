@@ -25,9 +25,8 @@ RUN echo 'deb [arch=amd64 signed-by=/usr/share/keyrings/gramine-keyring.gpg] htt
 RUN apt-get update
 RUN apt-get install -y gramine-dcap
 
-RUN git clone --depth 1 https://github.com/gramineproject/gramine.git
 # TODO: After release of gramine v1.3, replace master with v1.3 in below line
-RUN cd gramine && git checkout master
+RUN git clone --depth 1 --branch master https://github.com/gramineproject/gramine.git && cd gramine
 
 ARG server_dcap_pf="n"
 RUN if [ $server_dcap_pf="y" ]; then \

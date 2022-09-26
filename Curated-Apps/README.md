@@ -27,7 +27,7 @@ encrypted files support.
     |---------------------------------------------------------------------------------------------|
     | Required?| Argument         | Description/Possible values                                   |
     |----------|------------------|---------------------------------------------------------------|
-    |    Yes   | <Workload type>  | Provide type of workload e.g. redis or pytorch                |
+    |    Yes   | <workload type>  | Provide type of workload e.g. redis or pytorch                |
     |    Yes   | <base image name>| Base image name to be graminized.                             |
     | Optional | 'debug'          | To generate an insecure graminized image with debug symbols.  |
     | Optional | 'test'           | To generate an insecure image with a test enclave signing key.|
@@ -41,8 +41,8 @@ To generate a non-production test GSC image:
 
 `$ python3 ./curate.py redis redis:7.0.0 test`
 
-To generate a custom graminized image, type the following. This will launch an interactive application
-that will take inputs to create a curated graminized image.
+To generate a custom graminized image, type the following. This will launch an interactive
+application that will take inputs to create a curated graminized image.
 
 `$ python3 ./curate.py redis <your image>`
 
@@ -56,17 +56,17 @@ the curation application `curate.py` as shown below.
 To generate a non-production test GSC image from a sample PyTorch application image
 `pytorch-encrypted`:
 
-`$ cd pytorch/base_image_helper/`
-`$ /bin/bash "helper.sh"`
-`$ cd ../..`
-`$ python3 ./curate.py pytorch pytorch-encrypted test`
-
+```sh
+$ cd pytorch/base_image_helper/
+$ /bin/bash "helper.sh"
+$ cd ../..
+$ python3 ./curate.py pytorch pytorch-encrypted test
+```
 To generate a custom graminized image, follow the below.
 This will launch an interactive script that will take inputs to create a curated graminized
 image.
 
 `$ python3 ./curate.py pytorch <base_image_with_pytorch>`
-
 
 ## Contents
 

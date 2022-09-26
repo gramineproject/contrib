@@ -9,10 +9,13 @@ cd examples/pytorch
 python3 download-pretrained-model.py
 cd ../../
 
+dd if=/dev/urandom bs=16 count=1 > encryption_key
+
 # Encrypt files using given encryption key in file `wrap_key`
-gramine-sgx-pf-crypt encrypt -w wrap_key -i examples/pytorch/input.jpg -o input.jpg
-gramine-sgx-pf-crypt encrypt -w wrap_key -i examples/pytorch/classes.txt -o classes.txt
-gramine-sgx-pf-crypt encrypt -w wrap_key -i examples/pytorch/alexnet-pretrained.pt -o alexnet-pretrained.pt
+gramine-sgx-pf-crypt encrypt -w encryption_key -i examples/pytorch/input.jpg -o input.jpg
+gramine-sgx-pf-crypt encrypt -w encryption_key -i examples/pytorch/classes.txt -o classes.txt
+gramine-sgx-pf-crypt encrypt -w encryption_key -i examples/pytorch/alexnet-pretrained.pt -o \
+alexnet-pretrained.pt
 
 mv examples/pytorch/pytorchexample.py ./
 rm -rf examples
@@ -21,5 +24,5 @@ rm -rf examples
 docker rmi -f $image_name >/dev/null 2>&1
 docker build -t $image_name .
 
-echo -e '\n\nCreated base image `$image_name`.'
-echo -e 'Please refer `Curated-Apps/README.md` to curate the above image with GSC.\n'
+echo -e '\n\nCreated base image `'$image_name'`.'
+echo -e 'Please refer to `Curated-Apps/README.md` to curate the above image with GSC.\n'

@@ -6,7 +6,7 @@ This directory contains steps and artifacts to create a docker image with encryp
   on your machine.
 - File Encryption is done using `gramine-sgx-pf-crypt` tool which is part of
   [Gramine installation](https://gramine.readthedocs.io/en/latest/quickstart.html#install-gramine).
-- Encryption key. We have added an encryption key in `wrap_key` file for test purpose.
+- Encryption key. We have added an encryption key in `encryption_key` file for test purpose.
 
 # Base docker image creation
 
@@ -16,7 +16,7 @@ to demonstrate the base image creation with encrypted files.
 - Execute `bash ./helper.sh` command to encrypt the files and create base image with
   encrypted files.
 
-Please refer `Curated-Apps/README.md` to curate the image created in above steps with GSC.
+Please refer to `Curated-Apps/README.md` to curate the image created in above steps with GSC.
 
 # Retrieve and decrypt results
 
@@ -26,5 +26,5 @@ below commands
 
 - Execute `docker cp <container id or name>:/workspace/result.txt .` to fetch results from docker
   container to local machine.
-- Execute `gramine-sgx-pf-crypt decrypt -w wrap_key -i result.txt -o result_plaintext.txt` to
-  decrypt the results. Make sure `wrap_key` path in decryption command is correct.
+- Execute `gramine-sgx-pf-crypt decrypt -w encryption_key -i result.txt -o result_plaintext.txt` to
+  decrypt the results. Make sure `encryption_key` path in decryption command is correct.

@@ -1,4 +1,4 @@
-This directory contains artifacts which helps in creating curated GSC Redis image, as explained
+This directory contains artifacts which help in creating curated GSC Redis image, as explained
 below:
 
 - `redis-gsc.dockerfile.template` file is used by `curation_script.sh` to create a wrapper

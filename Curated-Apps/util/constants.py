@@ -24,10 +24,11 @@ color_set = '::reverse'
 
 test_image_mssg = ('Your test GSC image is being generated. This image is not supposed to be'
                    ' used in production \n\n')
+
 test_run_instr = ('Run the {} docker image in an Azure Confidential Compute'
-                  ' instance using the below command. Host networking (--net=host) is optional\n\n'
-                  'docker run --net=host --device=/dev/sgx/enclave -it {}\n\n'
-                  'Press any key to exit the app')
+                  ' instance using the below command.\n\nHost networking (--net=host) is optional\n\n'
+                  '{}\n\nAbove command is saved to command.txt as well. Press any key to exit the app')
+test_run_cmd = ('$ docker run --net=host --device=/dev/sgx/enclave -it {}')
 image_not_found_warn = ('Warning: Cannot find application Docker image `{}`.\n'
                         'Fetching from Docker Hub ...\n\n')
 log_progress = 'You may monitor {} for detailed progress\n\n'
@@ -46,33 +47,39 @@ index = ['The target deployment environment is assumed to be an Azure Confidenti
          '1. Distro Selection',
          '2. Command-line arguments',
          '3. Environment variables',
-         '4. Encrypted files and Key Provisioning',
-         '5. Attestation',
+         '4. Encrypted files and key provisioning',
+         '5. Remote Attestation',
          '6. Enclave signing',
-         '7. Generation of the final curated image',
-         '8. Generation of docker run command(s)']
+         '7. Generation of the final curated images',
+         '8. Generation of docker run commands']
 
-distro_prompt = ['Provide the Distro of your base image', '- Press 1 for Ubuntu 18.04',
-                 '- Press 2 for Ubuntu 20.04', 'Any other option or no input will default to'
-                 ' Ubuntu 18.04.', 'Press CTRL+G when done.']
+distro_prompt = ['>> Distro Selection:', 'Provide the distro of your base image',
+                 '- Press 1 for Ubuntu 18.04',
+                 '- Press 2 for Ubuntu 20.04',
+                 '- Press 3 for Debian 10',
+                 '- Press 4 for Debian 11',
+                 'Any other option or no input will default to Ubuntu 18.04.',
+                 'Press CTRL+G when done.']
 distro_help = ['Tested distros are Ubuntu 18.04 and Ubuntu 20.04']
-key_prompt = ['>> Enclave signing key:' , '- Please provide path to your enclave signing key in'
-              ' the blue box, and press CTRL+G OR',
-              '- Press CTRL+G without any input to generate a test signing key']
+key_prompt = ['>> Enclave signing:' ,
+              '- Please provide path to your enclave signing key in the blue box, OR',
+              '- Type test to generate a test signing key',
+              'Press CTRL+G when done']
 signing_key_help = ['SGX requires RSA 3072 keys with public exponent equal to 3. You can generate'
                     ' a signing key protected by a test passphrase using below command:',
                     'openssl genrsa -3 -aes128 -passout pass:test@123 -out enclave-key.pem 3072'
-                     + color_set]
+                    + color_set]
 verifier_build_messg = 'Building the RA-TLS Verifier image, this might take couple of minutes'
 verifier_log_help = 'You may monitor verifier/{} for progress'
 attestation_prompt = ['>> Remote Attestation:' , 'To enable remote attestation using Azure DCAP'
-                         ' client libs, use another terminal to copy the ca.crt, server.crt, and'
-                         ' server.key certificates to Curated-Apps/verifier/ssl directory',
-                         'NOTE: Encrypted Filesystem of Gramine requires Attestation to provision'
-                         ' a decryption key for encrypted files.',
-                         '- Type done and press CTRL+G when ready, OR',
-                         '- Type test and press CTRL+G to create test certificates, OR',
-                         '- Press CTRL+G to skip attestation']
+                      ' client libs, use another terminal to copy the ca.crt, server.crt, and'
+                      ' server.key certificates to Curated-Apps/verifier/ssl directory',
+                      'NOTE: Encrypted Filesystem of Gramine requires Attestation to provision'
+                      ' a decryption key for encrypted files.',
+                      '- Type done when ready, OR',
+                      '- Type test to create test certificates, OR',
+                      '- No input (blank) to skip attestation',
+                      'Press CTRL+G when done']
 attestation_help = ['This step enables the enclave to communicate to a remote verifier over'
                     ' an Remote Attestation TLS (RA-TLS) link. This remote verifier uses Azure'
                     ' DCAP client libs to verify the Quote supplied by the enclave. RA-TLS'
@@ -81,30 +88,32 @@ attestation_help = ['This step enables the enclave to communicate to a remote ve
                     ' authenticate the verifier during the RA-TLS flow. A test sample set of'
                     ' RA-TLS keys and certs are provided here:',
                     'https://github.com/gramineproject/contrib/tree/master/Examples/aks-attestation/ssl',
-                    'For further reading - ', 'https://gramine.readthedocs.io/en/stable/attestation.html']
+                    'For further reading - ',
+                    'https://gramine.readthedocs.io/en/stable/attestation.html']
 
-encrypted_files_prompt = ['>> Encrypted File System:', 'Please provide path of these files'
-                          ' relative to the working directory:', '1. Encrypted files in the base'
-                          ' image used by the application, if any.', '2. Files created at runtime,'
-                          ' if any.', 'Accepted format: `file_path1:file_path2:file_path3`',
+encrypted_files_prompt = ['>> Encrypted files and key provisioning:', 'Please provide path of'
+                          ' these files relative to the working directory:', '1. Encrypted files'
+                          ' in the base image used by the application, if any.', '2. Files created'
+                          ' at runtime, if any.', 'Accepted format: `file_path1:file_path2`',
                           'e.g. for pytorch/base_image_helper/Dockerfile based image, the'
                           ' encrypted files input would be --> ',
                           'classes.txt:input.jpg:alexnet-pretrained.pt:result.txt' + color_set,
                           'Press CTRL+G when done']
 encypted_files_help = ["Gramine's Encrypted FS feature supports transparently decrypting data"
-                       " using the encryption key that will be provisioned after successful"
-                       " attestation."]
-encryption_key_prompt = 'Please provide the path to the key used for the encryption.'
-arg_input = ['>> Runtime Arguments:', 'Specify docker command-line arguments here in a single'
+                       ' using the encryption key that will be provisioned after successful'
+                       ' attestation.']
+encryption_key_prompt = ('Please provide the path to the key used for the encryption. Press CTRL+G'
+                         ' when done')
+arg_input = ['>> Command-line arguments:', 'Specify docker command-line arguments here in a single'
              ' string. For example, if your docker runtime is ', 'docker run <image_name> arg1'
-             ' arg2' + color_set, 'then the arguments that needs to be provided here are', 'arg1'
+             ' arg2' + color_set, 'then the arguments that need to be provided here are', 'arg1'
              ' arg2' + color_set, 'Press CTRL+G when done']
 arg_help = ['Allowing an attacker to control executable arguments can break the security of the'
             ' resulting enclave. Gramine will ignore any arguments provided at docker run-time,'
             ' so ensure those are provided here now']
 
-env_input = ['>> Runtime Environments:', 'Please specify a list of env variables and respective'
-             ' values separated by comma', 'Accepted format:',
+env_input = ['>> Environment variables:', 'Please specify a list of env variables and respective'
+             ' values in below mentioned format:',
              '-e ENV_NAME1="value1" -e ENV_NAME2="value2"' + color_set,
              'Press CTRL+G when done']
 env_help =  ['This step secures the environment variables. Gramine will ignore environment'
