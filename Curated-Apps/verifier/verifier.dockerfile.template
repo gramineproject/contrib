@@ -6,7 +6,8 @@ RUN apt-get update \
     curl \
     git \
     gnupg2 \
-    wget
+    wget \
+    pkg-config
 
 # Installing Azure DCAP Quote Provider Library (az-dcap-client).
 # Here, the version of az-dcap-client should be in sync with the az-dcap-client
@@ -21,9 +22,11 @@ RUN echo 'deb [arch=amd64] https://download.01.org/intel-sgx/sgx_repo/ubuntu bio
     && apt-key add intel-sgx-deb.key
 
 RUN curl -fsSLo /usr/share/keyrings/gramine-keyring.gpg https://packages.gramineproject.io/gramine-keyring.gpg
-RUN echo 'deb [arch=amd64 signed-by=/usr/share/keyrings/gramine-keyring.gpg] https://packages.gramineproject.io/ stable main' | tee /etc/apt/sources.list.d/gramine.list
+RUN echo 'deb [arch=amd64 signed-by=/usr/share/keyrings/gramine-keyring.gpg] https://packages.gramineproject.io/ bionic main' | tee /etc/apt/sources.list.d/gramine.list
 RUN apt-get update
-RUN apt-get install -y gramine-dcap
+RUN apt-get install -y gramine
+RUN wget http://mirrors.kernel.org/ubuntu/pool/universe/c/cjson/libcjson1_1.7.10-1.1_amd64.deb \
+    && dpkg -i libcjson1_1.7.10-1.1_amd64.deb
 
 RUN git clone --depth 1 --branch v1.3 https://github.com/gramineproject/gramine.git
 
