@@ -19,7 +19,6 @@ cd ../../
 
 dd if=/dev/urandom bs=16 count=1 > encryption_key
 
-# Encrypt files using given encryption key in file `encryption_key`
 gramine-sgx-pf-crypt encrypt -w encryption_key -i examples/pytorch/input.jpg -o input.jpg
 gramine-sgx-pf-crypt encrypt -w encryption_key -i examples/pytorch/classes.txt -o classes.txt
 gramine-sgx-pf-crypt encrypt -w encryption_key -i examples/pytorch/alexnet-pretrained.pt -o \

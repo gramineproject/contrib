@@ -15,7 +15,8 @@ to demonstrate the base image creation with encrypted files.
 - Execute `bash ./helper.sh` command to encrypt the files and create base image with
   encrypted files.
 
-Please refer to `Curated-Apps/README.md` to curate the image created in above steps with GSC.
+Please refer to `Curated-Apps/workloads/pytorch/README.md` to curate the image created in above
+steps with GSC.
 
 # Retrieve and decrypt results
 
