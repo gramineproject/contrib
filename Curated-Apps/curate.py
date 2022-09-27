@@ -476,10 +476,10 @@ def main(stdscr, argv):
                                 enc_keys_mount_str + ' -it verifier:latest')
         custom_image_dns_info = ''
         if config != 'test':
-            custom_image_dns_info = ('Assign the correct DNS information of the verifier server to'
+            custom_image_dns_info = ('. Assign the correct DNS information of the verifier server to'
                                      ' the environment variable SECRET_PROVISION_SERVERS')
         run_command = (f'{verifier_run_command} \n \n'
-                       f'Execute below command to deploy the curated GSC image.'
+                       f'Execute below command to deploy the curated GSC image:'
                        f'{custom_image_dns_info}:\n'
                        f'{workload_run.format(host_net, verifier_server, gsc_app_image)}')
     else:
