@@ -22,7 +22,7 @@
 # -- arg4    : path to the enclave signing key or
 #              'test' string to generate test signing key
 # -- arg5    : string with command-line arguments (hard-coded in Docker image via Gramine manifest)
-# -- arg6    : 'test-image' string to create a non production GSC image when curate.py is run in
+# -- arg6    : 'test-image' string to create a non-production GSC image when curate.py is run in
 #            :  test mode
 #            : y or n (attestation required?) in case of custom image creation
 # -- arg7    : y or n (build GSC with debug?)
@@ -82,7 +82,6 @@ add_encrypted_files_to_manifest(){
 }
 
 create_gsc_image () {
-    # Download GSC that has dcap already enabled
     echo
     cd $CUR_DIR
     rm -rf gsc >/dev/null 2>&1
@@ -143,7 +142,7 @@ if [ "$signing_input" = "test" ]; then
      echo 'sgx.file_check_policy = "allow_all_but_log"' >> $app_image_manifest
 fi
 
-# Runtime arguments:
+# Command-line arguments:
 args=$5
 if [[ "$start" = "redis" ]]; then
     args+=" --protected-mode no --save ''"

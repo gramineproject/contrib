@@ -7,7 +7,7 @@
 # the details, it will call a separate curation script (util/curation_script.sh) that takes the
 # user provided inputs to create the graminized Docker image using GSC. This script also calls into
 # another script (verifier/helper.sh) to generate the verifier Docker image (for SGX remote
-# attestation). The generated verifier Docker image has to be started on a trusted remote
+# attestation). The generated verifier Docker image must be started on a trusted remote
 # system before the graminized Docker image is deployed at the target system, to verify the SGX
 # attestation evidence (SGX quote) sent by the latter image.
 
@@ -217,7 +217,7 @@ def get_encryption_key_input(user_console, guide_win):
     return file
 
 # User is expected to provide the path to a signing key or `test` as input.
-# `test`as an input will result in generating a test signing key which is insecure for use in
+# `test` as an input will result in generating a test signing key which is insecure for use in
 # production!
 def get_enclave_signing_input(user_console, guide_win):
     sign_file = update_user_input()
@@ -337,16 +337,14 @@ def main(stdscr, argv):
     distro_option = update_user_input()
     if distro_option == '2':
         distro = 'ubuntu:20.04'
-    elif distro_option == '3':
-        distro = 'debian:10'
-    elif distro_option == '4':
+    elif distro_option == '3' or distro_option == '4':
         distro = 'debian:11'
 
     # 2. Provide command-line arguments
     update_user_and_commentary_win_array(user_console, guide_win, arg_input, arg_help)
     args = update_user_input()
 
-    # 3. Provide enviroment variables
+    # 3. Provide environment variables
     update_user_and_commentary_win_array(user_console, guide_win, env_input, env_help)
     env_required = 'n'
     envs = update_user_input()

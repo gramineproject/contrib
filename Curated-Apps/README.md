@@ -29,7 +29,7 @@ learning.
    suits the application.
 2. Install the necessary build dependencies as shown below (for Ubuntu 18.04).
    ```sh
-   $ sudo apt-get update && sudo apt-get install docker.io
+   $ sudo apt-get update && sudo apt-get install -y docker.io
    $ sudo chown $USER /var/run/docker.sock
    $ echo 'deb [arch=amd64] https://download.01.org/intel-sgx/sgx_repo/ubuntu bionic main' |
      sudo tee /etc/apt/sources.list.d/intel-sgx.list
@@ -37,7 +37,7 @@ learning.
      sudo apt-key add -
    $ sudo apt-key adv --fetch-keys https://packages.microsoft.com/keys/microsoft.asc
    $ sudo apt-add-repository 'https://packages.microsoft.com/ubuntu/18.04/prod main'
-   $ sudo apt update && sudo apt install az-dcap-client
+   $ sudo apt update && sudo apt install -y az-dcap-client
    $ sudo apt-get install -y -f libsgx-dcap-ql
    ```
 
@@ -54,13 +54,13 @@ learning.
     |---------------------------------------------------------------------------------------------|
 
 ## Sample Workloads
-`worloads/` subdirectory contains relevant instructions and support files to curate a selected set of
-applications with Gramine.
+`workloads/` subdirectory contains relevant instructions and support files to curate a selected
+ set of applications with Gramine.
 
 ## Contents
 
     .
     |-- curate.py               # Entry file for curation that the user runs as explained above
     |-- util/                   # Helper scripts and files that curate.py uses
-    |-- verifier/               # Contents to build attestaton verifier image
+    |-- verifier/               # Contents to build attestation verifier image
     |-- workloads/              # Sample curated applications for select set of workloads

@@ -8,7 +8,7 @@
 # The input parameters in sequence are below:
 # -- arg1    : 'done' means user provided his own certs in verifier/ssl directory, else the default
 #               non-production ready certs will be used. The certs are finally copied to ssl_common
-#               directory for future use by gsc image and the verifier image.
+#               directory for future use by GSC image and the verifier image.
 # -- arg2    :  encryption key path. When this variable is set, then `CMD ["key-path"]` will be
 #               appended to verifier.dockerfile
 echo printing args $0 $@
@@ -37,7 +37,7 @@ fi
 cp verifier.dockerfile.template verifier.dockerfile
 
 args=''
-# Use `secret_prov_pf` if base image have encrypted files
+# Use `secret_prov_pf` if base image has encrypted files
 if [ "$2" = "y" ]; then
     sed -i 's|secret_prov_minimal|secret_prov_pf|g' verifier.dockerfile
     args="--build-arg server_dcap_pf=y"

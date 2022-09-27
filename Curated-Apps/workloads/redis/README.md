@@ -1,11 +1,9 @@
 # Gramine Curated Redis
 In the following two sections, we explain how a Docker image for the protected Redis version can be
-built and how the image can be executed.
+built and how the image can be executed. [Prerequisites](https://github.com/gramineproject/contrib.git/Curated-Apps/README.md) for both the phases are assumed to be met
 
 ## Build a confidential compute image for Redis
-The following description assumes that the [prerequisites](https://github.com/gramineproject/contrib.git/Curated-Apps/README.md)
-for building the curated image are met, and the commands below are executed on the
-corresponding VM.
+Execute the below commands on the VM.
 
 1. Clone the Gramine Contrib repository
 
