@@ -469,7 +469,7 @@ def main(stdscr, argv):
         if len(isv_svn_list) > 0: isv_svn = isv_svn_list[0]
 
         verifier_run_command = (f'Execute below command to start verifier on a trusted system:\n'
-                                f'$ docker run {host_net} --device=/dev/sgx/enclave:/dev/sgx_enclave '
+                                f'$ docker run {host_net} --device=/dev/sgx/enclave '
                                 f'-e RA_TLS_MRENCLAVE={mr_enclave} -e RA_TLS_MRSIGNER={mr_signer} '
                                 f'-e RA_TLS_ISV_PROD_ID={isv_prod_id} -e RA_TLS_ISV_SVN={isv_svn} '
                                 f'{debug_enclave_env_ver_ext}' + verifier_cert_mount_str + ' ' +
