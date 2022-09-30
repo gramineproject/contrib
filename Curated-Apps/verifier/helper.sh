@@ -22,10 +22,10 @@ if [ "$1" = "done" ]; then
     cd ..
 else
     rm -rf gramine >/dev/null 2>&1
-    git clone --depth 1 --branch v1.3 https://github.com/gramineproject/gramine.git
+    git clone --depth 1 --branch v1.3.1 https://github.com/gramineproject/gramine.git
 
     cd gramine/CI-Examples/ra-tls-secret-prov
-    make clean && make ssl/server.crt >/dev/null 2>&1
+    make clean && make ssl/server.crt
     cd ssl
     cp ca.crt server.crt server.key ../../../../ssl_common
     cd ../../../../
