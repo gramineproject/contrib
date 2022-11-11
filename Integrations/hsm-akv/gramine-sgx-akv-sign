@@ -22,7 +22,7 @@ def sign_with_akv(data, key):
     Suitable to be used as a callback to :py:func:`graminelibos.Sigstruct.sign()`. This function
     requires that the user has an active subscription to Azure and Azure Key Vault's Managed HSM
     (MHSM), a 3072-bit RSA key created in the MHSM enabled for signing and the user is logged into
-    Azure CLI. This function qualifies for production signing.
+    Azure CLI.
 
     Args:
         data (bytes): Data to calculate the signature over.
@@ -67,7 +67,7 @@ def sign_with_akv(data, key):
 @click.option('--libpal', '-l', type=click.Path(exists=True, dir_okay=False), default=SGX_LIBPAL,
               help='Input libpal file')
 @click.option('--key', '-k', type=click.STRING, required=True,
-	      help='Signing key in format `vault_url:key_name` for AKV Managed HSM')
+              help='Signing key in format `vault_url:key_name` for AKV Managed HSM')
 @click.option('--manifest', '-m', 'manifest_file', type=click.File('r', encoding='utf-8'),
               required=True, help='Input .manifest file')
 @click.option('--sigfile', '-s', help='Output .sig file')
@@ -89,7 +89,7 @@ def main(output, libpal, key, manifest_file, sigfile, verbose):
             sigfile = manifest_file.name
         sigfile += '.sig'
 
-    if verbose == True:
+    if verbose:
         print(f'Signing with key `{key}`.')
 
     today = datetime.date.today()

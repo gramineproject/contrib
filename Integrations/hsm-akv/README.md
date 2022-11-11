@@ -1,8 +1,8 @@
 # Enclave signing with Azure Key Vault's Managed HSM
 
-SGX enclaves need to build and signed using a 3072-bit RSA key. This key needs
-to be protected and must not be disclosed to anyone. Typically for production
-deployments, you must use a key secured in a Hardware Security Module (HSM).
+SGX enclaves must be signed using a 3072-bit RSA key. This key needs to be
+protected and must not be disclosed to anyone. Typically for production
+deployments, you should use a key secured in a Hardware Security Module (HSM).
 
 This directory contains a plugin to Gramine tools that enables support for
 production signing of SGX enclaves using keys from Azure Key Vault (AKV) Managed
