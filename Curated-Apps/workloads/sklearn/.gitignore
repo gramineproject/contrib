@@ -1,0 +1,4 @@
+/*.log
+/entry_script_sklearn.sh
+/sklearn-gsc.dockerfile
+/sklearn.manifest

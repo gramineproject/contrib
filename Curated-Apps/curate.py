@@ -32,12 +32,15 @@ from sys import argv
 # Following are the command line parameters accepted by this script:
 usage = '''
 |---------------------------------------------------------------------------------------------|
-| Required?| Argument         | Description/Possible values                                   |
-|----------|------------------|---------------------------------------------------------------|
-|    Yes   | <workload type>  | Provide type of workload e.g. redis or pytorch                |
-|    Yes   | <base image name>| Base image name to be graminized.                             |
-| Optional | 'debug'          | To generate an insecure graminized image with debug symbols.  |
-| Optional | 'test'           | To generate an insecure image with a test enclave signing key.|
+| S.No.| Required?| Argument         | Description/Possible values                            |
+|------|----------|------------------|--------------------------------------------------------|
+| 1.   |    Yes   | <workload type>  | Type of workload (refer to workload/ sub-directory     |
+|      |          |                  | for full list of supported workload types) e.g. redis. |
+| 2.   |    Yes   | <base image name>| Base image name to be graminized.                      |
+| 3.   | Optional | 'debug'          | To generate an insecure graminized image with debug    |
+|      |          |                  | symbols.                                               |
+| 4.   | Optional | 'test'           | To generate an insecure image with a test enclave      |
+|      |          |                  | signing key.                                           |
 |---------------------------------------------------------------------------------------------|
 '''
 # -------GUI curses interfaces--------------------------------------------------------------------
@@ -476,8 +479,8 @@ def main(stdscr, argv):
                                 enc_keys_mount_str + ' -it verifier:latest')
         custom_image_dns_info = ''
         if config != 'test':
-            custom_image_dns_info = ('. Assign the correct DNS information of the verifier server to'
-                                     ' the environment variable SECRET_PROVISION_SERVERS')
+            custom_image_dns_info = ('. Assign the correct DNS information of the verifier server'
+                                     ' to the environment variable SECRET_PROVISION_SERVERS')
         run_command = (f'{verifier_run_command} \n \n'
                        f'Execute below command to deploy the curated GSC image'
                        f'{custom_image_dns_info}:\n'

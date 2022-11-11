@@ -16,7 +16,8 @@
 # user, it just processes the input received from curate.py and produces the final GSC image.
 
 # The input parameters in sequence are below:
-# -- arg1    : workload type e.g. redis or pytorch
+# -- arg1    : workload type (see workload/ sub-directory for list of supported workload types)
+#              e.g. redis
 # -- arg2    : base_image_name e.g. name of the base image to be graminized
 # -- arg3    : distro e.g. ubuntu:18.04 or ubuntu:20.04
 # -- arg4    : path to the enclave signing key or
@@ -50,7 +51,7 @@ cp $app_image_manifest'.template' $app_image_manifest
 base_image="$2"
 distro="$3"
 # Set base image name in the dockerfile
-sed -i 's|^From <base_image_name>$|From '$base_image'|' $wrapper_dockerfile
+sed -i 's|^FROM <base_image_name>$|FROM '$base_image'|' $wrapper_dockerfile
 
 if [[ "$base_image" == *":"* ]]; then
     app_image_x=$(echo $base_image | sed "s/:/_x:/")
