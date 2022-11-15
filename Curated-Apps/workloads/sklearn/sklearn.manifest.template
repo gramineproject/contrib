@@ -16,4 +16,3 @@ sys.enable_extra_runtime_domain_names_conf = true
 fs.mounts = [
   { type = "tmpfs", path = "/tmp" },
 ]
-

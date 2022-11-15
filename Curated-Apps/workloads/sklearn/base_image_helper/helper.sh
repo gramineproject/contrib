@@ -19,4 +19,3 @@ cd $CUR_DIR
 echo -e '\n\nCreated base image `'$image_name'`.'
 echo -e 'Please refer to `Curated-Apps/workloads/sklearn/README.md` to curate the above image' \
 ' with GSC.\n'
-

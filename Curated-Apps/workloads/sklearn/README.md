@@ -1,10 +1,12 @@
 # Gramine Curated Intel® extension for Scikit-learn
-In the following two sections, we explain how a Docker image for the Scikit-learn can be built and
- how the image can be executed.
+
+In the following two sections, we explain how a Docker image for the Scikit-learn machine learning
+library can be built and how the image can be executed.
 [Prerequisites](https://github.com/gramineproject/contrib/tree/master/Curated-Apps/README.md) for
 both the phases are assumed to be met.
 
 ## Build a confidential compute image for Scikit-learn
+
 Execute the below commands on the VM.
 
 1. Clone the Gramine Contrib repository:
@@ -20,8 +22,9 @@ Execute the below commands on the VM.
    contains sample dockerfiles and instructions to create a test Scikit-learn base image. This base
    image is then passed to the curation application `curate.py` as shown below.
 
-4. To generate a preconfigured non-production test `Intel® extension
-   for Scikit-learn` confidential compute image, follow the below steps:
+4. To generate a preconfigured non-production test confidential compute image for Scikit-learn,
+   follow the below steps:
+
    1. Generate a sample Scikit-learn application image `sklearn-base`:
 
           $ /bin/bash workloads/sklearn/base_image_helper/helper.sh
@@ -42,6 +45,7 @@ Execute the below commands on the VM.
 - Follow the output of the `curate.py` script to run the generated Docker image(s).
 
 ## Contents
+
 This sub-directory contains artifacts which help in creating curated GSC Scikit-learn image,
 as explained below:
 

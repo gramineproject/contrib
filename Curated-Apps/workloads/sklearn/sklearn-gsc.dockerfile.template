@@ -10,4 +10,3 @@ From <base_image_name>
 # These two lines are required to incorporate command-line arguments with the image entrypoint and cmd
 COPY entry_script_sklearn.sh /usr/local/bin/entry_script_sklearn.sh
 ENTRYPOINT ["/bin/bash", "/usr/local/bin/entry_script_sklearn.sh"]
-

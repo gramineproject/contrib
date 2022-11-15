@@ -37,7 +37,6 @@ usage = '''
 | 1.   |    Yes   | <workload type>  | Provide type of workload (refer /workload sub-directory|
 |      |          |                  | for full list of supported workload types) e.g. redis. |
 | 2.   |    Yes   | <base image name>| Base image name to be graminized.                      |
-|      |          |                  |                                                        |
 | 3.   | Optional | 'debug'          | To generate an insecure graminized image with debug    |
 |      |          |                  | symbols.                                               |
 | 4.   | Optional | 'test'           | To generate an insecure image with a test enclave      |

@@ -16,8 +16,8 @@
 # user, it just processes the input received from curate.py and produces the final GSC image.
 
 # The input parameters in sequence are below:
-# -- arg1    : workload type (refer /workload sub-directory for full list of supported workload
-#              types) e.g. redis
+# -- arg1    : workload type (see /workload sub-directory for list of supported workloads types)
+#              e.g. redis
 # -- arg2    : base_image_name e.g. name of the base image to be graminized
 # -- arg3    : distro e.g. ubuntu:18.04 or ubuntu:20.04
 # -- arg4    : path to the enclave signing key or
