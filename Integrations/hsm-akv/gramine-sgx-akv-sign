@@ -6,6 +6,7 @@
 #                    Borys Popławski <borysp@invisiblethingslab.com>
 
 import datetime
+import hashlib
 import os
 
 import click
