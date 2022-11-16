@@ -8,17 +8,6 @@ This directory contains a plugin to Gramine tools that enables support for
 production signing of SGX enclaves using keys from Azure Key Vault (AKV) Managed
 HSM.
 
-## Installation
-
-Make sure that Gramine is installed on the system. Then copy the file
-`gramine-sgx-akv-sign` into Gramine installation directory like this:
-```
-cp gramine-sgx-akv-sign $(dirname $(which gramine-sgx-sign))
-```
-
-You may need to run the above command with `sudo` if Gramine was installed in a
-system-wide directory.
-
 ## Prerequisites for SGX enclave signing
 
 - Azure Subscription with access to Azure Key Vault's Managed HSM.
@@ -36,7 +25,7 @@ for creating the key in Azure Key Vault Managed HSM.
 
 The command to sign the enclave with AKV's Managed HSM looks like this:
 ```
-gramine-sgx-akv-sign \
+./gramine-sgx-akv-sign \
   --manifest <your-app-manifest> --output <your-app-manifest>.sgx \
   --key https://myakv-mhsm.managedhsm.azure.net:sgx_sign_key
 ```
