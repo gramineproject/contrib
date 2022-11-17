@@ -49,11 +49,12 @@ index = ['The target deployment environment is assumed to be an Azure Confidenti
          '1. Distro selection',
          '2. Command-line arguments',
          '3. Environment variables',
-         '4. Encrypted files and key provisioning',
-         '5. Remote Attestation',
-         '6. Enclave signing',
-         '7. Generation of the final curated images',
-         '8. Generation of docker run commands']
+         '4. Additional docker flags',
+         '5. Encrypted files and key provisioning',
+         '6. Remote Attestation',
+         '7. Enclave signing',
+         '8. Generation of the final curated images',
+         '9. Generation of docker run commands']
 
 distro_prompt = ['>> Distro Selection:', 'Provide the distro of your base image',
                  '- Press 1 for Ubuntu 18.04',
@@ -122,6 +123,15 @@ env_help =  ['This step secures the environment variables. Gramine will ignore e
              ' variables specified at runtime, so please ensure you provide those here.'
              ' By default Gramine will add all the environment variables set in the base'
              ' docker image.']
+
+flags_input = ['>> Additional docker flags:','Specify docker flags here in a single string.'
+             ' For example, if your docker runtime is ', 'docker run flag1 flag2 <image_name>'
+             + color_set, 'then the flags that need to be provided here are', 'flag1 flag2'
+             + color_set, 'Press CTRL+G when done']
+flags_help =  ['At the end of this Curation app, it writes instructions into commands.txt to run'
+               ' the curated images. If you have Docker container flags/configurations which should'
+               ' be added to the `docker run` instructions, please specify them here.']
+
 wait_message = ['Image Creation:', 'Your Gramine Shielded Container image is being created.'
                 ' This might take a few minutes.']
 system_config_message = ['System config by default is assumed to be an Azure Confidential compute'
