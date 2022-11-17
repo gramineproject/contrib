@@ -354,7 +354,11 @@ def main(stdscr, argv):
     if envs:
         env_required = 'y'
 
-    # 4. Provide encrypted files and key provisioning
+    # 4. Provide additional docker run flags
+    update_user_and_commentary_win_array(user_console, guide_win, flags_input, flags_help)
+    flags = update_user_input()
+
+    # 5. Provide encrypted files and key provisioning
     ef_required = 'n'
     encryption_key = ''
     enc_key_path_in_verifier = ''
@@ -370,7 +374,7 @@ def main(stdscr, argv):
         enc_key_path_in_verifier = enc_key_path.format(encryption_key_name)
         ef_required = 'y'
 
-    # 5. Remote Attestation with RA-TLS
+    # 6. Remote Attestation with RA-TLS
     ca_cert_path = ''
     config = ''
     verifier_server = '<verifier-dns-name:port>'
@@ -399,7 +403,7 @@ def main(stdscr, argv):
 
         break
 
-    # 6. Obtain enclave signing key
+    # 7. Obtain enclave signing key
     update_user_and_commentary_win_array(user_console, guide_win, key_prompt, signing_key_help)
     key_path = get_enclave_signing_input(user_console, guide_win)
     passphrase = ''
@@ -413,7 +417,7 @@ def main(stdscr, argv):
                       '                   Press CTRL+G to continue')
         passphrase = update_user_input(secure=True)
 
-    # 7. Generation of the final curated images
+    # 8. Generation of the final curated images
     if attestation_required == 'y':
         os.chdir('verifier')
         verifier_log_file_pointer = open(verifier_log_file, 'w')
@@ -435,7 +439,9 @@ def main(stdscr, argv):
     image = gsc_app_image
     check_image_creation_success(user_console, docker_socket, image, log_file)
 
-    # 8. Generation of docker run commands
+    # 9. Generation of docker run commands
+    if host_net and host_net not in flags:
+        flags = flags + " " + host_net
     commands_fp = open(commands_file, 'w')
     if attestation_required == 'y':
         debug_enclave_env_ver_ext = ''
@@ -484,9 +490,9 @@ def main(stdscr, argv):
         run_command = (f'{verifier_run_command} \n \n'
                        f'Execute below command to deploy the curated GSC image'
                        f'{custom_image_dns_info}:\n'
-                       f'{workload_run.format(host_net, verifier_server, gsc_app_image)}')
+                       f'{workload_run.format(flags, verifier_server, gsc_app_image)}')
     else:
-        run_command = run_command_no_att.format(host_net, gsc_app_image)
+        run_command = run_command_no_att.format(flags, gsc_app_image)
 
     user_info = [image_ready_messg.format(gsc_app_image), commands_file + color_set,
                 app_exit_messg]
