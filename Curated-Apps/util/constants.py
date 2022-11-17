@@ -49,7 +49,7 @@ index = ['The target deployment environment is assumed to be an Azure Confidenti
          '1. Distro selection',
          '2. Command-line arguments',
          '3. Environment variables',
-         '4. Additional docker flags',
+         '4. Additional docker run flags',
          '5. Encrypted files and key provisioning',
          '6. Remote Attestation',
          '7. Enclave signing',
@@ -124,8 +124,8 @@ env_help =  ['This step secures the environment variables. Gramine will ignore e
              ' By default Gramine will add all the environment variables set in the base'
              ' docker image.']
 
-flags_input = ['>> Additional docker flags:','Specify docker flags here in a single string.'
-             ' For example, if your docker runtime is ', 'docker run flag1 flag2 <image_name>'
+flags_input = ['>> Additional docker run flags:','Specify docker run flags here in a single string.'
+             ' For example, if your docker command is ', 'docker run flag1 flag2 <image_name>'
              + color_set, 'then the flags that need to be provided here are', 'flag1 flag2'
              + color_set, 'Press CTRL+G when done']
 flags_help =  ['At the end of this Curation app, it writes instructions into commands.txt to run'

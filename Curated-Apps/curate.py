@@ -351,7 +351,7 @@ def main(stdscr, argv):
     if envs:
         env_required = 'y'
 
-    # 4. Provide additional docker flags
+    # 4. Provide additional docker run flags
     update_user_and_commentary_win_array(user_console, guide_win, flags_input, flags_help)
     flags = update_user_input()
 
