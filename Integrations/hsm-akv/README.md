@@ -27,8 +27,8 @@ The command to sign the enclave with AKV's Managed HSM looks like this:
 ```
 ./gramine-sgx-akv-sign \
   --manifest <your-app-manifest> --output <your-app-manifest>.sgx \
-  --key https://myakv-mhsm.managedhsm.azure.net:sgx_sign_key
+  --url https://myakv-mhsm.managedhsm.azure.net --key sgx_sign_key
 ```
 
 where `sgx_sign_key` is the name of the RSA private key created in the AKV's
-Managed HSM with URL `https://myakv-mhsm.managedhsm.azure.net`.
+Managed HSM with Vault URL `https://myakv-mhsm.managedhsm.azure.net`.
