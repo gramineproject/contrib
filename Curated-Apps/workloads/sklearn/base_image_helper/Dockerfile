@@ -1,5 +1,8 @@
 FROM bitnami/scikit-learn-intel
 
-COPY kmeans.py /app/
+RUN pip3 install pandas
 
-ENTRYPOINT ["python3", "kmeans.py"]
+COPY kmeans_perf_eval.py /app/
+COPY data /app/data
+
+ENTRYPOINT ["python3", "kmeans_perf_eval.py"]

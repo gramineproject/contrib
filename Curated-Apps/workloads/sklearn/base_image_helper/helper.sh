@@ -10,7 +10,13 @@ cd $MY_PATH
 
 image_name='sklearn-base'
 
+echo "Downloading datasets..."
+
+# Download and save the datasets
+python3 download_dataset.py
+
 # Build Scikit-learn base image
+echo "Base image creation started"
 docker rmi -f $image_name >/dev/null 2>&1
 docker build -t $image_name .
 
