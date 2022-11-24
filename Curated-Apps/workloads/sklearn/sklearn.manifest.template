@@ -12,6 +12,7 @@ loader.env.OMP_NUM_THREADS = "8"
 loader.uid=999
 loader.gid=999
 
+sys.stack.size = "8M"
 sys.enable_extra_runtime_domain_names_conf = true
 
 fs.mounts = [
