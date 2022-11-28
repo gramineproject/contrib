@@ -130,7 +130,9 @@ flags_input = ['>> Additional docker run flags:','Specify docker run flags here 
              + color_set, 'Press CTRL+G when done']
 flags_help =  ['At the end of this Curation app, it writes instructions into commands.txt to run'
                ' the curated images. If you have Docker container flags/configurations which should'
-               ' be added to the `docker run` instructions, please specify them here.']
+               ' be added to the `docker run` instructions, please specify them here or modify'
+               ' the final commands in commands.txt at the end of curation.', 'Examples of'
+               ' docker flags: --rm, --name, --network, etc.' + color_set]
 
 wait_message = ['Image Creation:', 'Your Gramine Shielded Container image is being created.'
                 ' This might take a few minutes.']
