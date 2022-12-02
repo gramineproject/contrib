@@ -24,5 +24,5 @@ Gramine:
 #         Branch:     ""
 #
 SGXDriver:
-    Repository: ""
-    Branch:     ""
+    Repository: "https://github.com/intel/SGXDataCenterAttestationPrimitives.git"
+    Branch:     "DCAP_1.11 && cp -r driver/linux/* ."
