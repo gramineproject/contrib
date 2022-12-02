@@ -3,7 +3,7 @@
 # file and run-time arguments into the graminized Scikit-learn image.
 
 # The curation script fills the <base_image_name> during curation.
-From <base_image_name>
+FROM <base_image_name>
 
 # COPY ca.crt /ca.crt
 

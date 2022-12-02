@@ -47,7 +47,7 @@ learning.
     |---------------------------------------------------------------------------------------------|
     | S.No.| Required?| Argument         | Description/Possible values                            |
     |------|----------|------------------|--------------------------------------------------------|
-    | 1.   |    Yes   | <workload type>  | Provide type of workload (refer /workload sub-directory|
+    | 1.   |    Yes   | <workload type>  | Type of workload (refer to workload/ sub-directory     |
     |      |          |                  | for full list of supported workload types) e.g. redis. |
     | 2.   |    Yes   | <base image name>| Base image name to be graminized.                      |
     | 3.   | Optional | 'debug'          | To generate an insecure graminized image with debug    |
