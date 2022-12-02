@@ -5,6 +5,9 @@ sgx.nonpie_binary = true
 sgx.enclave_size = "16G"
 sgx.thread_num = 128
 loader.pal_internal_mem_size = "128M"
+
+# Given example is tested on a 72 core machine which produces best results with default value as `8`.
+# Please tune this parameter based on machine configuration.
 loader.env.OMP_NUM_THREADS = "8"
 
 # This is required to run workload as non-root user, any number works except `0` which is for root.
