@@ -1,0 +1,63 @@
+# Gramine Curated tensorflow-serving
+In the following two sections, we explain how a GSC image for the tensorflow-serving can be
+built and how the image can be executed.
+[Prerequisites](https://github.com/gramineproject/contrib/tree/master/Curated-Apps/README.md) for
+both the phases are assumed to be met.
+
+## Build a confidential compute image for tensorflow-serving
+Execute the below commands on the VM.
+
+1. Clone the Gramine Contrib repository:
+
+       $ git clone --depth 1 https://github.com/gramineproject/contrib.git
+
+2. Move to the Curated-Apps folder:
+
+       $ cd contrib/Curated-Apps
+
+3. User is expected to first have a base image `<base_image_with_tensorflow-serving>` ready with
+   tensorflow-serving and the necessary application files built into this image. The current
+   directory contains sample dockerfiles and instructions to create a test tensorflow-serving base
+   image. This base image is then passed to the curation application `curate.py` as shown below.
+
+4. To generate a preconfigured non-production test confidential compute image for
+   tensorflow-serving, follow the below steps:
+   1. Generate a sample tensorflow-serving application image 
+      `intel/intel-optimized-tensorflow-serving:2.9.1-ubuntu`:
+
+          $ /bin/bash workloads/tensorflow-serving/base_image_helper/helper.sh
+
+   2. Generate the test confidential compute image based on the
+      `intel/intel-optimized-tensorflow-serving:2.9.1-ubuntu` image as shown below:
+
+          $ python3 ./curate.py tensorflow-serving \
+            intel/intel-optimized-tensorflow-serving:2.9.1-ubuntu test
+
+5. To generate a custom confidential compute image based on a user-provided tensorflow-serving
+   image, execute the following to launch an interactive setup script:
+
+       $ python3 ./curate.py tensorflow-serving <base_image_with_tensorflow-serving>
+
+## Run the confidential compute image for tensorflow-serving
+
+- This example was tested on a Standard_DC8s_v3 Azure VM.
+- Follow the output of the `curate.py` script to run the generated Docker image(s).
+
+## Contents
+This sub-directory contains artifacts which help in creating curated GSC tensorflow-serving image,
+as explained below:
+
+    .
+    |-- tensorflow-serving-gsc.dockerfile.template   # Template used by `curation_script.sh` to
+    |                                                  create a wrapper dockerfile
+    |                                                  `tensorflow-serving-gsc.dockerfile` that
+    |                                                  includes user-provided inputs such as
+    |                                                  command-line argument into the graminized
+    |                                                  tensorflow-serving image.
+    |-- tensorflow-serving.manifest.template         # Template used by `curation_script.sh` to
+    |                                                  create a user manifest file (with basic set
+    |                                                  of values defined for graminizing
+    |                                                  tensorflow-serving images), that will be
+    |                                                  passed to GSC.
+    |-- base_image_helper/                           # `base_image_helper` directory contains steps
+    |                                                  which helps in generating a base image.

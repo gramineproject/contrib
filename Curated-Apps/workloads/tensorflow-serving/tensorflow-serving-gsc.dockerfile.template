@@ -1,0 +1,10 @@
+# This template is used by `curation_script.sh` to create a wrapper dockerfile
+# `tensorflow-serving-gsc.dockerfile` that includes user provided inputs such as 
+# run-time arguments into the graminized tensorflow-serving image
+
+# The curation script fills the <base_image_name> during curation.
+From <base_image_name>
+
+# These two lines are required to incorporate command-line arguments with the image entrypoint and cmd
+COPY entry_script_tensorflow-serving.sh /usr/local/bin/entry_script_tensorflow-serving.sh
+ENTRYPOINT ["/bin/bash", "/usr/local/bin/entry_script_tensorflow-serving.sh"]
