@@ -1,0 +1,4 @@
+/*.log
+/entry_script_tensorflow-serving.sh
+/tensorflow-serving-gsc.dockerfile
+/tensorflow-serving.manifest
