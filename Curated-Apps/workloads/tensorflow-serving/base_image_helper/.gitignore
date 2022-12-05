@@ -1,0 +1,4 @@
+/models
+/serving
+/resnet_v1_fp32_savedmodel_NCHW_jpg.tar.gz
+/hash_resnet.txt

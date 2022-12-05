@@ -266,6 +266,16 @@ def is_azure_instance():
 
     return len(rec_pattern.findall(service_output.stdout)) > 0
 
+def get_insecure_args(workload_type):
+    insecure_args_file = f'workloads/{workload_type}/insecure_args.txt'
+
+    try:
+        with open(insecure_args_file, 'r') as pfile:
+            args = pfile.read()
+    except FileNotFoundError:
+        args = ''
+    return args
+
 def main(stdscr, argv):
 
     if len(argv) < 3:
@@ -316,11 +326,13 @@ def main(stdscr, argv):
                          'test', '', 'test-image', debug_flag], stdout=log_file_pointer,
                          stderr=log_file_pointer)
         check_image_creation_success(stdscr, docker_socket, gsc_app_image, log_file)
-        string_t = test_run_cmd.format(gsc_app_image)
+        args = get_insecure_args(workload_type)
+        string_t = test_run_cmd.format(gsc_app_image + ' ' + args)
         stdscr.addstr(test_run_instr.format(gsc_app_image, string_t))
 
         commands_fp = open(commands_file, 'w')
-        commands_fp.write(test_run_cmd.format(gsc_app_image))
+
+        commands_fp.write(test_run_cmd.format(gsc_app_image + ' ' + args))
         commands_fp.close()
 
         stdscr.getch()
