@@ -79,7 +79,7 @@ def main(output, libpal, key, url, manifest_file, sigfile, verbose):
 
     expanded = manifest.expand_all_trusted_files()
 
-    with open(output, 'w', encoding='utf-8') as f:
+    with open(output, 'wb') as f:
         manifest.dump(f)
 
     if not sigfile:
