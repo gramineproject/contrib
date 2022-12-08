@@ -82,6 +82,7 @@ add_encrypted_files_to_manifest(){
     echo "]" >> $app_image_manifest
 }
 
+cmdline_flag=""
 create_gsc_image () {
     echo
     cd $CUR_DIR
@@ -98,9 +99,9 @@ create_gsc_image () {
     docker rmi -f gsc-$base_image-unsigned >/dev/null 2>&1
 
     if [ "$1" = "y" ]; then
-        ./gsc build -d $app_image_x  $WORKLOAD_DIR/$app_image_manifest
+        ./gsc build $cmdline_flag -d $app_image_x  $WORKLOAD_DIR/$app_image_manifest
     else
-        ./gsc build $app_image_x $WORKLOAD_DIR/$app_image_manifest
+        ./gsc build $cmdline_flag $app_image_x $WORKLOAD_DIR/$app_image_manifest
     fi
 
     echo
@@ -136,6 +137,7 @@ fetch_base_image_config () {
 echo ""
 read -r signing_input signing_key_path <<<$(echo "$4 $4")
 if [ "$signing_input" = "test" ]; then
+    cmdline_flag="--insecure-args"
     echo 'Generating signing key'
     openssl genrsa -3 -out $CUR_DIR'/test/enclave-key.pem' 3072
     signing_key_path=$CUR_DIR'/test/enclave-key.pem'
@@ -168,10 +170,11 @@ touch $entrypoint_script
 # Copying the complete binary string to the entrypoint script file
 echo '#!/bin/bash' >> $entrypoint_script
 echo '' >> $entrypoint_script
-echo $complete_binary_cmd >> $entrypoint_script
+echo $complete_binary_cmd' "${@}"' >> $entrypoint_script
 
 # Test image creation
 if [ "$6" = "test-image" ]; then
+    cmdline_flag="--insecure-args"
     grep -qxF 'sgx.file_check_policy = "allow_all_but_log"' $app_image_manifest ||
      echo 'sgx.file_check_policy = "allow_all_but_log"' >> $app_image_manifest
 
