@@ -11,21 +11,19 @@ fi
 export TF_SERVING_ROOT=$(pwd)/serving
 export TF_SERVING_AZ_IMAGE_UBUNTU_20="gramine.azurecr.io:443/base_images/intel-tensorflow-ubuntu20.04"
 export TF_SERVING_AZ_IMAGE_UBUNTU_18="gramine.azurecr.io:443/base_images/intel-tensorflow-ubuntu18.04"
-export TF_SERVING_IMAGE_FINAL=intel/intel-optimized-tensorflow-serving:2.9.1-ubuntu
+export TF_SERVING_IMAGE_FINAL=tf-serving-base
 
 OS=$1
 if [ "$OS" == "20.04" ]
 then  
-    sed -i "1s|.*|FROM ${TF_SERVING_AZ_IMAGE_UBUNTU_20} |" workloads/tensorflow-serving/base_image_helper/Dockerfile
+    sed -i "1s|.*|FROM ${TF_SERVING_AZ_IMAGE_UBUNTU_20} |" Dockerfile
 elif [ "$OS" == "18.04" ]
 then
-    sed -i "1s|.*|FROM ${TF_SERVING_AZ_IMAGE_UBUNTU_18} |" workloads/tensorflow-serving/base_image_helper/Dockerfile
+    sed -i "1s|.*|FROM ${TF_SERVING_AZ_IMAGE_UBUNTU_18} |" Dockerfile
 else
     echo "Not valid option."
     exit
 fi
-
-pushd workloads/tensorflow-serving/base_image_helper
 
 if [ -d /tmp/resnet ]; then
     rm -rf /tmp/resnet
@@ -50,7 +48,6 @@ mv /tmp/mnist models/mnist
 docker build \
     -f Dockerfile \
     -t ${TF_SERVING_IMAGE_FINAL} .
-popd
 
 echo -e '\n\nCreated base image `'$TF_SERVING_IMAGE_FINAL'`.'
 echo -e 'Please refer to `Curated-Apps/workloads/tensorflow-serving/README.md` to curate the above image' \

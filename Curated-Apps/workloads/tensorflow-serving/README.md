@@ -11,30 +11,39 @@ Execute the below commands on the VM.
 
        $ git clone --depth 1 https://github.com/gramineproject/contrib.git
 
-2. Move to the Curated-Apps folder:
+2. Move to `contrib/Curated-Apps/workloads/tensorflow-serving/base_image_helper` folder:
 
-       $ cd contrib/Curated-Apps
+       $ cd contrib/Curated-Apps/workloads/tensorflow-serving/base_image_helper
 
 3. User is expected to first have a base image `<base_image_with_tensorflow-serving>` ready with
    tensorflow-serving and the necessary application files built into this image. The current
-   directory contains sample dockerfiles and instructions to create a test tensorflow-serving base
-   image. This base image is then passed to the curation application `curate.py` as shown below.
+   directory contains sample dockerfiles and instructions to create a test tensorflow-serving
+   base image. This base image is then passed to the curation application `curate.py` as shown
+   below.
 
 4. To generate a preconfigured non-production test confidential compute image for
    tensorflow-serving, follow the below steps:
-   1. Generate a sample tensorflow-serving application image 
-      `intel/intel-optimized-tensorflow-serving:2.9.1-ubuntu`:
+   1. Generate a sample tensorflow-serving application image `tf-serving-base:latest`:
 
-          $ /bin/bash workloads/tensorflow-serving/base_image_helper/helper.sh
+      1. For ubuntu 20.04:  
+         `$ /bin/bash helper.sh 20.04`
+
+      2. For ubuntu 18.04:  
+         `$ /bin/bash helper.sh 18.04`
 
    2. Generate the test confidential compute image based on the
-      `intel/intel-optimized-tensorflow-serving:2.9.1-ubuntu` image as shown below:
+      `tf-serving-base:latest` image as shown below:
 
-          $ python3 ./curate.py tensorflow-serving \
-            intel/intel-optimized-tensorflow-serving:2.9.1-ubuntu test
+          $ python3 ./curate.py tensorflow-serving tf-serving-base:latest test
 
-5. To generate a custom confidential compute image based on a user-provided tensorflow-serving
-   image, execute the following to launch an interactive setup script:
+5. Move to the Curated-Apps folder:
+
+       $ cd contrib/Curated-Apps
+
+6. To generate a custom confidential compute image based on a user-provided tensorflow-serving
+   image, execute the following to launch an interactive setup script. Please input command-line
+   arguments `--model_name="resnet" --model_base_path="/models/resnet"` for resnet model
+   and `--model_name="mnist" --model_base_path="/models/mnist"` for mnist model.
 
        $ python3 ./curate.py tensorflow-serving <base_image_with_tensorflow-serving>
 
