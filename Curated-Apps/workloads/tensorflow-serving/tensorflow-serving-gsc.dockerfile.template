@@ -5,6 +5,8 @@
 # The curation script fills the <base_image_name> during curation.
 From <base_image_name>
 
+# COPY ca.crt /ca.crt
+
 # These two lines are required to incorporate command-line arguments with the image entrypoint and cmd
 COPY entry_script_tensorflow-serving.sh /usr/local/bin/entry_script_tensorflow-serving.sh
 ENTRYPOINT ["/bin/bash", "/usr/local/bin/entry_script_tensorflow-serving.sh"]
