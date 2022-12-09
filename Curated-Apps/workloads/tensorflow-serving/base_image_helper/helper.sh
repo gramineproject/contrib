@@ -21,7 +21,10 @@ elif [ "$OS" == "18.04" ]
 then
     sed -i "1s|.*|FROM ${TF_SERVING_AZ_IMAGE_UBUNTU_18} |" Dockerfile
 else
-    echo "Not valid option."
+    echo "No Ubuntu version provided."
+    echo "Allowed usage:"
+    echo "/bin/bash helper.sh 20.04"
+    echo "/bin/bash helper.sh 18.04"
     exit
 fi
 

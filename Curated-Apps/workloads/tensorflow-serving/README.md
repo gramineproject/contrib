@@ -25,10 +25,10 @@ Execute the below commands on the VM.
    tensorflow-serving, follow the below steps:
    1. Generate a sample tensorflow-serving application image `tf-serving-base:latest`:
 
-      1. For ubuntu 20.04:  
+      1. For ubuntu 20.04:\
          `$ /bin/bash helper.sh 20.04`
 
-      2. For ubuntu 18.04:  
+      2. For ubuntu 18.04:\
          `$ /bin/bash helper.sh 18.04`
 
    2. Generate the test confidential compute image based on the
@@ -51,6 +51,10 @@ Execute the below commands on the VM.
 
 - This example was tested on a Standard_DC8s_v3 Azure VM.
 - Follow the output of the `curate.py` script to run the generated Docker image(s).
+- For non-production test image, to run the generated Docker image(s) append
+  `--model_name="resnet" --model_base_path="/models/resnet"` for resnet model
+  and `--model_name="mnist" --model_base_path="/models/mnist"` for mnist model with the output of
+  the `curate.py` script.
 
 ## Contents
 This sub-directory contains artifacts which help in creating curated GSC tensorflow-serving image,
