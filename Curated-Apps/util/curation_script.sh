@@ -170,7 +170,7 @@ touch $entrypoint_script
 # Copying the complete binary string to the entrypoint script file
 echo '#!/bin/bash' >> $entrypoint_script
 echo '' >> $entrypoint_script
-echo $complete_binary_cmd' "${@}"' >> $entrypoint_script
+echo $complete_binary_cmd' ${@}' >> $entrypoint_script
 
 # Test image creation
 if [ "$6" = "test-image" ]; then
