@@ -9,52 +9,52 @@ Execute the below commands on the VM.
 
 1. Clone the Gramine Contrib repository:
 
-       $ git clone --depth 1 https://github.com/gramineproject/contrib.git
+        $ git clone --depth 1 https://github.com/gramineproject/contrib.git
 
-2. Move to `contrib/Curated-Apps/workloads/tensorflow-serving/base_image_helper` folder:
+2. Move to the Curated-Apps folder:
 
-       $ cd contrib/Curated-Apps/workloads/tensorflow-serving/base_image_helper
+        $ cd contrib/Curated-Apps
 
 3. User is expected to first have a base image `<base_image_with_tensorflow-serving>` ready with
-   tensorflow-serving and the necessary application files built into this image. The current
-   directory contains sample dockerfiles and instructions to create a test tensorflow-serving
+   tensorflow-serving and the necessary application files built into this image. The
+   directory `contrib/Curated-Apps/workloads/tensorflow-serving/base_image_helper` contains
+   sample dockerfile and instructions to create a test tensorflow-serving
    base image. This base image is then passed to the curation application `curate.py` as shown
    below.
 
 4. To generate a preconfigured non-production test confidential compute image for
    tensorflow-serving, follow the below steps:
-   1. Generate a sample tensorflow-serving application image `tf-serving-base:latest`:
+    1. Generate a sample tensorflow-serving application image `tf-serving-base`:
 
-      1. For ubuntu 20.04:\
-         `$ /bin/bash helper.sh 20.04`
+        1. For ubuntu 20.04:\
+           `$ /bin/bash workloads/tensorflow-serving/base_image_helper/helper.sh 20.04`
 
-      2. For ubuntu 18.04:\
-         `$ /bin/bash helper.sh 18.04`
+        2. For ubuntu 18.04:\
+           `$ /bin/bash workloads/tensorflow-serving/base_image_helper/helper.sh 18.04`
 
-   2. Generate the test confidential compute image based on the
-      `tf-serving-base:latest` image as shown below:
+    2. Generate the test confidential compute image based on the
+       `tf-serving-base` image as shown below:
 
-          $ python3 ./curate.py tensorflow-serving tf-serving-base:latest test
+            $ python3 ./curate.py tensorflow-serving tf-serving-base test
 
-5. Move to the Curated-Apps folder:
+    Or, to generate a custom confidential compute image based on a user-provided tensorflow-serving
+    image, execute the following to launch an interactive setup script. Please input command-line
+    arguments `--model_name="resnet" --model_base_path="/models/resnet"` for resnet
+    model, `--model_name="mnist" --model_base_path="/models/mnist"` for mnist model and
+    `--model_name="half_plus_two" --model_base_path="/models/half_plus_two"` for half_plus_two
+    model.
 
-       $ cd contrib/Curated-Apps
-
-6. To generate a custom confidential compute image based on a user-provided tensorflow-serving
-   image, execute the following to launch an interactive setup script. Please input command-line
-   arguments `--model_name="resnet" --model_base_path="/models/resnet"` for resnet model
-   and `--model_name="mnist" --model_base_path="/models/mnist"` for mnist model.
-
-       $ python3 ./curate.py tensorflow-serving <base_image_with_tensorflow-serving>
+        $ python3 ./curate.py tensorflow-serving <base_image_with_tensorflow-serving>
 
 ## Run the confidential compute image for tensorflow-serving
 
 - This example was tested on a Standard_DC8s_v3 Azure VM.
 - Follow the output of the `curate.py` script to run the generated Docker image(s).
 - For non-production test image, to run the generated Docker image(s) append
-  `--model_name="resnet" --model_base_path="/models/resnet"` for resnet model
-  and `--model_name="mnist" --model_base_path="/models/mnist"` for mnist model with the output of
-  the `curate.py` script.
+  `--model_name="resnet" --model_base_path="/models/resnet"` for resnet model,
+  `--model_name="mnist" --model_base_path="/models/mnist"` for mnist model
+  and `--model_name="half_plus_two" --model_base_path="/models/half_plus_two"` for half_plus_two
+  model with the output of the `curate.py` script.
 
 ## Contents
 This sub-directory contains artifacts which help in creating curated GSC tensorflow-serving image,
