@@ -90,6 +90,13 @@ create_gsc_image () {
     git clone --depth 1 --branch v1.3.1 https://github.com/gramineproject/gsc.git
     cp $signing_key_path gsc/enclave-key.pem
 
+    # This is a temporary fix for the issue described in PR #21 and will be removed once fix is
+    # available in next GSC release.
+    sed -i 's/"{{"\\" \\"".join(cmd)}}"/{% if cmd %} "{{"\\" \\"".join(cmd)}}" {% endif %}/' \
+    gsc/templates/Dockerfile.common.build.template
+    sed -i 's/CMD \[{% if insecure_args %}/CMD \[{% if insecure_args and cmd %}/' \
+    gsc/templates/Dockerfile.common.build.template
+
     cd gsc
     cp ../util/config.yaml.template config.yaml
     sed -i 's|ubuntu:.*|'$distro'"|' config.yaml
@@ -170,7 +177,7 @@ touch $entrypoint_script
 # Copying the complete binary string to the entrypoint script file
 echo '#!/bin/bash' >> $entrypoint_script
 echo '' >> $entrypoint_script
-echo $complete_binary_cmd' ${@}' >> $entrypoint_script
+echo $complete_binary_cmd' "${@}"' >> $entrypoint_script
 
 # Test image creation
 if [ "$6" = "test-image" ]; then
