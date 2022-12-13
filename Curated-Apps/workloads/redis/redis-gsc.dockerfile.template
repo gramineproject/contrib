@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: LGPL-3.0-or-later
+# Copyright (C) 2022 Intel Corporation
+
 # This template is used by `curation_script.sh` to create a wrapper dockerfile
 # `redis-gsc.dockerfile` that includes user provided inputs such as `ca.cert`
 # file and run-time arguments into the graminized Redis image.
