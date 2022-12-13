@@ -1,4 +1,7 @@
-# At a time only one model can be enabled. Resnet is enabled by default as shown below.
+# SPDX-License-Identifier: LGPL-3.0-or-later
+# Copyright (C) 2022 Intel Corporation
+
+# At a time only one model can be enabled. ResNet is enabled by default as shown below.
 --model_name="resnet" --model_base_path="/models/resnet"
 #--model_name="mnist" --model_base_path="/models/mnist"
 #--model_name="half_plus_two" --model_base_path="/models/half_plus_two"

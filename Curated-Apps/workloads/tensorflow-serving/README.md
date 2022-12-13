@@ -31,7 +31,7 @@ Execute the below commands on the VM.
        Where `<distro>` can be `18.04` and `20.04`.
 
     2. Generate the test confidential compute image based on the `tf-serving-base` image as shown
-       below. By default, resnet is enabled. To enable other models one can uncomment
+       below. By default, ResNet is enabled. To enable other models one can uncomment
        corresponding command line arguments from `workloads/tensorflow-serving/insecure_args.txt`
        file.
 
