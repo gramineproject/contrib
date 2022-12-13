@@ -17,7 +17,7 @@ Execute the below commands on the VM.
 
 3. User is expected to first have a base image `<base_image_with_tensorflow-serving>` ready with
    tensorflow-serving and the necessary application files built into this image. The
-   directory `contrib/Curated-Apps/workloads/tensorflow-serving/base_image_helper` contains
+   directory `workloads/tensorflow-serving/base_image_helper` contains
    sample dockerfile and instructions to create a test tensorflow-serving
    base image. This base image is then passed to the curation application `curate.py` as shown
    below.
@@ -26,23 +26,19 @@ Execute the below commands on the VM.
    tensorflow-serving, follow the below steps:
     1. Generate a sample tensorflow-serving application image `tf-serving-base`:
 
-        1. For ubuntu 20.04:\
-           `$ /bin/bash workloads/tensorflow-serving/base_image_helper/helper.sh 20.04`
+            $ /bin/bash workloads/tensorflow-serving/base_image_helper/helper.sh <distro>
 
-        2. For ubuntu 18.04:\
-           `$ /bin/bash workloads/tensorflow-serving/base_image_helper/helper.sh 18.04`
+       Where `<distro>` can be `18.04` and `20.04`.
 
-    2. Generate the test confidential compute image based on the
-       `tf-serving-base` image as shown below:
+    2. Generate the test confidential compute image based on the `tf-serving-base` image as shown
+       below. By default, resnet is enabled. To enable other models one can uncomment
+       corresponding command line arguments from `workloads/tensorflow-serving/insecure_args.txt`
+       file.
 
             $ python3 ./curate.py tensorflow-serving tf-serving-base test
 
-    Or, to generate a custom confidential compute image based on a user-provided tensorflow-serving
-    image, execute the following to launch an interactive setup script. Please input command-line
-    arguments `--model_name="resnet" --model_base_path="/models/resnet"` for resnet
-    model, `--model_name="mnist" --model_base_path="/models/mnist"` for mnist model and
-    `--model_name="half_plus_two" --model_base_path="/models/half_plus_two"` for half_plus_two
-    model.
+5.  Or, to generate a custom confidential compute image based on a user-provided tensorflow-serving
+    image, execute the following to launch an interactive setup script.
 
         $ python3 ./curate.py tensorflow-serving <base_image_with_tensorflow-serving>
 
@@ -50,11 +46,6 @@ Execute the below commands on the VM.
 
 - This example was tested on a Standard_DC8s_v3 Azure VM.
 - Follow the output of the `curate.py` script to run the generated Docker image(s).
-- For non-production test image, to run the generated Docker image(s) append
-  `--model_name="resnet" --model_base_path="/models/resnet"` for resnet model,
-  `--model_name="mnist" --model_base_path="/models/mnist"` for mnist model
-  and `--model_name="half_plus_two" --model_base_path="/models/half_plus_two"` for half_plus_two
-  model with the output of the `curate.py` script.
 
 ## Contents
 This sub-directory contains artifacts which help in creating curated GSC tensorflow-serving image,
