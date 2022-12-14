@@ -30,7 +30,7 @@ test_run_instr = ('Run the {} docker image in an Azure Confidential Compute'
                   'Host networking (--net=host) is optional\n\n{}\n\n'
                   'Above command is saved to command.txt as well.'
                   ' Press any key to exit the app')
-test_run_cmd = ('$ docker run --net=host --device=/dev/sgx/enclave -it {}')
+test_run_cmd = ('$ docker run --net=host --device=/dev/sgx/enclave:/dev/sgx_enclave -it {}')
 image_not_found_warn = ('Warning: Cannot find application Docker image `{}`.\n'
                         'Fetching from Docker Hub ...\n\n')
 log_progress = 'You may monitor {} for detailed progress\n\n'
@@ -138,7 +138,7 @@ wait_message = ['Image Creation:', 'Your Gramine Shielded Container image is bei
                 ' This might take a few minutes.']
 system_config_message = ['System config by default is assumed to be an Azure Confidential compute'
                          ' instance.']
-run_command_no_att = '$ docker run {} --device=/dev/sgx/enclave -it {}'
+run_command_no_att = '$ docker run {} --device=/dev/sgx/enclave:/dev/sgx_enclave -it {}'
 run_with_debug = 'python3 curate.py {} {} debug' + color_set
 extra_debug_instr = ("It's also possible that you may run into issues resulting from lack of"
                      ' sufficient enclave memory pages, or insufficient number of threads.'
@@ -152,7 +152,7 @@ image_ready_messg  = ('The curated GSC image {} is ready, please follow the inst
 image_ready_messg_att = ('The curated GSC image , and the remote attestation verifier'
                          ' image is ready, You can run the images using the instructions provided'
                          ' in the below file.')
-workload_run = ('$ docker run {} --device=/dev/sgx/enclave -e SECRET_PROVISION_SERVERS={}'
+workload_run = ('$ docker run {} --device=/dev/sgx/enclave:/dev/sgx_enclave -e SECRET_PROVISION_SERVERS={}'
                 ' -v /var/run/aesmd/aesm.socket:/var/run/aesmd/aesm.socket -it {}')
 enc_keys_mount = '-v {}:/keys'
 enc_key_path = '/keys/{}'
