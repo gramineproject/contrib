@@ -31,14 +31,17 @@ Execute the below commands on the VM.
        Where `<distro>` can be `18.04` and `20.04`.
 
     2. Generate the test confidential compute image based on the `tf-serving-base` image as shown
-       below. By default, ResNet is enabled. To enable other models one can uncomment
-       corresponding command line arguments from `workloads/tensorflow-serving/insecure_args.txt`
-       file.
+       below. By default, ResNet is enabled. To enable other models you need to modify `model_name`
+       and `model_base_path` in `workloads/tensorflow-serving/insecure_args.txt` file.
 
             $ python3 ./curate.py tensorflow-serving tf-serving-base test
 
 5.  Or, to generate a custom confidential compute image based on a user-provided tensorflow-serving
-    image, execute the following to launch an interactive setup script.
+    image, execute the following to launch an interactive setup script. Please input command-line
+    arguments `--model_name="resnet" --model_base_path="/models/resnet"` for resnet
+    model, `--model_name="mnist" --model_base_path="/models/mnist"` for mnist model and
+    `--model_name="half_plus_two" --model_base_path="/models/half_plus_two"` for half_plus_two
+    model.
 
         $ python3 ./curate.py tensorflow-serving <base_image_with_tensorflow-serving>
 

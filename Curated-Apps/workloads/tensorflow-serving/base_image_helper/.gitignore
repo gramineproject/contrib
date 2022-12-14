@@ -1,4 +1,4 @@
 /models
 /serving
 /resnet_v1_fp32_savedmodel_NCHW_jpg.tar.gz
-/check_sum_resnet.txt
+/hash_resnet.txt

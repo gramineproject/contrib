@@ -20,10 +20,10 @@ export TF_SERVING_IMAGE_FINAL=tf-serving-base
 OS=$1
 if [ "$OS" == "20.04" ]
 then
-    sed -i "4s|.*|FROM ${TF_SERVING_AZ_IMAGE_UBUNTU_20} |" Dockerfile
+    sed -i "s|^FROM.*|FROM ${TF_SERVING_AZ_IMAGE_UBUNTU_20}|" Dockerfile
 elif [ "$OS" == "18.04" ]
 then
-    sed -i "4s|.*|FROM ${TF_SERVING_AZ_IMAGE_UBUNTU_18} |" Dockerfile
+    sed -i "s|^FROM.*|FROM ${TF_SERVING_AZ_IMAGE_UBUNTU_18}|" Dockerfile
 else
     echo "No Ubuntu version provided."
     echo "Allowed usage:"
@@ -39,8 +39,8 @@ mkdir -p /tmp/resnet
 resnet_checksum=c2c94887e54f8427716569385bc055d9e12e1608e8c65247fa5297d3f5ddc1bc
 if [ ! -f resnet_v1_fp32_savedmodel_NCHW_jpg.tar.gz ]; then
     wget http://download.tensorflow.org/models/official/20181001_resnet/savedmodels/resnet_v1_fp32_savedmodel_NCHW_jpg.tar.gz || exit
-    sha256sum resnet_v1_fp32_savedmodel_NCHW_jpg.tar.gz > check_sum_resnet.txt
-    grep $resnet_checksum check_sum_resnet.txt
+    sha256sum resnet_v1_fp32_savedmodel_NCHW_jpg.tar.gz > hash_resnet.txt
+    grep $resnet_checksum hash_resnet.txt
     if [ $? -ne 0 ]; then
         echo "File resnet_v1_fp32_savedmodel_NCHW_jpg.tar.gz checksum failure"
         rm -f resnet_v1_fp32_savedmodel_NCHW_jpg.tar.gz
