@@ -3,10 +3,8 @@
 
 # exit when any command fails
 set -e
-CUR_DIR=$(pwd)
 MY_PATH=$(dirname "$0")
-MY_ABS_PATH=$(pwd)"/"$MY_PATH
-pushd ${MY_ABS_PATH}
+pushd ${MY_PATH}
 
 if [ ! -d serving ]; then
     git clone https://github.com/tensorflow/serving.git
