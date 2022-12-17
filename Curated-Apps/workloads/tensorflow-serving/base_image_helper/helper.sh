@@ -18,10 +18,10 @@ export TF_SERVING_IMAGE_FINAL=tf-serving-base
 OS=$1
 if [ "$OS" == "20.04" ]
 then
-    sed -i "s|^FROM.*|FROM ${TF_SERVING_AZ_IMAGE_UBUNTU_20}|" Dockerfile
+    sed -i "s|FROM ${TF_SERVING_AZ_IMAGE_UBUNTU_18}|FROM ${TF_SERVING_AZ_IMAGE_UBUNTU_20}|" Dockerfile
 elif [ "$OS" == "18.04" ]
 then
-    sed -i "s|^FROM.*|FROM ${TF_SERVING_AZ_IMAGE_UBUNTU_18}|" Dockerfile
+    sed -i "s|FROM ${TF_SERVING_AZ_IMAGE_UBUNTU_20}|FROM ${TF_SERVING_AZ_IMAGE_UBUNTU_18}|" Dockerfile
 else
     echo "No Ubuntu version provided."
     echo "Allowed usage:"
