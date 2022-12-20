@@ -11,24 +11,7 @@ if [ ! -d serving ]; then
 fi
 
 export TF_SERVING_ROOT=$(pwd)/serving
-export TF_SERVING_AZ_IMAGE_UBUNTU_20="gramine.azurecr.io:443/base_images/intel-optimized-tensorflow-serving-avx512-ubuntu20.04"
-export TF_SERVING_AZ_IMAGE_UBUNTU_18="gramine.azurecr.io:443/base_images/intel-optimized-tensorflow-serving-avx512-ubuntu18.04"
 export TF_SERVING_IMAGE_FINAL=tf-serving-base
-
-OS=$1
-if [ "$OS" == "20.04" ]
-then
-    sed -i "s|FROM ${TF_SERVING_AZ_IMAGE_UBUNTU_18}|FROM ${TF_SERVING_AZ_IMAGE_UBUNTU_20}|" Dockerfile
-elif [ "$OS" == "18.04" ]
-then
-    sed -i "s|FROM ${TF_SERVING_AZ_IMAGE_UBUNTU_20}|FROM ${TF_SERVING_AZ_IMAGE_UBUNTU_18}|" Dockerfile
-else
-    echo "No Ubuntu version provided."
-    echo "Allowed usage:"
-    echo "/bin/bash helper.sh 20.04"
-    echo "/bin/bash helper.sh 18.04"
-    exit
-fi
 
 if [ -d /tmp/resnet ]; then
     rm -rf /tmp/resnet

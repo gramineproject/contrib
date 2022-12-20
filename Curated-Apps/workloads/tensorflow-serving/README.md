@@ -26,9 +26,7 @@ Execute the below commands on the VM.
    tensorflow-serving, follow the below steps:
     1. Generate a sample tensorflow-serving application image `tf-serving-base`:
 
-            $ /bin/bash workloads/tensorflow-serving/base_image_helper/helper.sh <distro>
-
-       Where `<distro>` can be `18.04` and `20.04`.
+            $ /bin/bash workloads/tensorflow-serving/base_image_helper/helper.sh
 
     2. Generate the test confidential compute image based on the `tf-serving-base` image as shown
        below. By default, ResNet is enabled. To enable other models you need to modify `model_name`
