@@ -176,7 +176,7 @@ echo '' >> $entrypoint_script
 echo 'if [[ "$#" -le "1" && "$1" -eq "" ]]; then
     '$complete_binary_cmd'
 else
-    '$complete_binary_cmd ' "${@}"
+    '$complete_binary_cmd' "${@}"
 fi' >> $entrypoint_script
 
 # Test image creation
