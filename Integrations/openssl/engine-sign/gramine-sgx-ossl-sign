@@ -65,7 +65,7 @@ def sign_with_ossl_engine(data, engine, key):
               required=True, help='Input .manifest file')
 @click.option('--sigfile', '-s', help='Output .sig file')
 @click.option('--verbose/--quiet', '-v/-q', default=True, help='Display details (on by default)')
-def main(output, libpal, key, url, manifest_file, sigfile, verbose):
+def main(output, libpal, key, engine, manifest_file, sigfile, verbose):
     # pylint: disable=too-many-arguments
 
     manifest = Manifest.load(manifest_file)
@@ -87,7 +87,7 @@ def main(output, libpal, key, url, manifest_file, sigfile, verbose):
 
     today = datetime.date.today()
     sigstruct = get_tbssigstruct(output, today, libpal, verbose=verbose)
-    sigstruct.sign(sign_with_ossl_engine, url, key)
+    sigstruct.sign(sign_with_ossl_engine, engine, key)
 
     with open(sigfile, 'wb') as f:
         f.write(sigstruct.to_bytes())
