@@ -22,18 +22,19 @@ partition_y = 7
 
 color_set = '::reverse'
 
-test_image_mssg = ('Your test GSC image is being generated. This image is not supposed to be'
-                   ' used in production \n\n')
+test_image_msg = ('\nYour test GSC image is being generated. This image is not supposed to be'
+                   ' used in production\n')
 
 test_run_instr = ('Run the {} docker image in an Azure Confidential Compute'
                   ' instance using the below command.\n\n'
                   'Host networking (--net=host) is optional\n\n{}\n\n'
-                  'Above command is saved to command.txt as well.'
-                  ' Press any key to exit the app')
+                  'Above command is saved to command.txt as well.\n')
 test_run_cmd = ('$ docker run --net=host --device=/dev/sgx/enclave -it {}')
 image_not_found_warn = ('Warning: Cannot find application Docker image `{}`.\n'
                         'Fetching from Docker Hub ...\n\n')
-log_progress = 'You may monitor {} for detailed progress\n\n'
+image_creation_failed = ('\n\n\n`{}` creation failed, exiting....\n\n'
+                         'For more info, look at the log file here: {}\n\n')
+log_progress = 'You may monitor {} for detailed progress\n'
 title = "Curate a Gramine Shielded Container (GSC) image"
 
 user_win_title = 'User Agent'
