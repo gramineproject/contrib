@@ -19,11 +19,14 @@ RUN chmod +x /gramine/app_files/gramine-sgx-akv-sign
 
 RUN az login
 
-RUN {% block path %}{% endblock %} /gramine/app_files/gramine-sgx-akv-sign \
-      --url <akv_mhsm_url> \
-      --key <akv_sign_key> \
-      --manifest /gramine/app_files/entrypoint.manifest \
-      --output /gramine/app_files/entrypoint.manifest.sgx
+RUN {% block path %}export PYTHONPATH="${PYTHONPATH}:$(find /gramine/meson_build_output/lib -type d -path '*/site-packages')" &&{% endblock %} \
+    /gramine/app_files/gramine-sgx-akv-sign \
+        --url <akv_mhsm_url> \
+        --key <akv_sign_key> \
+        --manifest /gramine/app_files/entrypoint.manifest \
+        --output /gramine/app_files/entrypoint.manifest.sgx
+
+RUN az logout
 
 # This trick removes all temporary files from the previous commands
 FROM {{image}}
