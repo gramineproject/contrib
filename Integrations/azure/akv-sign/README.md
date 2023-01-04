@@ -4,9 +4,9 @@ SGX enclaves must be signed using a 3072-bit RSA key. This key needs to be
 protected and must not be disclosed to anyone. Typically for production
 deployments, you should use a key secured in a Hardware Security Module (HSM).
 
-This directory contains the plugin to Gramine tools and templates that enable
-support for production signing of SGX enclaves using keys from Azure Key Vault
-(AKV) Managed HSM.
+This directory contains the plugin to Gramine tools as well as Dockerfile
+templates that enable support for production signing of SGX enclaves using keys
+from Azure Key Vault (AKV) Managed HSM.
 
 ## Prerequisites for SGX enclave signing
 
@@ -35,10 +35,9 @@ Managed HSM with Vault URL `https://myakv-mhsm.managedhsm.azure.net`.
 
 ## Templates for use with Gramine Shielded Containers (GSC)
 
-GSC `sign-image` command can take in a user supplied Dockerfile
-as an argument to `--template` and sign the graminized docker image. These
-templates can be used when a HSM is needed for signing. This directory has
-templates for using AKV to sign the graminized docker image. Please
-note that these are templates and the users will need to update the template
-with the required details to make it a 'self-contained' Dockerfile before
-passing it to `sign-image` command.
+This directory contains two Dockerfile templates, intended for use with GSC's
+`sign-image` command. GSC `sign-image` command can take in a user supplied
+Dockerfile as an argument to `--template` to sign the graminized docker image.
+Please note that these are templates and the users need to update the template
+with the required details to make it a self-contained Dockerfile before passing
+it to `gsc sign-image` command.

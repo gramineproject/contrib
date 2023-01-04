@@ -1,9 +1,11 @@
+# This Dockerfile template is derived from a generic
+# https://github.com/gramineproject/gsc/blob/master/templates/Dockerfile.common.sign.template
+
 FROM {{image}} as unsigned_image
 
 # Install the required packages using root user
 USER root
 
-{% block install %}
 RUN dnf update -y \
         && dnf install -y \
         curl \
@@ -13,7 +15,9 @@ RUN dnf update -y \
 RUN rpm --import https://packages.microsoft.com/keys/microsoft.asc
 RUN dnf install -y https://packages.microsoft.com/config/rhel/8/packages-microsoft-prod.rpm
 RUN dnf install -y azure-cli
-{% endblock %}
+
+# Switch back to original app_image user
+USER {{app_user}}
 
 RUN wget -P /gramine/app_files/ https://raw.githubusercontent.com/gramineproject/contrib/master/Integrations/azure/akv-sign/gramine-sgx-akv-sign
 
@@ -35,4 +39,3 @@ FROM {{image}}
 
 COPY --from=unsigned_image /gramine/app_files/*.sig /gramine/app_files/
 COPY --from=unsigned_image /gramine/app_files/*.sgx /gramine/app_files/
-
