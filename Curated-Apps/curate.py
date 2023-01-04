@@ -87,11 +87,9 @@ def resize_screen(screen_height, screen_width):
     subprocess.call(['echo','-e',f'\x1b[8;{screen_height};{screen_width}t'])
     time.sleep(0.35)
 
-def print_correct_usage(win, arg):
-    win.addstr(usage)
-    win.addstr('Press any key to exit')
-    win.getch()
-    sys.exit(1)
+def print_correct_usage():
+    print(f'{usage}')
+    exit()
 
 def update_user_input(secure=False):
     editwin = curses.newwin(user_input_height, user_input_width, user_input_start_y, 0)
@@ -193,19 +191,17 @@ def get_docker_image(docker_socket, image_name):
 def check_image_creation_success(win, docker_socket, image_name, log_file):
     image = get_docker_image(docker_socket, image_name)
     if image is None:
-        win.addstr(f'\n\n\n`{image_name}` creation failed, exiting....')
-        win.addstr(f'For more info, look at the log file here: {log_file}')
+        win.addstr(image_creation_failed.format(image_name, log_file))
         win.getch()
         sys.exit(1)
 
-def pull_docker_image(win, docker_socket, image_name):
+def pull_docker_image(docker_socket, image_name):
     try:
         docker_image = docker_socket.images.pull(image_name)
         return 0
     except (docker.errors.ImageNotFound, docker.errors.APIError):
-        win.addstr(f'Error: Could not fetch `{image_name}` image from DockerHub.\n')
-        win.addstr('Please check if the image name is correct and try again.')
-        win.refresh()
+        print(f'Error: Could not fetch `{image_name}` image from DockerHub.\n')
+        print('Please check if the image name is correct and try again.')
         return -1
 
 def get_encryption_key_input(user_console, guide_win):
@@ -276,10 +272,9 @@ def get_insecure_args(workload_type):
         args = ''
     return args
 
-def main(stdscr, argv):
-
+def main():
     if len(argv) < 3:
-        print_correct_usage(stdscr, argv[0])
+        print_correct_usage()
 
     workload_type = argv[1]
     base_image_name = argv[2]
@@ -294,19 +289,13 @@ def main(stdscr, argv):
             test_flag = 'test'
             processed_args += 1
         else:
-            print_correct_usage(stdscr, argv[0])
-
-    stdscr.clear()
-    resize_screen(screen_height, screen_width)
-    stdscr = curses.initscr()
+            print_correct_usage()
 
     docker_socket = docker.from_env()
     base_image = get_docker_image(docker_socket, base_image_name)
     if base_image is None:
-        stdscr.addstr(image_not_found_warn.format(base_image_name))
-        stdscr.refresh()
-        if pull_docker_image(stdscr, docker_socket, base_image_name) == -1:
-            stdscr.getch()
+        print(f'{image_not_found_warn.format(base_image_name)}')
+        if pull_docker_image(docker_socket, base_image_name) == -1:
             return -1
 
     log_file_name, n = re.subn('[:/]', '_', base_image_name)
@@ -316,28 +305,39 @@ def main(stdscr, argv):
     gsc_app_image ='gsc-{}'.format(base_image_name)
     gsc_app_image_unsigned ='gsc-{}-unsigned'.format(base_image_name)
 
-    distro = 'ubuntu:18.04'
-    # Generating test image
     if test_flag:
-        stdscr.addstr(test_image_mssg)
-        stdscr.addstr(log_progress.format(log_file))
-        stdscr.refresh()
-        subprocess.call(['util/curation_script.sh', workload_type, base_image_name, distro,
-                         'test', '', 'test-image', debug_flag], stdout=log_file_pointer,
-                         stderr=log_file_pointer)
-        check_image_creation_success(stdscr, docker_socket, gsc_app_image, log_file)
-        args = get_insecure_args(workload_type)
-        string_t = test_run_cmd.format(gsc_app_image + ' ' + args)
-        stdscr.addstr(test_run_instr.format(gsc_app_image, string_t))
+        create_test_image(docker_socket, workload_type, base_image_name, debug_flag, gsc_app_image,
+                          log_file, log_file_pointer)
+    else:
+        wrapper(create_custom_image, docker_socket, workload_type, base_image_name, debug_flag,
+                gsc_app_image, log_file, log_file_pointer)
 
-        commands_fp = open(commands_file, 'w')
+def create_test_image(docker_socket, workload_type, base_image_name, debug_flag, gsc_app_image,
+                      log_file, log_file_pointer):
+    print(f'{test_image_msg}')
+    print(f'{log_progress.format(log_file)}')
+    subprocess.call(['util/curation_script.sh', workload_type, base_image_name, 'ubuntu:18.04',
+                        'test', '', 'test-image', debug_flag], stdout=log_file_pointer,
+                        stderr=log_file_pointer)
 
-        commands_fp.write(test_run_cmd.format(gsc_app_image + ' ' + args))
-        commands_fp.close()
+    if get_docker_image(docker_socket, gsc_app_image) is None:
+        print(f'{image_creation_failed.format(gsc_app_image, log_file)}')
 
-        stdscr.getch()
-        return 0
+    args = get_insecure_args(workload_type)
+    docker_run_cmd = test_run_cmd.format(gsc_app_image + ' ' + args)
+    print(f'{test_run_instr.format(gsc_app_image, docker_run_cmd)}')
 
+    commands_fp = open(commands_file, 'w')
+    commands_fp.write(docker_run_cmd)
+    commands_fp.close()
+
+    return 0
+
+def create_custom_image(stdscr, docker_socket, workload_type, base_image_name, debug_flag,
+                        gsc_app_image, log_file, log_file_pointer):
+    stdscr.clear()
+    resize_screen(screen_height, screen_width)
+    stdscr = curses.initscr()
     user_console, guide_win = initwindows()
 
     update_user_and_commentary_win_array(user_console, guide_win, introduction, index)
@@ -350,6 +350,7 @@ def main(stdscr, argv):
     # 1. Obtain distro version
     update_user_and_commentary_win_array(user_console, guide_win, distro_prompt, distro_help)
     distro_option = update_user_input()
+    distro = 'ubuntu:18.04'
     if distro_option == '2':
         distro = 'ubuntu:20.04'
     elif distro_option == '3' or distro_option == '4':
@@ -522,4 +523,5 @@ def main(stdscr, argv):
         continue
     return 0
 
-wrapper(main, argv)
+if __name__ == "__main__":
+    main()
