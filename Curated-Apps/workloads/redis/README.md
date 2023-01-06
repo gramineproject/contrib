@@ -12,12 +12,14 @@ Execute the below commands on the VM.
    git clone --depth 1 https://github.com/gramineproject/contrib.git
    cd contrib/Curated-Apps
    ```
+
 2. To generate a preconfigured non-production test confidential compute image for Redis, execute
    the following script:
    ```sh
    python3 ./curate.py redis redis:7.0.0 test
    ```
-3. To generate a custom confidential compute image based on a user-provided Redis image, execute
+
+3. Or, to generate a custom confidential compute image based on a user-provided Redis image, execute
    the following to launch an interactive setup script:
    ```sh
    python3 ./curate.py redis <your_image>

@@ -28,14 +28,15 @@ learning.
 1. [Create an Intel SGX VM from the Azure portal](https://learn.microsoft.com/en-us/azure/confidential-computing/quick-create-portal).
    The tested distros are Ubuntu and Debian. Selection of a VM must factor in the EPC size that
    suits the application.
+
 2. Install the necessary build dependencies as shown below (for Ubuntu 18.04).
    ```sh
    sudo apt-get update && sudo apt-get install -y docker.io
    sudo chown $USER /var/run/docker.sock
    echo 'deb [arch=amd64] https://download.01.org/intel-sgx/sgx_repo/ubuntu bionic main' |
-   sudo tee /etc/apt/sources.list.d/intel-sgx.list
+       sudo tee /etc/apt/sources.list.d/intel-sgx.list
    wget -qO - https://download.01.org/intel-sgx/sgx_repo/ubuntu/intel-sgx-deb.key |
-   sudo apt-key add -
+       sudo apt-key add -
    sudo apt-key adv --fetch-keys https://packages.microsoft.com/keys/microsoft.asc
    sudo apt-add-repository 'https://packages.microsoft.com/ubuntu/18.04/prod main'
    sudo apt update && sudo apt install -y az-dcap-client

@@ -12,6 +12,7 @@ Execute the below commands on the VM.
    git clone --depth 1 https://github.com/gramineproject/contrib.git
    cd contrib/Curated-Apps
    ```
+
 2. User is expected to first have a base image `<base_image_with_tensorflow-serving>` ready with
    tensorflow-serving and the necessary application files built into this image. The
    directory `workloads/tensorflow-serving/base_image_helper` contains
@@ -21,16 +22,19 @@ Execute the below commands on the VM.
 
 3. To generate a preconfigured non-production test confidential compute image for
    tensorflow-serving, follow the below steps:
+
    1. Generate a sample tensorflow-serving application image `tf-serving-base`:
       ```sh
       /bin/bash workloads/tensorflow-serving/base_image_helper/helper.sh
       ```
+
    2. Generate the test confidential compute image based on the `tf-serving-base` image as shown
       below. By default, ResNet is enabled. To enable other models you need to modify `model_name`
       and `model_base_path` in `workloads/tensorflow-serving/insecure_args.txt` file.
       ```sh
       python3 ./curate.py tensorflow-serving tf-serving-base test
       ```
+
 4. Or, to generate a custom confidential compute image based on a user-provided tensorflow-serving
    image, execute the following to launch an interactive setup script. Please input command-line
    arguments `--model_name="resnet" --model_base_path="/models/resnet"` for resnet

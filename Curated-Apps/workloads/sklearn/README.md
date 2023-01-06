@@ -14,6 +14,7 @@ Execute the below commands on the VM.
    git clone --depth 1 https://github.com/gramineproject/contrib.git
    cd contrib/Curated-Apps
    ```
+
 2. User is expected to first have a base image `<base_image_with_scikit-learn>` ready with
    Scikit-learn and the necessary application files built into this image. The current directory
    contains sample dockerfiles and instructions to create a test Scikit-learn base image. This base
@@ -28,11 +29,13 @@ Execute the below commands on the VM.
       ```sh
       /bin/bash workloads/sklearn/base_image_helper/helper.sh
       ```
+
    3. Generate the test confidential compute image based on the `sklearn-base` image  as shown
       below:
       ```sh
       python3 ./curate.py sklearn sklearn-base test
       ```
+
 4. Or, to generate a custom confidential compute image based on a user-provided Scikit-learn image,
    execute the following to launch an interactive setup script:
    ```sh

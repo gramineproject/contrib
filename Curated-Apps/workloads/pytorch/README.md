@@ -12,6 +12,7 @@ Execute the below commands on the VM.
    git clone --depth 1 https://github.com/gramineproject/contrib.git
    cd contrib/Curated-Apps
    ```
+
 2. User is expected to first have a base image `<base_image_with_pytorch>` ready with PyTorch and
    the necessary application files built into this image. The current directory contains sample
    dockerfiles and instructions to create a test PyTorch base image. This base image is then passed
@@ -26,15 +27,18 @@ Execute the below commands on the VM.
       ```sh
       /bin/bash workloads/pytorch/base_image_helper/helper.sh
       ```
+
    3. Generate the test confidential compute image based on the `pytorch-encrypted` image as shown
       below:
       ```sh
       python3 ./curate.py pytorch pytorch-encrypted test
       ```
+
    4. Run test confidential compute image for PyTorch using below command:
       ```sh
       docker run --net=host --device=/dev/sgx/enclave -it gsc-pytorch-encrypted
       ```
+
    5. Follow the instructions [here](https://github.com/gramineproject/contrib/blob/master/Curated-Apps/workloads/pytorch/base_image_helper/README.md#retrieve-and-decrypt-results) to retrieve the results
 
 4. Or, to generate a custom confidential compute image based on a user-provided PyTorch image,

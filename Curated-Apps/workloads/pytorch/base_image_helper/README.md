@@ -7,7 +7,7 @@ This directory contains steps and artifacts to create a docker image with encryp
   pip3 install --user torchvision pillow
   ```
 
-  [Install gramine](https://gramine.readthedocs.io/en/latest/quickstart.html#install-gramine): File Encryption is done using `gramine-sgx-pf-crypt` tool which is part of gramine installation.
+  [Install Gramine](https://gramine.readthedocs.io/en/latest/quickstart.html#install-gramine): File Encryption is done using `gramine-sgx-pf-crypt` tool which is part of Gramine installation.
 
 # Base docker image creation
 
