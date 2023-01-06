@@ -17,32 +17,35 @@ learning.
 - No hardware requirements.
 - Any regular system with a Linux distribution is sufficient.
 - Install the necessary build dependencies as shown below (for Ubuntu).
-```sh
- $ sudo apt-get update && sudo apt-get install jq docker.io python3 python3-pip
- $ python3 -m pip install docker jinja2 tomli tomli-w pyyaml
- $ sudo chown $USER /var/run/docker.sock
-```
+  ```sh
+  sudo apt-get update && sudo apt-get install jq docker.io python3 python3-pip
+  python3 -m pip install docker jinja2 tomli tomli-w pyyaml
+  sudo chown $USER /var/run/docker.sock
+  ```
 
 ### For running the curated GSC image
 1. [Create an Intel SGX VM from the Azure portal](https://learn.microsoft.com/en-us/azure/confidential-computing/quick-create-portal).
    The tested distros are Ubuntu and Debian. Selection of a VM must factor in the EPC size that
    suits the application.
+
 2. Install the necessary build dependencies as shown below (for Ubuntu 18.04).
    ```sh
-   $ sudo apt-get update && sudo apt-get install -y docker.io
-   $ sudo chown $USER /var/run/docker.sock
-   $ echo 'deb [arch=amd64] https://download.01.org/intel-sgx/sgx_repo/ubuntu bionic main' |
-     sudo tee /etc/apt/sources.list.d/intel-sgx.list
-   $ wget -qO - https://download.01.org/intel-sgx/sgx_repo/ubuntu/intel-sgx-deb.key |
-     sudo apt-key add -
-   $ sudo apt-key adv --fetch-keys https://packages.microsoft.com/keys/microsoft.asc
-   $ sudo apt-add-repository 'https://packages.microsoft.com/ubuntu/18.04/prod main'
-   $ sudo apt update && sudo apt install -y az-dcap-client
-   $ sudo apt-get install -y -f libsgx-dcap-ql
+   sudo apt-get update && sudo apt-get install -y docker.io
+   sudo chown $USER /var/run/docker.sock
+   echo 'deb [arch=amd64] https://download.01.org/intel-sgx/sgx_repo/ubuntu bionic main' |
+       sudo tee /etc/apt/sources.list.d/intel-sgx.list
+   wget -qO - https://download.01.org/intel-sgx/sgx_repo/ubuntu/intel-sgx-deb.key |
+       sudo apt-key add -
+   sudo apt-key adv --fetch-keys https://packages.microsoft.com/keys/microsoft.asc
+   sudo apt-add-repository 'https://packages.microsoft.com/ubuntu/18.04/prod main'
+   sudo apt update && sudo apt install -y az-dcap-client
+   sudo apt-get install -y -f libsgx-dcap-ql
    ```
 
 ## Interactive script usage
-`$ python3 curate.py <workload type> <base image name> <optional args>`
+```sh
+python3 curate.py <workload type> <base image name> <optional args>
+```
 
     |---------------------------------------------------------------------------------------------|
     | S.No.| Required?| Argument         | Description/Possible values                            |
