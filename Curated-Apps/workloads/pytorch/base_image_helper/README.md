@@ -1,11 +1,13 @@
 This directory contains steps and artifacts to create a docker image with encrypted files.
 
 # Prerequisites
+  ```sh
+  sudo apt install libnss-mdns libnss-myhostname python3-pip lsb-release
+  pip3 install --upgrade pip # on ubuntu 18.04 machine
+  pip3 install --user torchvision pillow
+  ```
 
-- Please install [prerequisites](https://github.com/gramineproject/examples/tree/master/pytorch#pre-requisites)
-  on your machine.
-- File Encryption is done using `gramine-sgx-pf-crypt` tool which is part of
-  [Gramine installation](https://gramine.readthedocs.io/en/latest/quickstart.html#install-gramine).
+  [Install gramine](https://gramine.readthedocs.io/en/latest/quickstart.html#install-gramine): File Encryption is done using `gramine-sgx-pf-crypt` tool which is part of gramine installation.
 
 # Base docker image creation
 
@@ -18,7 +20,7 @@ to demonstrate the base image creation with encrypted files.
 Please refer to `Curated-Apps/workloads/pytorch/README.md` to curate the image created in above
 steps with GSC.
 
-# Retrieve and decrypt results
+# Retrieve and decrypt the results
 
 Results are generated in `/workspace/result.txt` within container in encrypted form after running
 the curated GSC image. User need to copy results from container to local machine and decrypt using

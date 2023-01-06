@@ -9,35 +9,35 @@ both the phases are assumed to be met.
 
 Execute the below commands on the VM.
 
-1. Clone the Gramine Contrib repository:
-
-       $ git clone --depth 1 https://github.com/gramineproject/contrib.git
-
-2. Move to the Curated-Apps folder:
-
-       $ cd contrib/Curated-Apps
-
-3. User is expected to first have a base image `<base_image_with_scikit-learn>` ready with
+1. Clone the Gramine Contrib repository and move to the Curated-Apps folder:
+   ```sh
+   git clone --depth 1 https://github.com/gramineproject/contrib.git
+   cd contrib/Curated-Apps
+   ```
+2. User is expected to first have a base image `<base_image_with_scikit-learn>` ready with
    Scikit-learn and the necessary application files built into this image. The current directory
    contains sample dockerfiles and instructions to create a test Scikit-learn base image. This base
    image is then passed to the curation application `curate.py` as shown below.
 
-4. To generate a preconfigured non-production test confidential compute image for Scikit-learn,
+3. To generate a preconfigured non-production test confidential compute image for Scikit-learn,
    follow the below steps:
 
-   1. Generate a sample Scikit-learn application image `sklearn-base`:
+   1. Install prerequisites given [here](https://github.com/gramineproject/contrib/blob/master/Curated-Apps/workloads/sklearn/base_image_helper/README.md) for creating sample Scikit-learn application image `sklearn-base`
 
-          $ /bin/bash workloads/sklearn/base_image_helper/helper.sh
-
-   2. Generate the test confidential compute image based on the `sklearn-base` image  as shown
+   2. Generate a sample Scikit-learn application image `sklearn-base`:
+      ```sh
+      /bin/bash workloads/sklearn/base_image_helper/helper.sh
+      ```
+   3. Generate the test confidential compute image based on the `sklearn-base` image  as shown
       below:
-
-          $ python3 ./curate.py sklearn sklearn-base test
-
-5. To generate a custom confidential compute image based on a user-provided Scikit-learn image,
+      ```sh
+      python3 ./curate.py sklearn sklearn-base test
+      ```
+4. Or, to generate a custom confidential compute image based on a user-provided Scikit-learn image,
    execute the following to launch an interactive setup script:
-
-       $ python3 ./curate.py sklearn <base_image_with_scikit-learn>
+   ```sh
+   python3 ./curate.py sklearn <base_image_with_scikit-learn>
+   ```
 
 ## Run the confidential compute image for Scikit-learn
 

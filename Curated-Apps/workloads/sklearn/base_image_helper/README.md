@@ -5,7 +5,8 @@ for Scikit-learn.
 
 Please run the following command to install the required packages (Ubuntu-specific):
 
-```
+```sh
+pip3 install --upgrade pip # on ubuntu 18.04 machine
 python3 -m pip install scikit-learn-intelex pandas numpy
 ```
 

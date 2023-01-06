@@ -7,22 +7,21 @@ both the phases are assumed to be met.
 ## Build a confidential compute image for Redis
 Execute the below commands on the VM.
 
-1. Clone the Gramine Contrib repository:
-
-       $ git clone --depth 1 https://github.com/gramineproject/contrib.git
-
-2. Move to the Curated-Apps folder:
-
-       $ cd contrib/Curated-Apps
-
-3. To generate a preconfigured confidential compute image for Redis, execute the following script:
-
-       $ python3 ./curate.py redis redis:7.0.0 test
-
-4. To generate a custom confidential compute image based on a user-provided Redis image, execute
+1. Clone the Gramine Contrib repository and move to the Curated-Apps folder:
+   ```sh
+   git clone --depth 1 https://github.com/gramineproject/contrib.git
+   cd contrib/Curated-Apps
+   ```
+2. To generate a preconfigured non-production test confidential compute image for Redis, execute
+   the following script:
+   ```sh
+   python3 ./curate.py redis redis:7.0.0 test
+   ```
+3. To generate a custom confidential compute image based on a user-provided Redis image, execute
    the following to launch an interactive setup script:
-
-       $ python3 ./curate.py redis <your_image>
+   ```sh
+   python3 ./curate.py redis <your_image>
+   ```
 
 ## Run the confidential compute image for Redis
 
