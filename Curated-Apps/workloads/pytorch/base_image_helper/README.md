@@ -3,8 +3,8 @@ This directory contains steps and artifacts to create a docker image with encryp
 # Prerequisites
   ```sh
   sudo apt install libnss-mdns libnss-myhostname python3-pip lsb-release
-  pip3 install --upgrade pip # on ubuntu 18.04 machine
-  pip3 install --user torchvision pillow
+  python3 -m pip install --upgrade pip # on ubuntu 18.04 machine
+  python3 -m pip install --user torchvision pillow
   ```
 
   [Install Gramine](https://gramine.readthedocs.io/en/latest/quickstart.html#install-gramine): File Encryption is done using `gramine-sgx-pf-crypt` tool which is part of Gramine installation.

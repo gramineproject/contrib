@@ -27,12 +27,17 @@ Execute the below commands on the VM.
       ```sh
       /bin/bash workloads/pytorch/base_image_helper/helper.sh
       ```
+      The above `helper.sh` script encrypts sensitive files such as models, data etc. with an auto
+      generated test encryption key `workloads/pytorch/base_image_helper/encryption_key` and copies
+      to the base image. Learn more about [Encrypted files](https://gramine.readthedocs.io/en/latest/manifest-syntax.html?highlight=protected#encrypted-files) support in gramine
 
    3. Generate the test confidential compute image based on the `pytorch-encrypted` image as shown
       below:
       ```sh
       python3 ./curate.py pytorch pytorch-encrypted test
       ```
+
+
 
    4. Run test confidential compute image for PyTorch using below command:
       ```sh
