@@ -37,8 +37,6 @@ Execute the below commands on the VM.
       python3 ./curate.py pytorch pytorch-encrypted test
       ```
 
-
-
    4. Run test confidential compute image for PyTorch using below command:
       ```sh
       docker run --net=host --device=/dev/sgx/enclave -it gsc-pytorch-encrypted
