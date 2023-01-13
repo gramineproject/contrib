@@ -1,0 +1,1 @@
+classes.txt:input.jpg:alexnet-pretrained.pt:result.txt

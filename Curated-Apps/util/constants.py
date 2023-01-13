@@ -81,7 +81,9 @@ attestation_prompt = ['>> Remote Attestation:' , 'To enable remote attestation u
                       ' a decryption key for encrypted files.',
                       '- Type done when ready, OR',
                       '- Type test to create test certificates, OR',
-                      '- No input (blank) to skip attestation',
+                      '- No input (blank) to skip attestation. Encryption key will be hard-coded in'
+                      ' the manifest if user had input encryption files in the previous step. This'
+                      ' option is thus insecure and must not be used in production environments!',
                       'Press CTRL+G when done']
 attestation_help = ['This step enables the enclave to communicate to a remote verifier over'
                     ' an Remote Attestation TLS (RA-TLS) link. This remote verifier uses Azure'
