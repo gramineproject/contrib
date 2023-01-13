@@ -32,16 +32,17 @@
 # -- arg10   : Actual environment variable string
 # -- arg11   : y or n (encrypted files as part of base image?)
 # -- arg12   : Path to the encrypted files in the image
-# -- arg13   : Passphrase to the enclave signing key (if applicable)
+# -- arg13   : encryption key used for encrypting sensitive files such as models, data etc.
+# -- arg14   : Passphrase to the enclave signing key (if applicable)
 
 echo printing args $0 $@
 
-start=$1
-wrapper_dockerfile=$start'-gsc.dockerfile'
-app_image_manifest=$start'.manifest'
+workload_type=$1
+wrapper_dockerfile=$workload_type'-gsc.dockerfile'
+app_image_manifest=$workload_type'.manifest'
 
 CUR_DIR=$(pwd)
-WORKLOAD_DIR=$CUR_DIR'/workloads/'$start
+WORKLOAD_DIR=$CUR_DIR'/workloads/'$workload_type
 cd $WORKLOAD_DIR
 mkdir $CUR_DIR'/test' >/dev/null 2>&1
 
@@ -59,27 +60,59 @@ else
     app_image_x="${base_image}_x"
 fi
 
+# Delete existing GSC image for the base image
+docker rmi -f gsc-$base_image >/dev/null 2>&1
+
 create_base_wrapper_image () {
     docker rmi -f $app_image_x >/dev/null 2>&1
     docker build -f $wrapper_dockerfile -t $app_image_x .
 }
 
-add_encrypted_files_to_manifest(){
+add_encrypted_files_to_manifest() {
+    if [[ -z "$1" ]]; then
+        return
+    fi
+
     IFS=':' # Setting colon as delimiter
     read -a ef_files_list <<<"$1"
     unset IFS
-    echo '' >> $app_image_manifest
-    echo '# User Provided Encrypted files' >> $app_image_manifest
-    echo 'fs.mounts = [' >> $app_image_manifest
     workdir_base_image="$(docker image inspect "$base_image" | jq '.[].Config.WorkingDir')"
     workdir_base_image=`sed -e 's/^"//' -e 's/"$//' <<<"$workdir_base_image"`
+    encrypted_files_string=''
     for i in "${ef_files_list[@]}"
     do
-        encrypted_files_string='  { path = "'$workdir_base_image'/'$i'", uri = "file:'$i'", '
-        encrypted_files_string+='type = "encrypted" },'
-        echo "$encrypted_files_string" >> $app_image_manifest
+        if [[ "$i" =~ ^/.* ]]; then
+            encrypted_files_string+='\n  { path = "'$i'", uri = "file:'$i'", type = "encrypted" },'
+        else
+            encrypted_files_string+='\n  { path = "'$workdir_base_image'/'$i'", uri = "file:'$i'", type = "encrypted" },'
+        fi
     done
-    echo "]" >> $app_image_manifest
+
+    if ! grep -q '^fs.mounts[[:space:]]*=[[:space:]]*\[' $app_image_manifest; then
+        encrypted_files_string="fs.mounts = [$encrypted_files_string\n]"
+        echo -e $encrypted_files_string >> $app_image_manifest
+    else
+        sed -i 's|\(^fs.mounts[[:space:]]*=[[:space:]]*\[\)|\1'"$encrypted_files_string"'|' $app_image_manifest
+    fi
+}
+
+add_encryption_key_to_manifest() {
+    if [[ ! -e $1 ]]; then
+        echo "Encryption key was not found!"
+        exit
+    fi
+    echo -e 'fs.insecure__keys.default = "'$(xxd -p $1)'"' >> $app_image_manifest
+}
+
+process_encrypted_files() {
+    input_file="../$workload_type/base_image_helper/encrypted_files.txt"
+    if [[ ! -e $input_file || -z "$(<$input_file)" ]]; then
+        return
+    fi
+
+    add_encrypted_files_to_manifest $(<$input_file)
+    encryption_key="../$workload_type/base_image_helper/encryption_key"
+    add_encryption_key_to_manifest $encryption_key
 }
 
 cmdline_flag=""
@@ -93,10 +126,6 @@ create_gsc_image () {
     cd gsc
     cp config.yaml.template config.yaml
     sed -i 's|ubuntu:.*|'$distro'"|' config.yaml
-
-    # Delete already existing GSC image for the base image
-    docker rmi -f gsc-$base_image >/dev/null 2>&1
-    docker rmi -f gsc-$base_image-unsigned >/dev/null 2>&1
 
     if [ "$1" = "y" ]; then
         ./gsc build $cmdline_flag -d $app_image_x  $WORKLOAD_DIR/$app_image_manifest
@@ -146,7 +175,7 @@ fi
 
 # Command-line arguments:
 args=$5
-if [[ "$start" = "redis" ]]; then
+if [[ "$workload_type" = "redis" ]]; then
     args+=" --protected-mode no --save ''"
 fi
 
@@ -162,7 +191,7 @@ else
 fi
 
 # Creating entrypoint script file
-entrypoint_script=entry_script_$start.sh
+entrypoint_script=entry_script_$workload_type.sh
 rm -f $entrypoint_script >/dev/null 2>&1
 touch $entrypoint_script
 
@@ -177,13 +206,7 @@ if [ "$6" = "test-image" ]; then
     grep -qxF 'sgx.file_check_policy = "allow_all_but_log"' $app_image_manifest ||
      echo 'sgx.file_check_policy = "allow_all_but_log"' >> $app_image_manifest
 
-    if [[ "$start" = "pytorch" ]]; then
-        encrypted_files='classes.txt:input.jpg:alexnet-pretrained.pt:result.txt'
-        add_encrypted_files_to_manifest $encrypted_files
-        var=$(xxd -p ../pytorch/base_image_helper/encryption_key)
-        echo 'fs.insecure__keys.default = "'$var'"' >> $app_image_manifest
-    fi
-
+    process_encrypted_files
     create_base_wrapper_image
     create_gsc_image $7
     exit 1
@@ -228,8 +251,13 @@ encrypted_files_required=${11}
 if [ "$encrypted_files_required" = "y" ]; then
     ef_files=${12}
     add_encrypted_files_to_manifest ${12}
-    sed -i 's|.*SECRET_PROVISION_SET_KEY.*|loader.env.SECRET_PROVISION_SET_KEY = "default"|' \
-    $app_image_manifest
+
+    if [ "$attestation_required" = "y" ]; then
+        sed -i 's|.*SECRET_PROVISION_SET_KEY.*|loader.env.SECRET_PROVISION_SET_KEY = "default"|' \
+            $app_image_manifest
+    else
+        add_encryption_key_to_manifest ${13}
+    fi
 fi
 
 echo ""
@@ -237,4 +265,4 @@ create_base_wrapper_image
 if [ "$attestation_required" = "y" ]; then
     rm ca.crt
 fi
-create_gsc_image $7 ${13}
+create_gsc_image $7 ${14}
