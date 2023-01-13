@@ -394,26 +394,16 @@ def main(stdscr, argv):
     host_net = ''
     update_user_and_commentary_win_array(user_console, guide_win, attestation_prompt,
                                          attestation_help)
-    while True:
-        attestation_input = get_attestation_input(user_console, guide_win)
-        if attestation_input == 'done':
-            attestation_required = 'y'
-            ca_cert_path = ssl_folder_path_on_host+'/ca.crt'
 
-        elif attestation_input == 'test':
-            ca_cert_path, verifier_server = ssl_folder_path_on_host+'/ca.crt', '"localhost:4433"'
-            host_net, config = '--net=host', 'test'
-            attestation_required = 'y'
+    attestation_input = get_attestation_input(user_console, guide_win)
+    if attestation_input == 'done':
+        attestation_required = 'y'
+        ca_cert_path = ssl_folder_path_on_host+'/ca.crt'
 
-        if ef_required == 'y' and attestation_required == 'n':
-            user_console.erase()
-            update_user_and_commentary_win_array(user_console, guide_win, attestation_prompt,
-                                                 attestation_help)
-            error = ('You require Remote Attestation to provision the key for encrypted files.')
-            update_user_error_win(user_console, error)
-            continue
-
-        break
+    elif attestation_input == 'test':
+        ca_cert_path, verifier_server = ssl_folder_path_on_host+'/ca.crt', '"localhost:4433"'
+        host_net, config = '--net=host', 'test'
+        attestation_required = 'y'
 
     # 7. Obtain enclave signing key
     update_user_and_commentary_win_array(user_console, guide_win, key_prompt, signing_key_help)
@@ -446,8 +436,8 @@ def main(stdscr, argv):
                                          [log_progress.format(log_file)])
     subprocess.call(['util/curation_script.sh', workload_type, base_image_name, distro,
                      key_path, args, attestation_required, debug_flag, ca_cert_path, env_required,
-                     envs, ef_required, encrypted_files, passphrase], stdout=log_file_pointer,
-                     stderr=log_file_pointer)
+                     envs, ef_required, encrypted_files, os.path.abspath(encryption_key),
+                     passphrase], stdout=log_file_pointer, stderr=log_file_pointer)
     image = gsc_app_image
     check_image_creation_success(user_console, docker_socket, image, log_file)
 
