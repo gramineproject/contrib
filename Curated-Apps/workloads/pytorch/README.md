@@ -29,7 +29,7 @@ Execute the below commands on the VM.
       ```
       The above `helper.sh` script encrypts sensitive files such as models, data etc. with an auto
       generated test encryption key `workloads/pytorch/base_image_helper/encryption_key` and copies
-      to the base image. Learn more about [Encrypted files](https://gramine.readthedocs.io/en/latest/manifest-syntax.html?highlight=protected#encrypted-files) support in gramine
+      to the base image. Learn more about [Encrypted files](https://gramine.readthedocs.io/en/stable/manifest-syntax.html#encrypted-files) support in Gramine.
 
    3. Generate the test confidential compute image based on the `pytorch-encrypted` image as shown
       below:
@@ -42,7 +42,7 @@ Execute the below commands on the VM.
       docker run --net=host --device=/dev/sgx/enclave -it gsc-pytorch-encrypted
       ```
 
-   5. Follow the instructions [here](https://github.com/gramineproject/contrib/blob/master/Curated-Apps/workloads/pytorch/base_image_helper/README.md#retrieve-and-decrypt-results) to retrieve the results
+   5. Follow the instructions [here](https://github.com/gramineproject/contrib/blob/master/Curated-Apps/workloads/pytorch/base_image_helper/README.md#retrieve-and-decrypt-results) to retrieve the results.
 
 4. Or, to generate a custom confidential compute image based on a user-provided PyTorch image,
    execute the following to launch an interactive setup script:
