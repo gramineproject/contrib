@@ -105,7 +105,7 @@ add_encryption_key_to_manifest() {
 }
 
 process_encrypted_files() {
-    input_file="../$workload_type/base_image_helper/encrypted_files.txt"
+    input_file="../$workload_type/base_image_helper/encrypted_files"
     if [[ ! -e $input_file || -z "$(<$input_file)" ]]; then
         return
     fi
