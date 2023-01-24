@@ -448,7 +448,7 @@ def create_custom_image(stdscr, docker_socket, workload_type, base_image_name, d
     commands_fp = open(commands_file, 'w')
     if attestation_required == 'y':
         debug_enclave_env_ver_ext = ''
-        if config == 'test':
+        if config == 'test' or debug_flag == 'y':
             debug_enclave_env_ver_ext = debug_enclave_env_verifier
 
         ssl_folder_abs_path_on_host = os.path.abspath(ssl_folder_path_on_host)
