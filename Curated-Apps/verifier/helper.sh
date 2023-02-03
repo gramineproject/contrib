@@ -46,4 +46,5 @@ if [ ! -z "$3" ]; then
 fi
 
 docker rmi -f verifier_image >/dev/null 2>&1
-docker build -f verifier.dockerfile -t verifier $args .
+cd ..
+docker build -f verifier/verifier.dockerfile -t verifier $args .
