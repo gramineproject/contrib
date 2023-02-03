@@ -6,6 +6,7 @@ FROM ubuntu:18.04
 RUN apt-get update \
     && env DEBIAN_FRONTEND=noninteractive apt-get install -y \
     build-essential \
+    pkg-config \
     curl \
     git \
     gnupg2 \
@@ -21,12 +22,21 @@ RUN wget https://packages.microsoft.com/ubuntu/18.04/prod/pool/main/a/az-dcap-cl
 RUN echo 'deb [arch=amd64] https://download.01.org/intel-sgx/sgx_repo/ubuntu bionic main' \
     > /etc/apt/sources.list.d/intel-sgx.list \
     && wget https://download.01.org/intel-sgx/sgx_repo/ubuntu/intel-sgx-deb.key \
-    && apt-key add intel-sgx-deb.key
+    && env APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE=DontWarn apt-key add intel-sgx-deb.key
 
-RUN curl -fsSLo /usr/share/keyrings/gramine-keyring.gpg https://packages.gramineproject.io/gramine-keyring.gpg
-RUN echo 'deb [arch=amd64 signed-by=/usr/share/keyrings/gramine-keyring.gpg] https://packages.gramineproject.io/ bionic main' | tee /etc/apt/sources.list.d/gramine.list
-RUN apt-get update
-RUN apt-get install -y gramine-dcap
+RUN env DEBIAN_FRONTEND=noninteractive apt-get update \
+    && env DEBIAN_FRONTEND=noninteractive apt-get install -y libsgx-dcap-quote-verify-dev
+
+RUN wget https://packages.gramineproject.io/pool/main/p/python-toml/python3-toml_0.10.0-1_all.deb
+RUN wget https://packages.gramineproject.io/pool/main/c/cjson/libcjson1_1.7.10-1.1_amd64.deb
+RUN wget https://packages.gramineproject.io/pool/main/g/gramine/gramine-dcap_1.3.1-1_amd64.deb
+RUN wget https://packages.gramineproject.io/pool/main/g/gramine/gramine-ratls-dcap_1.3.1-1_amd64.deb
+
+RUN env DEBIAN_FRONTEND=noninteractive apt-get install -y \
+    ./gramine-dcap_1.3.1-1_amd64.deb \
+    ./gramine-ratls-dcap_1.3.1-1_amd64.deb \
+    ./libcjson1_1.7.10-1.1_amd64.deb \
+    ./python3-toml_0.10.0-1_all.deb
 
 RUN git clone --depth 1 --branch v1.3.1 https://github.com/gramineproject/gramine.git
 
