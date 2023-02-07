@@ -3,14 +3,29 @@
 
 FROM ubuntu:18.04
 
-RUN apt-get update \
+RUN env DEBIAN_FRONTEND=noninteractive apt-get update \
     && env DEBIAN_FRONTEND=noninteractive apt-get install -y \
-    build-essential \
-    pkg-config \
-    curl \
-    git \
-    gnupg2 \
-    wget
+        autoconf \
+        bison \
+        build-essential \
+        coreutils \
+        curl \
+        gawk \
+        git \
+        libcurl4-openssl-dev \
+        libprotobuf-c-dev \
+        linux-headers-generic \
+        nasm \
+        ninja-build \
+        pkg-config \
+        protobuf-c-compiler \
+        protobuf-compiler \
+        python3 \
+        python3-cryptography \
+        python3-pip \
+        python3-protobuf \
+        wget \
+    && /usr/bin/python3 -B -m pip install 'toml>=0.10' 'meson>=0.56'
 
 # Installing Azure DCAP Quote Provider Library (az-dcap-client).
 # Here, the version of az-dcap-client should be in sync with the az-dcap-client
@@ -27,18 +42,24 @@ RUN echo 'deb [arch=amd64] https://download.01.org/intel-sgx/sgx_repo/ubuntu bio
 RUN env DEBIAN_FRONTEND=noninteractive apt-get update \
     && env DEBIAN_FRONTEND=noninteractive apt-get install -y libsgx-dcap-quote-verify-dev
 
-RUN wget https://packages.gramineproject.io/pool/main/p/python-toml/python3-toml_0.10.0-1_all.deb
-RUN wget https://packages.gramineproject.io/pool/main/c/cjson/libcjson1_1.7.10-1.1_amd64.deb
-RUN wget https://packages.gramineproject.io/pool/main/g/gramine/gramine-dcap_1.3.1-1_amd64.deb
-RUN wget https://packages.gramineproject.io/pool/main/g/gramine/gramine-ratls-dcap_1.3.1-1_amd64.deb
-
-RUN env DEBIAN_FRONTEND=noninteractive apt-get install -y \
-    ./gramine-dcap_1.3.1-1_amd64.deb \
-    ./gramine-ratls-dcap_1.3.1-1_amd64.deb \
-    ./libcjson1_1.7.10-1.1_amd64.deb \
-    ./python3-toml_0.10.0-1_all.deb
-
 RUN git clone --depth 1 --branch v1.3.1 https://github.com/gramineproject/gramine.git
+
+RUN mkdir -p /gramine/driver/asm \
+    && cd /gramine/driver/asm \
+    && wget --timeout=10 -O sgx.h \
+        https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/plain/arch/x86/include/uapi/asm/sgx.h?h=v5.11 \
+    && sha256sum sgx.h | grep -q a34a997ade42b61376b1c5d3d50f839fd28f2253fa047cb9c0e68a1b00477956
+
+RUN cd /gramine \
+    && meson setup build/ \
+       --buildtype=release \
+       -Ddirect=enabled -Dsgx=enabled \
+       -Ddcap=enabled \
+        \
+       -Dsgx_driver=upstream -Dsgx_driver_include_path=/gramine/driver \
+        \
+    && ninja -C build \
+    && ninja -C build install
 
 ARG server_dcap_pf="n"
 RUN if [ $server_dcap_pf="y" ]; then \
