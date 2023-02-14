@@ -12,22 +12,25 @@ RUN env DEBIAN_FRONTEND=noninteractive apt-get update \
     git \
     gnupg2 \
     libssl1.1 \
+    pkg-config \
     wget
+
+COPY keys/* /usr/share/keyrings/
 
 # Installing Azure DCAP Quote Provider Library (az-dcap-client).
 # Here, the version of az-dcap-client should be in sync with the az-dcap-client
 # version used for quote generation. User can replace the below package with the
 # latest package.
-RUN wget https://packages.microsoft.com/ubuntu/18.04/prod/pool/main/a/az-dcap-client/az-dcap-client_1.10_amd64.deb \
- && dpkg -i az-dcap-client_1.10_amd64.deb
+RUN echo "deb [arch=amd64 signed-by=/usr/share/keyrings/microsoft.asc] https://packages.microsoft.com/ubuntu/20.04/prod focal main" \
+    | tee /etc/apt/sources.list.d/msprod.list
+RUN env DEBIAN_FRONTEND=noninteractive apt-get update \
+    && env DEBIAN_FRONTEND=noninteractive apt-get install -y az-dcap-client
 
-COPY intel-sgx-deb.asc /usr/share/keyrings/
 RUN echo "deb [arch=amd64 signed-by=/usr/share/keyrings/intel-sgx-deb.asc] https://download.01.org/intel-sgx/sgx_repo/ubuntu jammy main" \
-| tee /etc/apt/sources.list.d/intel-sgx.list
+    | tee /etc/apt/sources.list.d/intel-sgx.list
 
-COPY gramine-keyring.gpg /usr/share/keyrings/
 RUN echo 'deb [arch=amd64 signed-by=/usr/share/keyrings/gramine-keyring.gpg] https://packages.gramineproject.io/ 1.3 main' \
-| tee /etc/apt/sources.list.d/gramine.list
+    | tee /etc/apt/sources.list.d/gramine.list
 
 RUN env DEBIAN_FRONTEND=noninteractive apt-get update \
     && env DEBIAN_FRONTEND=noninteractive apt-get install -y gramine-dcap

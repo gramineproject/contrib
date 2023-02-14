@@ -45,13 +45,5 @@ if [ ! -z "$3" ]; then
     echo 'CMD ["'$3'"]' >> verifier.dockerfile
 fi
 
-if [ ! -f "intel-sgx-deb.asc" ]; then
-    curl -fsSLo intel-sgx-deb.asc https://download.01.org/intel-sgx/sgx_repo/ubuntu/intel-sgx-deb.key
-fi
-
-if [ ! -f "gramine-keyring.gpg" ]; then
-    curl -fsSLo gramine-keyring.gpg https://packages.gramineproject.io/gramine-keyring.gpg
-fi
-
 docker rmi -f verifier_image >/dev/null 2>&1
 docker build -f verifier.dockerfile -t verifier $args .
