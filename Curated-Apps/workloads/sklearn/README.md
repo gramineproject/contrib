@@ -44,7 +44,7 @@ Execute the below commands on the VM.
 
 ## Run the confidential compute image for Scikit-learn
 
-- This example was tested on a Standard_DC8s_v3 Azure VM.
+- This example was tested on a Standard_DC48ds_v3 Azure VM.
 - Follow the output of the `curate.py` script to run the generated Docker image(s).
 
 ## Contents

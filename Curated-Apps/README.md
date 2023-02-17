@@ -19,8 +19,7 @@ learning.
 - Install the necessary build dependencies as shown below (for Ubuntu).
   ```sh
   sudo apt-get update && sudo apt-get install jq docker.io python3 python3-pip
-  python3 -m pip install docker jinja2 tomli tomli-w pyyaml
-  python3 -m pip install toml  # for compatibility with Gramine v1.3 or lower
+  python3 -m pip install docker jinja2 toml pyyaml
   sudo chown $USER /var/run/docker.sock
   ```
 
