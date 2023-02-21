@@ -6,7 +6,7 @@
 
 sgx.nonpie_binary = true
 sgx.enclave_size = "64G"
-sgx.thread_num = 1024
+sgx.max_threads = 1024
 loader.pal_internal_mem_size = "128M"
 
 # This is required to run workload as non-root user, any number works except `0` which is for root.

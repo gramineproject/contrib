@@ -1,11 +1,7 @@
-# SPDX-License-Identifier: LGPL-3.0-or-later
-# Copyright (C) 2022 Intel Corporation
-
-# DO NOT CHANGE! BELOW WILL BE REPLACED BY THE CURATION SCRIPT!
-# Currently tested distros are
+# Specify the OS distro. Currently tested distros are
 # - ubuntu:18.04, ubuntu:20.04, ubuntu:21.04
 # - debian:10, debian:11
-
+# - centos:8
 Distro: "ubuntu:18.04"
 
 # If the image has a specific registry, define it here.
@@ -13,19 +9,33 @@ Distro: "ubuntu:18.04"
 Registry: ""
 
 # If you're using your own fork and branch of Gramine, specify the GitHub link and the branch name
-# below; typically, you want to keep the default values though
+# below; typically, you want to keep the default values though.
+#
+# It is also possible to specify the prebuilt Gramine Docker image (that was built previously via
+# the `gsc build-gramine` command). For this, remove Repository and Branch and instead write:
+#   Image:      "<prebuilt Gramine Docker image>"
+#
+# GSC releases are guaranteed to work with corresponding Gramine releases (and GSC `master`
+# branch is guaranteed to work with current Gramine `master` branch).
 Gramine:
     Repository: "https://github.com/gramineproject/gramine.git"
-    Branch:     "v1.3.1"
+    Branch:     "v1.4"
 
-# Specify the Intel SGX driver installed on your target machine (more specifically, on the machine
-# where the graminized Docker container will run); Default assumption is DCAP out-of-tree driver,
-# but for DCAP in-kernel driver: use empty values like below
+# Specify the Intel SGX driver installed on your machine (more specifically, on the machine where
+# the graminized Docker container will run); there are several variants of the SGX driver:
 #
-#   - DCAP in-kernel driver: use empty values like below
+#   - upstream (in-kernel) driver: use empty values like below
 #         Repository: ""
 #         Branch:     ""
 #
+#   - DCAP out-of-tree driver: same as above, use empty values
+#         Repository: ""
+#         Branch:     ""
+#
+#   - legacy out-of-tree driver: use something like the below values, but adjust the branch name
+#         Repository: "https://github.com/01org/linux-sgx-driver.git"
+#         Branch:     "sgx_driver_1.9"
+#
 SGXDriver:
-    Repository: "https://github.com/intel/SGXDataCenterAttestationPrimitives.git"
-    Branch:     "DCAP_1.11 && cp -r driver/linux/* ."
+    Repository: ""
+    Branch:     ""

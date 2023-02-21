@@ -87,7 +87,7 @@ create_gsc_image () {
     echo
     cd $CUR_DIR
     rm -rf gsc >/dev/null 2>&1
-    git clone --depth 1 --branch v1.3.1 https://github.com/gramineproject/gsc.git
+    git clone --depth 1 --branch v1.4 https://github.com/gramineproject/gsc.git
     cp $signing_key_path gsc/enclave-key.pem
 
     cd gsc
@@ -117,7 +117,6 @@ create_gsc_image () {
     ./gsc info-image gsc-$base_image
 
     cd ../
-    rm -rf gsc >/dev/null 2>&1
     rm -rf $CUR_DIR'/test' >/dev/null 2>&1
 }
 
