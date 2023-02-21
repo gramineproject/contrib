@@ -87,11 +87,11 @@ create_gsc_image () {
     echo
     cd $CUR_DIR
     rm -rf gsc >/dev/null 2>&1
-    git clone --depth 1 --branch v1.3.1 https://github.com/gramineproject/gsc.git
+    git clone --depth 1 --branch v1.4 https://github.com/gramineproject/gsc.git
     cp $signing_key_path gsc/enclave-key.pem
 
     cd gsc
-    cp ../util/config.yaml.template config.yaml
+    cp config.yaml.template config.yaml
     sed -i 's|ubuntu:.*|'$distro'"|' config.yaml
 
     # Delete already existing GSC image for the base image
@@ -117,7 +117,6 @@ create_gsc_image () {
     ./gsc info-image gsc-$base_image
 
     cd ../
-    rm -rf gsc >/dev/null 2>&1
     rm -rf $CUR_DIR'/test' >/dev/null 2>&1
 }
 
@@ -168,16 +167,9 @@ rm -f $entrypoint_script >/dev/null 2>&1
 touch $entrypoint_script
 
 # Copying the complete binary string to the entrypoint script file
-echo '#!/bin/bash' >> $entrypoint_script
+echo '#!/usr/bin/env bash' >> $entrypoint_script
 echo '' >> $entrypoint_script
-
-# TODO: This is a workaround, actual fix will go in GSC with PR #113
-# This workaround should be removed when contrib starts using GSC v1.4 with PR #113 merged
-echo 'if [[ "$#" -le "1" && "$1" -eq "" ]]; then
-    '$complete_binary_cmd'
-else
-    '$complete_binary_cmd' "${@}"
-fi' >> $entrypoint_script
+echo $complete_binary_cmd' "${@}"' >> $entrypoint_script
 
 # Test image creation
 if [ "$6" = "test-image" ]; then
@@ -241,10 +233,6 @@ if [ "$encrypted_files_required" = "y" ]; then
 fi
 
 echo ""
-if [[ "$7" = "y" && "$signing_input" != "test" && "$start" = "redis" ]]; then
-    echo 'loader.pal_internal_mem_size = "192M"' >> $app_image_manifest
-fi
-
 create_base_wrapper_image
 if [ "$attestation_required" = "y" ]; then
     rm ca.crt
