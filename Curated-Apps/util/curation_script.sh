@@ -240,10 +240,6 @@ if [ "$encrypted_files_required" = "y" ]; then
 fi
 
 echo ""
-if [[ "$7" = "y" && "$signing_input" != "test" && "$start" = "redis" ]]; then
-    echo 'loader.pal_internal_mem_size = "192M"' >> $app_image_manifest
-fi
-
 create_base_wrapper_image
 if [ "$attestation_required" = "y" ]; then
     rm ca.crt
