@@ -91,7 +91,7 @@ create_gsc_image () {
     cp $signing_key_path gsc/enclave-key.pem
 
     cd gsc
-    cp ../util/config.yaml.template config.yaml
+    cp config.yaml.template config.yaml
     sed -i 's|ubuntu:.*|'$distro'"|' config.yaml
 
     # Delete already existing GSC image for the base image

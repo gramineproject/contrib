@@ -7,7 +7,6 @@
 sgx.nonpie_binary = true
 sgx.enclave_size = "16G"
 sgx.max_threads = 128
-loader.pal_internal_mem_size = "128M"
 
 # Given example is tested on a 72 core machine which produces best results with default value as `8`.
 # Please tune this parameter based on machine configuration.
