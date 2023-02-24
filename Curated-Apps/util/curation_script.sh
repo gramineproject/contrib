@@ -167,16 +167,9 @@ rm -f $entrypoint_script >/dev/null 2>&1
 touch $entrypoint_script
 
 # Copying the complete binary string to the entrypoint script file
-echo '#!/bin/bash' >> $entrypoint_script
+echo '#!/usr/bin/env bash' >> $entrypoint_script
 echo '' >> $entrypoint_script
-
-# TODO: This is a workaround, actual fix will go in GSC with PR #113
-# This workaround should be removed when contrib starts using GSC v1.4 with PR #113 merged
-echo 'if [[ "$#" -le "1" && "$1" -eq "" ]]; then
-    '$complete_binary_cmd'
-else
-    '$complete_binary_cmd' "${@}"
-fi' >> $entrypoint_script
+echo $complete_binary_cmd' "${@}"' >> $entrypoint_script
 
 # Test image creation
 if [ "$6" = "test-image" ]; then
