@@ -98,14 +98,14 @@ add_encrypted_files_to_manifest() {
 
 add_encryption_key_to_manifest() {
     if [[ ! -e $1 ]]; then
-        echo "Encryption key is not found!"
+        echo "Encryption key was not found!"
         exit
     fi
     echo -e 'fs.insecure__keys.default = "'$(xxd -p $1)'"' >> $app_image_manifest
 }
 
 process_encrypted_files() {
-    input_file="../$workload_type/base_image_helper/encrypted_files"
+    input_file="../$workload_type/base_image_helper/encrypted_files.txt"
     if [[ ! -e $input_file || -z "$(<$input_file)" ]]; then
         return
     fi
