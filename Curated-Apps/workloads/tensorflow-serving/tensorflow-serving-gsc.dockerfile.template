@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: LGPL-3.0-or-later
-# Copyright (C) 2022 Intel Corporation
+# Copyright (C) 2023 Intel Corporation
 
 # This template is used by `curation_script.sh` to create a wrapper dockerfile
 # `tensorflow-serving-gsc.dockerfile` that includes user provided inputs such as 
