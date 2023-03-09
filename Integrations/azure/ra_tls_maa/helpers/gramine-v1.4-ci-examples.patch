@@ -1,0 +1,177 @@
+diff --git a/CI-Examples/ra-tls-mbedtls/Makefile b/CI-Examples/ra-tls-mbedtls/Makefile
+index 7d31e9306cca853c0ba5e45bb7638627b1629353..ed5af2ee031d33f02a8da400b233e4bf721f7fe9 100644
+--- a/CI-Examples/ra-tls-mbedtls/Makefile
++++ b/CI-Examples/ra-tls-mbedtls/Makefile
+@@ -27,6 +27,9 @@ epid: client_epid.manifest.sgx client_epid.sig
+ .PHONY: dcap
+ dcap: client_dcap.manifest.sgx client_dcap.sig
+ 
++.PHONY: maa
++maa: client_maa.manifest.sgx client_maa.sig
++
+ ############################# SSL DATA DEPENDENCY #############################
+ 
+ # SSL data: key and x.509 self-signed certificate
+@@ -87,6 +90,23 @@ sgx_sign_client_dcap: client_dcap.manifest client
+ 		--manifest $< \
+ 		--output $<.sgx
+ 
++########################### CLIENT (MAA) MANIFEST #############################
++
++client_maa.manifest: client.manifest.template
++	gramine-manifest \
++		-Dlog_level=$(GRAMINE_LOG_LEVEL) \
++		-Darch_libdir=$(ARCH_LIBDIR) \
++		$< >$@
++
++client_maa.manifest.sgx client_maa.sig: sgx_sign_client_maa
++	@:
++
++.INTERMEDIATE: sgx_sign_client_maa
++sgx_sign_client_maa: client_maa.manifest client
++	gramine-sgx-sign \
++		--manifest $< \
++		--output $<.sgx
++
+ ########################### CLIENT (EPID) MANIFEST ############################
+ 
+ client_epid.manifest: client.manifest.template
+@@ -146,6 +166,26 @@ check_dcap_fail: app dcap
+ 	./client dcap && exit 1 || echo "[ Success 1/1 ]"; \
+ 	kill -9 $$SERVER_ID
+ 
++.PHONY: check_maa
++check_maa: app maa
++	gramine-sgx server >/dev/null & SERVER_ID=$$!; \
++	sleep 30; \
++	./client maa > OUTPUT; \
++	./client maa 0 0 0 0 >> OUTPUT; \
++	kill -9 $$SERVER_ID
++	@grep -q "using default SGX-measurement verification callback" OUTPUT && echo "[ Success 1/4 ]"
++	@grep -q "using our own SGX-measurement verification callback" OUTPUT && echo "[ Success 2/4 ]"
++	@grep -q "Verifying peer X.509 certificate... ok" OUTPUT && echo "[ Success 3/4 ]"
++	@(exit `grep -c "failed" "OUTPUT"`) && echo "[ Success 4/4 ]"
++	@rm OUTPUT
++
++.PHONY: check_maa_fail
++check_maa_fail: app maa
++	gramine-sgx server --test-malicious-quote >/dev/null & SERVER_ID=$$!; \
++	sleep 30; \
++	./client maa && exit 1 || echo "[ Success 1/1 ]"; \
++	kill -9 $$SERVER_ID
++
+ ################################## CLEANUP ####################################
+ 
+ .PHONY: clean
+diff --git a/CI-Examples/ra-tls-mbedtls/src/client.c b/CI-Examples/ra-tls-mbedtls/src/client.c
+index 4d2f71ba870b67467e4b402f869429715f4d6140..234874dcd2a15356ed03c6344f08a79da3ad7540 100644
+--- a/CI-Examples/ra-tls-mbedtls/src/client.c
++++ b/CI-Examples/ra-tls-mbedtls/src/client.c
+@@ -161,9 +161,9 @@ int main(int argc, char** argv) {
+     mbedtls_x509_crt_init(&cacert);
+     mbedtls_entropy_init(&entropy);
+ 
+-    if (argc < 2 ||
+-            (strcmp(argv[1], "native") && strcmp(argv[1], "epid") && strcmp(argv[1], "dcap"))) {
+-        mbedtls_printf("USAGE: %s native|epid|dcap [SGX measurements]\n", argv[0]);
++    if (argc < 2 || (strcmp(argv[1], "native") && strcmp(argv[1], "epid") &&
++                strcmp(argv[1], "dcap") && strcmp(argv[1], "maa"))) {
++        mbedtls_printf("USAGE: %s native|epid|dcap|maa [SGX measurements]\n", argv[0]);
+         return 1;
+     }
+ 
+@@ -206,6 +206,13 @@ int main(int argc, char** argv) {
+                 return 1;
+             }
+         }
++    } else if (!strcmp(argv[1], "maa")) {
++        ra_tls_verify_lib = dlopen("libra_tls_verify_maa.so", RTLD_LAZY);
++        if (!ra_tls_verify_lib) {
++            mbedtls_printf("%s\n", dlerror());
++            mbedtls_printf("User requested RA-TLS verification with MAA but cannot find lib\n");
++            return 1;
++        }
+     }
+ 
+     if (ra_tls_verify_lib) {
+diff --git a/CI-Examples/ra-tls-secret-prov/.gitignore b/CI-Examples/ra-tls-secret-prov/.gitignore
+index cc4e300d316d0a7cf83a69e4ca62711c845539d8..a93d19078be6940ff09c5840f5553416ea777346 100644
+--- a/CI-Examples/ra-tls-secret-prov/.gitignore
++++ b/CI-Examples/ra-tls-secret-prov/.gitignore
+@@ -2,12 +2,15 @@
+ /secret_prov/client
+ /secret_prov/server_epid
+ /secret_prov/server_dcap
++/secret_prov/server_maa
+ /secret_prov_minimal/client
+ /secret_prov_minimal/server_epid
+ /secret_prov_minimal/server_dcap
++/secret_prov_minimal/server_maa
+ /secret_prov_pf/client
+ /secret_prov_pf/server_epid
+ /secret_prov_pf/server_dcap
++/secret_prov_pf/server_maa
+ /secret_prov_pf/wrap_key
+ /secret_prov_pf/enc_files/input.txt
+ 
+diff --git a/CI-Examples/ra-tls-secret-prov/Makefile b/CI-Examples/ra-tls-secret-prov/Makefile
+index 8ab9308aeac273b30005dadfa8b24c9acce2d5c1..2dc0b44c8b41b550110796774ee8381e4ae8688c 100644
+--- a/CI-Examples/ra-tls-secret-prov/Makefile
++++ b/CI-Examples/ra-tls-secret-prov/Makefile
+@@ -36,6 +36,10 @@ epid: ssl/server.crt secret_prov_minimal/server_epid secret_prov/server_epid sec
+ dcap: ssl/server.crt secret_prov_minimal/server_dcap secret_prov/server_dcap secret_prov_pf/server_dcap \
+       secret_prov_pf/wrap_key secret_prov_pf/enc_files/input.txt
+ 
++.PHONY: maa
++maa: ssl/server.crt secret_prov_minimal/server_maa secret_prov/server_maa secret_prov_pf/server_maa \
++     secret_prov_pf/wrap_key secret_prov_pf/enc_files/input.txt
++
+ ############################# SSL DATA DEPENDENCY #############################
+ 
+ # SSL data: key and x.509 self-signed certificate
+@@ -65,6 +69,9 @@ LDFLAGS += -Wl,--enable-new-dtags $(shell pkg-config --libs mbedtls_gramine)
+ %/server_dcap: %/server.c
+ 	$(CC) $< $(CFLAGS) $(LDFLAGS) -Wl,--no-as-needed -lsgx_urts -lsecret_prov_verify_dcap -pthread -o $@
+ 
++%/server_maa: %/server.c
++	$(CC) $< $(CFLAGS) $(LDFLAGS) -lsecret_prov_verify_maa -pthread -o $@
++
+ secret_prov/client: secret_prov/client.c
+ 	$(CC) $< $(CFLAGS) $(LDFLAGS) -lsecret_prov_attest -o $@
+ 
+@@ -218,6 +225,35 @@ check_dcap: app dcap
+ 
+ 	@rm OUTPUT
+ 
++.PHONY: check_maa
++check_maa: app maa
++	# secret_prov_minimal
++	cd secret_prov_minimal; \
++	./server_maa >/dev/null & SERVER_ID=$$!; \
++	../../../scripts/wait_for_server 60 127.0.0.1 4433; \
++	gramine-sgx client > ../OUTPUT; \
++	kill -9 $$SERVER_ID;
++	@grep -E "Received secret = 'A_SIMPLE_SECRET'" OUTPUT && echo "[ Success 1/4 ]"
++
++	# secret_prov
++	cd secret_prov; \
++	./server_maa >/dev/null & SERVER_ID=$$!; \
++	../../../scripts/wait_for_server 60 127.0.0.1 4433; \
++	gramine-sgx client > ../OUTPUT; \
++	kill -9 $$SERVER_ID;
++	@grep -E "Received secret1 = 'FIRST_SECRET', secret2 = '42'" OUTPUT && echo "[ Success 2/4 ]"
++
++	# secret_prov_pf
++	cd secret_prov_pf; \
++	./server_maa wrap_key >/dev/null & SERVER_ID=$$!; \
++	../../../scripts/wait_for_server 60 127.0.0.1 4433; \
++	gramine-sgx client > ../OUTPUT; \
++	kill -9 $$SERVER_ID;
++	@grep -E "\[parent\] Read from protected file: 'helloworld'" OUTPUT && echo "[ Success 3/4 ]"
++	@grep -E "\[child\] Read from protected file: 'helloworld'" OUTPUT && echo "[ Success 4/4 ]"
++
++	@rm OUTPUT
++
+ ################################## CLEANUP ####################################
+ 
+ .PHONY: clean
