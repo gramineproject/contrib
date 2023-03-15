@@ -62,9 +62,8 @@ below:
     .
     |-- pytorch-gsc.dockerfile.template   # Template used by `curation_script.sh` to create a
     |                                       wrapper dockerfile `pytorch-gsc.dockerfile` that
-    |                                       includes user-provided inputs such as `ca.cert`
-    |                                       file and command-line arguments into the graminized
-    |                                       PyTorch image.
+    |                                       includes user-provided inputs e.g. `ca.cert` file etc.
+    |                                       into the graminized MySQL image.
     |-- pytorch.manifest.template         # Template used by `curation_script.sh` to create a
     |                                       user manifest file (with basic set of values defined
     |                                       for graminizing PyTorch images), that will be passed to
