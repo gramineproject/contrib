@@ -1,11 +1,11 @@
 # Gramine Curated Memcached
-In the following two sections, we explain how a Docker image for the protected memcached version can be
-built and how the image can be executed.
+In the following two sections, we explain how a Docker image for the protected Memcached version
+can be built and how the image can be executed.
 [Prerequisites](https://github.com/gramineproject/contrib/tree/master/Curated-Apps/README.md) for
 both the phases are assumed to be met.
 
 ## Build a confidential compute image for Memcached
-Execute the below commands on the VM.
+Execute the below commands on your system.
 
 1. Clone the Gramine Contrib repository:
 
@@ -15,12 +15,13 @@ Execute the below commands on the VM.
 
        $ cd contrib/Curated-Apps
 
-3. To generate a preconfigured confidential compute image for Memcached, execute the following script:
+3. To generate a preconfigured non-production test confidential compute image for Memcached,
+   execute the following script:
 
        $ python3 ./curate.py memcached ubuntu/memcached:1.5-20.04_beta test
 
-4. To generate a custom confidential compute image based on a user-provided Memcached image, execute
-   the following to launch an interactive setup script:
+4. To generate a custom confidential compute image based on a user-provided Memcached image,
+   execute the following to launch an interactive setup script:
 
        $ python3 ./curate.py memcached <your_image>
 
@@ -30,8 +31,8 @@ Execute the below commands on the VM.
 - Follow the output of the image build script `curate.py` to run the generated Docker image.
 
 ## Contents
-This sub-directory contains artifacts which help in creating curated GSC Memcached image, as explained
-below:
+This sub-directory contains artifacts which help in creating curated GSC Memcached image, as
+explained below:
 
     .
     |-- memcached-gsc.dockerfile.template    # Template used by `curation_script.sh` to create a
@@ -41,5 +42,5 @@ below:
     |                                          Memcached image.
     |-- memcached.manifest.template          # Template used by `curation_script.sh` to create a
     |                                          user manifest file (with basic set of values defined
-    |                                          for graminizing Memcached images), that will be passed to
-    |                                          GSC.
+    |                                          for graminizing Memcached images), that will be
+    |                                          passed to GSC.
