@@ -29,7 +29,7 @@ test_run_instr = ('Run the {} docker image in an Azure Confidential Compute'
                   ' instance using the below command.\n\n'
                   'Host networking (--net=host) is optional\n\n{}\n\n'
                   'Above command is saved to command.txt as well.\n')
-test_run_cmd = ('$ docker run --net=host --device=/dev/sgx/enclave -it {}')
+test_run_cmd = ('$ docker run --net=host --device=/dev/sgx/enclave {} -it {}')
 image_not_found_warn = ('Warning: Cannot find application Docker image `{}`.\n'
                         'Fetching from Docker Hub ...\n\n')
 image_creation_failed = ('\n\n\n`{}` creation failed, exiting....\n\n'
