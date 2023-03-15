@@ -44,7 +44,7 @@ app_image_manifest=$workload_type'.manifest'
 CUR_DIR=$(pwd)
 WORKLOAD_DIR=$CUR_DIR'/workloads/'$workload_type
 cd $WORKLOAD_DIR
-mkdir $CUR_DIR'/test' >/dev/null 2>&1
+rm -rf $CUR_DIR'/test' && mkdir $CUR_DIR'/test' >/dev/null 2>&1
 
 cp $wrapper_dockerfile'.template' $wrapper_dockerfile
 cp $app_image_manifest'.template' $app_image_manifest
@@ -149,18 +149,6 @@ create_gsc_image () {
     rm -rf $CUR_DIR'/test' >/dev/null 2>&1
 }
 
-fetch_base_image_config () {
-    base_image_config="$(docker image inspect "$base_image" | jq '.[].Config.'$1'')"
-    if [[ "$base_image_config" = "null" || "$base_image_config" = "Null" ||
-          "$base_image_config" = "NULL" ]]; then
-        config_string=''
-    else
-        base_image_config=$(echo $base_image_config | sed 's/[][]//g')
-        config_string=$(echo $base_image_config | sed 's/"\s*,\s*"/" "/g')
-    fi
-    echo $config_string
-}
-
 # Signing key
 echo ""
 read -r signing_input signing_key_path <<<$(echo "$4 $4")
@@ -174,31 +162,9 @@ if [ "$signing_input" = "test" ]; then
 fi
 
 # Command-line arguments:
-args=$5
-if [[ "$workload_type" = "redis" ]]; then
-    args+=" --protected-mode no --save ''"
+if [[ ! -z $5 ]]; then
+    echo $5 >> $wrapper_dockerfile
 fi
-
-# Forming a complete binary string
-entrypoint_string=$(fetch_base_image_config "Entrypoint")
-cmd_string=$(fetch_base_image_config "Cmd")
-complete_binary_cmd="$entrypoint_string "
-
-if [[ "$args" = "" ]]; then
-    complete_binary_cmd+=$cmd_string
-else
-    complete_binary_cmd+=$args
-fi
-
-# Creating entrypoint script file
-entrypoint_script=entry_script_$workload_type.sh
-rm -f $entrypoint_script >/dev/null 2>&1
-touch $entrypoint_script
-
-# Copying the complete binary string to the entrypoint script file
-echo '#!/usr/bin/env bash' >> $entrypoint_script
-echo '' >> $entrypoint_script
-echo $complete_binary_cmd' "${@}"' >> $entrypoint_script
 
 # Test image creation
 if [ "$6" = "test-image" ]; then

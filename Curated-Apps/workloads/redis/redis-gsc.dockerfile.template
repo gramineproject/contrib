@@ -2,14 +2,10 @@
 # Copyright (C) 2022 Intel Corporation
 
 # This template is used by `curation_script.sh` to create a wrapper dockerfile
-# `redis-gsc.dockerfile` that includes user provided inputs such as `ca.cert`
-# file and run-time arguments into the graminized Redis image.
+# `redis-gsc.dockerfile` that includes user provided inputs e.g. `ca.cert` file etc.
+# into the graminized Redis image.
 
 # The curation script fills the <base_image_name> during curation.
 FROM <base_image_name>
 
 # COPY ca.crt /ca.crt
-
-# These two lines are required to incorporate command-line arguments with the image entrypoint and cmd
-COPY entry_script_redis.sh /usr/local/bin/entry_script_redis.sh
-ENTRYPOINT ["/bin/bash", "/usr/local/bin/entry_script_redis.sh"]
