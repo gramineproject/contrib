@@ -13,9 +13,11 @@
 
 import curses
 import docker
+import json
 import os
 import os.path
 import re
+import shlex
 import subprocess
 import sys
 import textwrap
@@ -262,6 +264,26 @@ def is_azure_instance():
 
     return len(rec_pattern.findall(service_output.stdout)) > 0
 
+def get_docker_run_flags(workload_type):
+    flags_file = f'workloads/{workload_type}/docker_run_flags.txt'
+
+    try:
+        with open(flags_file, 'r') as pfile:
+            flags = pfile.read()
+    except FileNotFoundError:
+        flags = ''
+    return flags
+
+def get_common_args(workload_type):
+    common_args_file = f'workloads/{workload_type}/common_args.txt'
+
+    try:
+        with open(common_args_file, 'r') as pfile:
+            common_args = pfile.read()
+    except FileNotFoundError:
+        common_args = ''
+    return common_args
+
 def get_insecure_args(workload_type):
     insecure_args_file = f'workloads/{workload_type}/insecure_args.txt'
 
@@ -322,9 +344,11 @@ def create_test_image(docker_socket, workload_type, base_image_name, debug_flag,
 
     if get_docker_image(docker_socket, gsc_app_image) is None:
         print(f'{image_creation_failed.format(gsc_app_image, log_file)}')
+        exit(-1)
 
-    args = get_insecure_args(workload_type)
-    docker_run_cmd = test_run_cmd.format(gsc_app_image + ' ' + args)
+    args = get_insecure_args(workload_type) + ' ' + get_common_args(workload_type)
+    docker_run_flags = get_docker_run_flags(workload_type)
+    docker_run_cmd = test_run_cmd.format(docker_run_flags, gsc_app_image + ' ' + args)
     print(f'{test_run_instr.format(gsc_app_image, docker_run_cmd)}')
 
     commands_fp = open(commands_file, 'w')
@@ -358,7 +382,10 @@ def create_custom_image(stdscr, docker_socket, workload_type, base_image_name, d
 
     # 2. Provide command-line arguments
     update_user_and_commentary_win_array(user_console, guide_win, arg_input, arg_help)
-    args = update_user_input()
+    user_args = update_user_input()
+    user_args += ' ' + get_common_args(workload_type)
+    args_list = shlex.split(user_args)
+    args_json = 'CMD ' + json.dumps(args_list)
 
     # 3. Provide environment variables
     update_user_and_commentary_win_array(user_console, guide_win, env_input, env_help)
@@ -436,7 +463,7 @@ def create_custom_image(stdscr, docker_socket, workload_type, base_image_name, d
     update_user_and_commentary_win_array(user_console, guide_win, wait_message,
                                          [log_progress.format(log_file)])
     subprocess.call(['util/curation_script.sh', workload_type, base_image_name, distro,
-                     key_path, args, attestation_required, debug_flag, ca_cert_path, env_required,
+                     key_path, args_json, attestation_required, debug_flag, ca_cert_path, env_required,
                      envs, ef_required, encrypted_files, os.path.abspath(encryption_key),
                      passphrase], stdout=log_file_pointer, stderr=log_file_pointer)
     image = gsc_app_image
