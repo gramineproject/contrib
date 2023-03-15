@@ -1,9 +1,9 @@
 # SPDX-License-Identifier: LGPL-3.0-or-later
-# Copyright (C) 2022 Intel Corporation
+# Copyright (C) 2023 Intel Corporation
 
 # This template is used by `curation_script.sh` to create a wrapper dockerfile
-# `sklearn-gsc.dockerfile` that includes user provided inputs e.g. `ca.cert` file etc.
-# into the graminized Scikit-learn image.
+# `mysql-gsc.dockerfile` that includes user provided inputs e.g. `ca.cert` file etc.
+# into the graminized MySQL image.
 
 # The curation script fills the <base_image_name> during curation.
 FROM <base_image_name>

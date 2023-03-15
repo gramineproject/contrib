@@ -8,4 +8,5 @@
 # The curation script fills the <base_image_name> during curation.
 FROM <base_image_name>
 
-# COPY ca.crt /ca.crt
+# Below line copies cert files into the image if user selects remote attestation
+<copy_cert_files>
