@@ -120,7 +120,10 @@ create_gsc_image () {
     echo
     cd $CUR_DIR
     rm -rf gsc >/dev/null 2>&1
-    git clone --depth 1 --branch v1.4 https://github.com/gramineproject/gsc.git
+
+    # FIXME: Using out of tree GSC brach `v1.4-for-curated-apps` to take the fix with commit
+    # fa5a07385ac205d89fb6ddb2bc5505ebe97d0539
+    git clone --depth 1 --branch v1.4-for-curated-apps https://github.com/gramineproject/gsc.git
 
     cd gsc
     cp config.yaml.template config.yaml
@@ -182,7 +185,7 @@ attestation_required=$6
 if [ "$attestation_required" = "y" ]; then
     ca_cert_path=$8
     cp $CUR_DIR/$ca_cert_path ca.crt
-    sed -i 's|.*ca.crt.*|COPY ca.crt /ca.crt|' $wrapper_dockerfile
+    sed -i 's|# COPY ca.crt /ca.crt|COPY ca.crt /ca.crt|' $wrapper_dockerfile
     echo '' >> $app_image_manifest
     echo '# Attestation related entries' >> $app_image_manifest
     echo 'sgx.remote_attestation = "dcap"' >> $app_image_manifest

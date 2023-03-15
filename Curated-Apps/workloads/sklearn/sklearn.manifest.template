@@ -13,8 +13,8 @@ sgx.max_threads = 128
 loader.env.OMP_NUM_THREADS = "8"
 
 # This is required to run workload as non-root user, any number works except `0` which is for root.
-loader.uid=999
-loader.gid=999
+loader.uid = 999
+loader.gid = 999
 
 sys.stack.size = "8M"
 sys.enable_extra_runtime_domain_names_conf = true

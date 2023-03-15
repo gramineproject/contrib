@@ -8,4 +8,5 @@
 # The curation script fills the <base_image_name> during curation.
 FROM <base_image_name>
 
+# Below line is uncommented if user selects remote attestation via UI
 # COPY ca.crt /ca.crt
