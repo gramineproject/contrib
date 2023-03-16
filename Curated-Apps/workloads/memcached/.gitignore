@@ -1,4 +1,3 @@
 /*.log
 /memcached-gsc.dockerfile
 /memcached.manifest
-/entry_script_memcached.sh
