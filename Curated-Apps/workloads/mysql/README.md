@@ -71,7 +71,7 @@ Execute the below commands on your system.
    sudo apt-get -y install mysql-client
    ```
 
-   Connect client to the MySQL server created using test confidential compute image using command:
+   Connect the client to the test MySQL server created at step 4:
    ```sh
    mysql -h 127.0.0.0 -uroot
    ```
