@@ -37,9 +37,8 @@ explained below:
     .
     |-- memcached-gsc.dockerfile.template    # Template used by `curation_script.sh` to create a
     |                                          wrapper dockerfile `memcached-gsc.dockerfile` that
-    |                                          includes user-provided inputs such as `ca.cert`
-    |                                          file and command-line arguments into the graminized
-    |                                          Memcached image.
+    |                                          includes user-provided inputs e.g. `ca.cert` file
+    |                                          etc. into the graminized Memcached image.
     |-- memcached.manifest.template          # Template used by `curation_script.sh` to create a
     |                                          user manifest file (with basic set of values defined
     |                                          for graminizing Memcached images), that will be
