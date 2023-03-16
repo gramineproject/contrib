@@ -5,7 +5,7 @@ built and how the image can be executed.
 both the phases are assumed to be met.
 
 ## Build a confidential compute image for tensorflow-serving
-Execute the below commands on the VM.
+Execute the below commands on your system.
 
 1. Clone the Gramine Contrib repository and move to the Curated-Apps folder:
    ```sh

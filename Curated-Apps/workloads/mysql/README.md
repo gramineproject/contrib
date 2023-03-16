@@ -5,7 +5,7 @@ be built and how the image can be executed.
 both the phases are assumed to be met.
 
 ## Build a confidential compute image for MySQL
-Execute the below commands on the VM.
+Execute the below commands on your system.
 
 1. Clone the Gramine Contrib repository and move to the Curated-Apps folder:
    ```sh
@@ -30,7 +30,8 @@ Execute the below commands on the VM.
 
    1. Install prerequisites for encrypting MySQL database
 
-      [Install Gramine](https://gramine.readthedocs.io/en/latest/quickstart.html#install-gramine): Encryption is done using `gramine-sgx-pf-crypt` tool which is part of Gramine installation.
+      [Install Gramine](https://gramine.readthedocs.io/en/latest/quickstart.html#install-gramine):
+      Encryption is done using `gramine-sgx-pf-crypt` tool which is part of Gramine installation.
 
    2. Encrypt MySQL database following below steps:
       ```sh
@@ -41,16 +42,16 @@ Execute the below commands on the VM.
       sudo gramine-sgx-pf-crypt encrypt -w workloads/mysql/base_image_helper/encryption_key \
           -i workloads/mysql/test_db -o /var/run/test_db_encrypted
       ```
-      The above commands encrypts MySQL database `workloads/mysql/test_db` to
+      The above commands encrypt MySQL database `workloads/mysql/test_db` to
       `/var/run/test_db_encrypted` with encryption key
       `workloads/mysql/base_image_helper/encryption_key`.
       Learn more about [Encrypted files](https://gramine.readthedocs.io/en/stable/manifest-syntax.html#encrypted-files) support in Gramine.
 
-4. Generate the test confidential compute image based on the `mysql:8.0.32-debian` image as shown
-      below:
-      ```sh
-      python3 ./curate.py mysql mysql:8.0.32-debian test
-      ```
+4. Generate the test confidential compute image with encrypted database. Step 3 is mandatory before
+   proceeding here:
+   ```sh
+   python3 ./curate.py mysql mysql:8.0.32-debian test
+   ```
 
 5. Or, to generate a custom confidential compute image based on a user-provided MySQL image,
    execute the following to launch an interactive setup script:
