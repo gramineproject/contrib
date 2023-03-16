@@ -59,7 +59,8 @@ as explained below:
     |                                                  create a wrapper dockerfile
     |                                                  `tensorflow-serving-gsc.dockerfile` that
     |                                                  includes user-provided inputs e.g. `ca.cert`
-    |                                                  file etc. into the graminized MySQL image.
+    |                                                  file etc. into the graminized
+    |                                                  Tensorflow-serving image.
     |-- tensorflow-serving.manifest.template         # Template used by `curation_script.sh` to
     |                                                  create a user manifest file (with basic set
     |                                                  of values defined for graminizing

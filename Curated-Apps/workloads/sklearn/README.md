@@ -56,7 +56,7 @@ as explained below:
     |-- sklearn-gsc.dockerfile.template   # Template used by `curation_script.sh` to create a
     |                                       wrapper dockerfile `sklearn-gsc.dockerfile` that
     |                                       includes user-provided inputs e.g. `ca.cert` file etc.
-    |                                       into the graminized MySQL image.
+    |                                       into the graminized Scikit-learn image.
     |-- sklearn.manifest.template         # Template used by `curation_script.sh` to create a
     |                                       user manifest file (with basic set of values defined
     |                                       for graminizing Scikit-learn images), that will be

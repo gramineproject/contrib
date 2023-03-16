@@ -38,7 +38,7 @@ below:
     |-- redis-gsc.dockerfile.template      # Template used by `curation_script.sh` to create a
     |                                        wrapper dockerfile `redis-gsc.dockerfile` that
     |                                        includes user-provided inputs e.g. `ca.cert` file etc.
-    |                                        into the graminized MySQL image.
+    |                                        into the graminized Redis image.
     |-- redis.manifest.template            # Template used by `curation_script.sh` to create a
     |                                        user manifest file (with basic set of values defined
     |                                        for graminizing Redis images), that will be passed to
