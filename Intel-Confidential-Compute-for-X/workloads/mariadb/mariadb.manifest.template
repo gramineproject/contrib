@@ -1,0 +1,19 @@
+# SPDX-License-Identifier: LGPL-3.0-or-later
+# Copyright (C) 2023 Intel Corporation
+
+# This file has basic set of values defined for graminizing MariaDB images. This manifest template
+# is used by `curation_script.sh` to create the user manifest file that will be passed to GSC.
+
+sgx.enclave_size = "8G"
+sgx.max_threads = 128
+
+# This is required to run workload as non-root user, any number works except `0` which is for root.
+loader.uid = 999
+loader.gid = 999
+
+sys.enable_extra_runtime_domain_names_conf = true
+
+fs.mounts = [
+  { type = "encrypted", path = "/run/mysqld", uri = "file:/run/mysqld" },
+  { type = "tmpfs", path = "/tmp" },
+]
