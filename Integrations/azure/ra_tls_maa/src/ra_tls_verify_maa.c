@@ -17,7 +17,7 @@
  *     POST {instanceUrl}/attest/SgxEnclave?api-version=2022-08-01
  *
  * The HTTPS "Get set of JWKs" request is sent to the URL in the format:
- *     POST {instanceUrl}/certs/
+ *     GET {instanceUrl}/certs/
  *
  * {instanceUrl} is the attestation provider URL, e.g. `shareduks.uks.attest.azure.net`.
  *
@@ -482,7 +482,7 @@ static int maa_send_request(struct maa_context_t* context, const void* quote, si
 
     /* construct JSON string with the attestation request to MAA */
     const char* request_json_fmt = "{\"quote\": \"%s\", \"runtimeData\": "
-                           "  {\"data\": \"%s\", \"dataType\": \"Binary\"}  }";
+                                   "  {\"data\": \"%s\", \"dataType\": \"Binary\"}  }";
 
     size_t request_json_size = strlen(request_json_fmt) + 1 + quote_b64_size +
                                runtime_data_b64_size;
@@ -963,15 +963,27 @@ static int maa_verify_response_output_quote(struct maa_response* response, const
         goto out;
     }
 
+    static_assert(sizeof(quote_body->report_body.isv_prod_id) == 2); /* uint16_t */
     if (sgx_product_id->valueint == INT_MAX || sgx_product_id->valueint == INT_MIN) {
         ERROR("MAA JWT payload's `x-ms-sgx-product-id` field is not an integer\n");
         ret = MBEDTLS_ERR_X509_CERT_UNKNOWN_FORMAT;
         goto out;
     }
+    if (sgx_product_id->valueint < 0 || sgx_product_id->valueint > USHRT_MAX) {
+        ERROR("MAA JWT payload's `x-ms-sgx-product-id` field is not uint16_t\n");
+        ret = MBEDTLS_ERR_X509_CERT_UNKNOWN_FORMAT;
+        goto out;
+    }
     quote_body->report_body.isv_prod_id = sgx_product_id->valueint;
 
+    static_assert(sizeof(quote_body->report_body.isv_svn) == 2); /* uint16_t */
     if (sgx_svn->valueint == INT_MAX || sgx_svn->valueint == INT_MIN) {
         ERROR("MAA JWT payload's `x-ms-sgx-svn` field is not an integer\n");
+        ret = MBEDTLS_ERR_X509_CERT_UNKNOWN_FORMAT;
+        goto out;
+    }
+    if (sgx_svn->valueint < 0 || sgx_svn->valueint > USHRT_MAX) {
+        ERROR("MAA JWT payload's `x-ms-sgx-svn` field is not uint16_t\n");
         ret = MBEDTLS_ERR_X509_CERT_UNKNOWN_FORMAT;
         goto out;
     }

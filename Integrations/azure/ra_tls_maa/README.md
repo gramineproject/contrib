@@ -114,7 +114,7 @@ and
 [`ra-tls-secret-prov`](https://github.com/gramineproject/gramine/tree/master/CI-Examples/ra-tls-secret-prov)
 examples available in Gramine.
 
-To be able tu run these tests, the machine must run on the Azure cloud, with
+To be able to run these tests, the machine must run on the Azure cloud, with
 access to the MAA attestation provider service.
 
 For this, we provide a patch that should be applied on top of Gramine v1.4 repo:
