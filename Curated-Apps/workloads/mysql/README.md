@@ -26,7 +26,7 @@ Execute the below commands on your system.
    docker stop init_test_db
    ```
 
-3. Encrypt MySQL database (optional)
+3. Encrypt MySQL database
 
    1. Install prerequisites for encrypting MySQL database
 
@@ -47,8 +47,7 @@ Execute the below commands on your system.
       `workloads/mysql/base_image_helper/encryption_key`.
       Learn more about [Encrypted files](https://gramine.readthedocs.io/en/stable/manifest-syntax.html#encrypted-files) support in Gramine.
 
-4. Generate the test confidential compute image with encrypted database. Step 3 is mandatory before
-   proceeding here:
+4. Generate the test confidential compute image with encrypted database:
    ```sh
    python3 ./curate.py mysql mysql:8.0.32-debian test
    ```
