@@ -1,0 +1,1 @@
+--datadir /var/run/test_db_encrypted
