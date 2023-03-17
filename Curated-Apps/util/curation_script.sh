@@ -161,8 +161,8 @@ if [ "$signing_input" = "test" ]; then
 fi
 
 # Command-line arguments:
-if [[ ! -z $5 ]]; then
-    echo $5 >> $wrapper_dockerfile
+if [[ $5 ]]; then
+    echo "$5" >> $wrapper_dockerfile
 fi
 
 # Test image creation

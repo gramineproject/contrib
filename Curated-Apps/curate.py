@@ -383,10 +383,12 @@ def create_custom_image(stdscr, docker_socket, workload_type, base_image_name, d
     # 2. Provide command-line arguments
     update_user_and_commentary_win_array(user_console, guide_win, arg_input, arg_help)
     user_args = update_user_input()
-    common_args =  get_common_args(workload_type)
+    if user_args:
+        user_args += ' '
+    user_args += get_common_args(workload_type)
     args_json = ''
-    if user_args or common_args:
-        args_list = shlex.split(user_args + ' ' + common_args)
+    if user_args:
+        args_list = shlex.split(user_args)
         args_json = 'CMD ' + json.dumps(args_list)
 
     # 3. Provide environment variables
