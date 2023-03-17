@@ -1,0 +1,4 @@
+/*.log
+/mariadb-gsc.dockerfile
+/mariadb.manifest
+/test_db
