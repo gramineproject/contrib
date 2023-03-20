@@ -22,7 +22,7 @@
 # -- arg3    : distro e.g. ubuntu:18.04 or ubuntu:20.04
 # -- arg4    : path to the enclave signing key or
 #              'test' string to generate test signing key
-# -- arg5    : string with command-line arguments (hard-coded in Docker image via Gramine manifest)
+# -- arg5    : CMD instruction for Dockerfile having all the command-line arguments
 # -- arg6    : 'test-image' string to create a non-production GSC image when curate.py is run in
 #            :  test mode
 #            : y or n (attestation required?) in case of custom image creation
@@ -160,7 +160,7 @@ if [ "$signing_input" = "test" ]; then
      echo 'sgx.file_check_policy = "allow_all_but_log"' >> $app_image_manifest
 fi
 
-# Command-line arguments:
+# CMD instruction for Dockerfile having all the command-line arguments
 if [[ $5 ]]; then
     echo "$5" >> $wrapper_dockerfile
 fi
