@@ -14,8 +14,8 @@
 #include "secret_prov.h"
 
 static __attribute__((used)) void* dummy_secret_prov_symbols_table[] = {
-  secret_provision_start_server,
-  secret_provision_read,
-  secret_provision_write,
-  secret_provision_close,
+    secret_provision_start_server,
+    secret_provision_read,
+    secret_provision_write,
+    secret_provision_close,
 };

@@ -820,7 +820,7 @@ static int maa_verify_response_output_quote(struct maa_response* response, const
         /* currently only support RSA keys */
         if (!cJSON_IsString(key_kty) || strcmp(key_kty->valuestring, "RSA")) {
             ERROR("MAA JWK's `kty` field contains an unexpected value (got `%s`, expected `%s`)\n",
-                    key_kty->valuestring, "RSA");
+                  key_kty->valuestring, "RSA");
             ret = MBEDTLS_ERR_X509_CERT_UNKNOWN_FORMAT;
             goto out;
         }
