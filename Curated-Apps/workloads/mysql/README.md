@@ -79,7 +79,7 @@ Execute the below commands on your system.
 
    Connect the client to the test MySQL server created at step 4:
    ```sh
-   mysql -h 127.0.0.0 -uroot
+   mysql -h 127.0.0.1 -uroot
    ```
 
 ## Decrypt MySQL database

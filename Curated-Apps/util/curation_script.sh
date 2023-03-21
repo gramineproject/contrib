@@ -120,7 +120,9 @@ create_gsc_image () {
     echo
     cd $CUR_DIR
     rm -rf gsc >/dev/null 2>&1
-    git clone --depth 1 --branch v1.4 https://github.com/gramineproject/gsc.git
+    # Using out of tree GSC brach `v1.4-for-curated-apps` to take the fix with commit
+    # fa5a07385ac205d89fb6ddb2bc5505ebe97d0539
+    git clone --depth 1 --branch v1.4-for-curated-apps https://github.com/gramineproject/gsc.git
 
     cd gsc
     cp config.yaml.template config.yaml
