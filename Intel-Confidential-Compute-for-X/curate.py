@@ -165,9 +165,9 @@ def update_user_error_win(user_console, error_text):
                         | curses.color_pair(3))
     user_console.refresh()
 
-def edit_user_win(user_console, error_text):
+def edit_user_win(user_console, text):
     [y, _] = user_console.getyx()
-    user_console.addstr(y + line_offset, 0, textwrap.fill(error_text, user_console_width))
+    user_console.addstr(y + line_offset, 0, textwrap.fill(text, user_console_width))
     user_console.refresh()
 
 def update_run_win(text):
@@ -206,53 +206,56 @@ def pull_docker_image(docker_socket, image_name):
         print('Please check if the image name is correct and try again.')
         return -1
 
-def get_encryption_key_input(user_console, guide_win):
-    file = update_user_input()
-    while not path.isfile(file):
+def get_encryption_key_input(user_console, guide_win, workload_type):
+    error = ''
+    key_example = f'workloads/{workload_type}/base_image_helper/encryption_key'
+    encrypted_files_prompt.extend(encryption_key_prompt.format(key_example).split(','))
+    while True:
         user_console.erase()
         update_user_and_commentary_win_array(user_console, guide_win, encrypted_files_prompt,
                                              encypted_files_help)
-        edit_user_win(user_console, encryption_key_prompt)
-        update_user_error_win(user_console, file_not_found_error.format(file))
+        update_user_error_win(user_console, error)
         file = update_user_input()
-    return file
+        if not path.isfile(file):
+            error = file_not_found_error.format(file)
+            continue
+        return file
+
 
 # User is expected to provide the path to a signing key or `test` as input.
 # `test` as an input will result in generating a test signing key which is insecure for use in
 # production!
 def get_enclave_signing_input(user_console, guide_win):
-    sign_file = update_user_input()
-    while not path.isfile(sign_file) and sign_file != 'test':
-        error = "Please provide a valid input"
-        if sign_file != '':
-            error = file_not_found_error.format(sign_file)
+    error = ''
+    while True:
         user_console.erase()
         update_user_and_commentary_win_array(user_console, guide_win, key_prompt, signing_key_help)
         update_user_error_win(user_console, error)
         sign_file = update_user_input()
-    return sign_file
+        if not path.isfile(sign_file) and sign_file != 'test':
+            error = "Please provide a valid input"
+            if sign_file != '':
+                error = file_not_found_error.format(sign_file)
+            continue
+        return sign_file
 
 def get_attestation_input(user_console, guide_win):
-    attestation_input = update_user_input()
+    error = ''
     while True:
-        while (attestation_input not in ['test', 'done', '']):
-            user_console.erase()
-            update_user_and_commentary_win_array(user_console, guide_win, attestation_prompt,
-                                                 attestation_help)
-            update_user_error_win(user_console, 'Invalid option specified')
-            attestation_input = update_user_input()
-        if attestation_input == 'done':
-            if (path.isfile('verifier/ssl/ca.crt') and
-                path.isfile('verifier/ssl/server.crt') and
-                path.isfile('verifier/ssl/server.key')):
-                return attestation_input
-            user_console.erase()
-            update_user_and_commentary_win_array(user_console, guide_win, attestation_prompt,
-                                                 attestation_help)
-            update_user_error_win(user_console, 'One or more files does not exist at'
-                                  ' verifier/ssl/ directory')
-            attestation_input = update_user_input()
+        user_console.erase()
+        update_user_and_commentary_win_array(user_console, guide_win, attestation_prompt,
+                                             attestation_help)
+        update_user_error_win(user_console, error)
+        attestation_input = update_user_input()
+        if attestation_input not in ['test', 'done', '']:
+            error = 'Invalid option specified'
             continue
+        elif attestation_input == 'done':
+            if (not path.isfile('verifier/ssl/ca.crt') or
+                not path.isfile('verifier/ssl/server.crt') or
+                not path.isfile('verifier/ssl/server.key')):
+                error = 'One or more files does not exist at `verifier/ssl/` directory'
+                continue
         return attestation_input
 
 def is_azure_instance():
@@ -264,35 +267,28 @@ def is_azure_instance():
 
     return len(rec_pattern.findall(service_output.stdout)) > 0
 
-def get_docker_run_flags(workload_type):
-    flags_file = f'workloads/{workload_type}/docker_run_flags.txt'
-
+def get_file_contents(in_file):
     try:
-        with open(flags_file, 'r') as pfile:
-            flags = pfile.read()
+        with open(in_file, 'r') as pfile:
+            contents = pfile.read()
     except FileNotFoundError:
-        flags = ''
-    return flags
+        contents = ''
+    return contents
+
+def get_encrypted_files(workload_type):
+    return get_file_contents(f'workloads/{workload_type}/base_image_helper/encrypted_files.txt')
+
+def get_env_vars(workload_type):
+    return get_file_contents(f'workloads/{workload_type}/env_vars.txt')
+
+def get_docker_run_flags(workload_type):
+    return get_file_contents(f'workloads/{workload_type}/docker_run_flags.txt')
 
 def get_common_args(workload_type):
-    common_args_file = f'workloads/{workload_type}/common_args.txt'
-
-    try:
-        with open(common_args_file, 'r') as pfile:
-            common_args = pfile.read()
-    except FileNotFoundError:
-        common_args = ''
-    return common_args
+    return get_file_contents(f'workloads/{workload_type}/common_args.txt')
 
 def get_insecure_args(workload_type):
-    insecure_args_file = f'workloads/{workload_type}/insecure_args.txt'
-
-    try:
-        with open(insecure_args_file, 'r') as pfile:
-            args = pfile.read()
-    except FileNotFoundError:
-        args = ''
-    return args
+    return get_file_contents(f'workloads/{workload_type}/insecure_args.txt')
 
 def main():
     if len(argv) < 3:
@@ -381,6 +377,9 @@ def create_custom_image(stdscr, docker_socket, workload_type, base_image_name, d
         distro = 'debian:11'
 
     # 2. Provide command-line arguments
+    args = get_insecure_args(workload_type)
+    if args:
+        arg_input[5:5] = arg_example.format(workload_type, args).split(',')
     update_user_and_commentary_win_array(user_console, guide_win, arg_input, arg_help)
     user_args = update_user_input()
     if user_args:
@@ -392,6 +391,9 @@ def create_custom_image(stdscr, docker_socket, workload_type, base_image_name, d
         args_json = 'CMD ' + json.dumps(args_list)
 
     # 3. Provide environment variables
+    env_vars = get_env_vars(workload_type)
+    if env_vars:
+        env_input[5:5] = env_example.format(workload_type, env_vars).split(',')
     update_user_and_commentary_win_array(user_console, guide_win, env_input, env_help)
     env_required = 'n'
     envs = update_user_input()
@@ -399,6 +401,9 @@ def create_custom_image(stdscr, docker_socket, workload_type, base_image_name, d
         env_required = 'y'
 
     # 4. Provide additional docker run flags
+    flags = get_docker_run_flags(workload_type)
+    if flags:
+        flags_input[5:5] = flags_example.format(workload_type, flags).split(',')
     update_user_and_commentary_win_array(user_console, guide_win, flags_input, flags_help)
     flags = update_user_input()
 
@@ -406,14 +411,17 @@ def create_custom_image(stdscr, docker_socket, workload_type, base_image_name, d
     ef_required = 'n'
     encryption_key_path = ''
     enc_key_path_in_verifier = ''
-    encrypted_files = ''
+    enc_files = get_encrypted_files(workload_type)
+    if enc_files:
+        encrypted_files_prompt[5:5] = encrypted_input_example.format(workload_type,
+                                                                     enc_files).split(',')
+
     update_user_and_commentary_win_array(user_console, guide_win, encrypted_files_prompt,
                                          encypted_files_help)
     encrypted_files = update_user_input()
 
     if encrypted_files:
-        edit_user_win(user_console, encryption_key_prompt)
-        encryption_key = get_encryption_key_input(user_console, guide_win)
+        encryption_key = get_encryption_key_input(user_console, guide_win, workload_type)
         encryption_key_name = os.path.basename(encryption_key)
         encryption_key_path = os.path.abspath(encryption_key)
         enc_key_path_in_verifier = enc_key_path.format(encryption_key_name)
@@ -425,9 +433,6 @@ def create_custom_image(stdscr, docker_socket, workload_type, base_image_name, d
     verifier_server = '<verifier-dns-name:port>'
     attestation_required = 'n'
     host_net = ''
-    update_user_and_commentary_win_array(user_console, guide_win, attestation_prompt,
-                                         attestation_help)
-
     attestation_input = get_attestation_input(user_console, guide_win)
     if attestation_input == 'done':
         attestation_required = 'y'
@@ -439,7 +444,6 @@ def create_custom_image(stdscr, docker_socket, workload_type, base_image_name, d
         attestation_required = 'y'
 
     # 7. Obtain enclave signing key
-    update_user_and_commentary_win_array(user_console, guide_win, key_prompt, signing_key_help)
     key_path = get_enclave_signing_input(user_console, guide_win)
     passphrase = ''
     if key_path == 'test':

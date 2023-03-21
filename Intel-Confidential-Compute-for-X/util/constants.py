@@ -97,20 +97,19 @@ attestation_help = ['This step enables the enclave to communicate to a remote ve
                     'https://github.com/gramineproject/contrib/tree/master/Examples/aks-attestation/ssl',
                     'For further reading - ',
                     'https://gramine.readthedocs.io/en/stable/attestation.html']
-
+encrypted_input_example = 'e.g. encrypted files input for {} would be:,{}' + color_set
 encrypted_files_prompt = ['>> Encrypted files and key provisioning:', 'Please provide path of'
                           ' these files relative to the working directory:', '1. Encrypted files'
                           ' in the base image used by the application, if any.', '2. Files created'
                           ' at runtime, if any.', 'Accepted format: `file_path1:file_path2`',
-                          'e.g. for workloads/pytorch/base_image_helper/Dockerfile based image,'
-                          ' the encrypted files input would be --> ',
-                          'classes.txt:input.jpg:alexnet-pretrained.pt:result.txt' + color_set,
                           'Press CTRL+G when done']
 encypted_files_help = ["Gramine's Encrypted FS feature supports transparently decrypting data"
                        ' using the encryption key that will be provisioned after successful'
                        ' attestation.']
-encryption_key_prompt = ('Please provide the path to the key used for the encryption. Press CTRL+G'
-                         ' when done')
+encryption_key_prompt = ('Please input encryption key path. e.g.:,{}' + color_set +
+                         ',Press CTRL+G when done')
+
+arg_example = 'e.g. command-line arguments for {} would be:,{}' + color_set
 arg_input = ['>> Command-line arguments:', 'Specify docker command-line arguments here in a single'
              ' string. For example, if your docker runtime is ', 'docker run <image_name> arg1'
              ' arg2' + color_set, 'then the arguments that need to be provided here are', 'arg1'
@@ -119,6 +118,7 @@ arg_help = ['Allowing an attacker to control executable arguments can break the 
             ' resulting enclave. Gramine will ignore any arguments provided at docker run-time,'
             ' so ensure those are provided here now']
 
+env_example = 'e.g. environment variables for {} would be:,{}' + color_set
 env_input = ['>> Environment variables:', 'Please specify a list of env variables and respective'
              ' values in below mentioned format:',
              '-e ENV_NAME1="value1" -e ENV_NAME2="value2"' + color_set,
@@ -128,6 +128,7 @@ env_help =  ['This step secures the environment variables. Gramine will ignore e
              ' By default Gramine will add all the environment variables set in the base'
              ' docker image.']
 
+flags_example = 'e.g. docker run flags for {} would be:,{}' + color_set
 flags_input = ['>> Additional docker run flags:','Specify docker run flags here in a single string.'
              ' For example, if your docker command is ', 'docker run flag1 flag2 <image_name>'
              + color_set, 'then the flags that need to be provided here are', 'flag1 flag2'
