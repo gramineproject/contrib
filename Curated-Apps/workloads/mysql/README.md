@@ -58,6 +58,13 @@ Execute the below commands on your system.
    python3 ./curate.py mysql <your_image>
    ```
 
+   Please provide below inputs on UI:
+   - `--datadir <database_abs_path>` when prompted for command-line arguments
+   - `-v <abs_path_to_encrypted_database>:<abs_path_to_encrypted_database>` when prompted for
+     additional docker flags
+   - `<abs_path_to_encrypted_database>` and `<encryption_key>` when prompted for encrypted files and
+     encryption key respectively
+
 ## Run the confidential compute image for MySQL
 
 - This example was tested on a Standard_DC8s_v3 Azure VM.
@@ -80,7 +87,7 @@ Execute the below commands on your system.
    Execute below command to decrypt the MySQL database:
    ```sh
    gramine-sgx-pf-crypt decrypt -w workloads/mysql/base_image_helper/encryption_key \
-       -i /var/run/test_db_encrypted -o test_db_plain
+       -i /var/run/test_db_encrypted -o workloads/mysql/test_db_plain
    ```
 
 ## Contents
