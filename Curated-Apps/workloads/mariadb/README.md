@@ -1,10 +1,12 @@
 # Gramine Curated MariaDB
+
 In the following two sections, we explain how a Docker image for the protected MariaDB version can
 be built and how the image can be executed.
 [Prerequisites](https://github.com/gramineproject/contrib/tree/master/Curated-Apps/README.md) for
 both the phases are assumed to be met.
 
 ## Build a confidential compute image for MariaDB
+
 Execute the below commands on your system.
 
 1. Clone the Gramine Contrib repository and move to the Curated-Apps folder:
@@ -24,15 +26,14 @@ Execute the below commands on your system.
 
    # Stop MariaDB server container using below command when database is initialized
    docker stop init_test_db
-   # To allow running MariaDB server under the current non-root user.
+   # To allow running MariaDB server under the current non-root user
    sudo chown -R $USER:$USER $PWD/workloads/mariadb/test_db
    ```
 
-3. Encrypt MariaDB database
+3. Encrypt MariaDB database:
 
-   1. Install prerequisites for encrypting MariaDB database
-
-      [Install Gramine](https://gramine.readthedocs.io/en/latest/quickstart.html#install-gramine):
+   1. Install the only prerequisite required for encrypting MariaDB database:
+      [Gramine](https://gramine.readthedocs.io/en/latest/quickstart.html#install-gramine).
       Encryption is done using `gramine-sgx-pf-crypt` tool which is part of Gramine installation.
 
    2. Encrypt MariaDB database following below steps:
@@ -50,21 +51,23 @@ Execute the below commands on your system.
       Learn more about [Encrypted files](https://gramine.readthedocs.io/en/stable/manifest-syntax.html#encrypted-files)
       support in Gramine.
 
-4. Generate the test confidential compute image with encrypted database.
+4. Generate the test confidential compute image with encrypted database:
    ```sh
    python3 ./curate.py mariadb mariadb:10.7 test
    ```
 
 5. Or, to generate a custom confidential compute image based on a user-provided MariaDB image,
-   execute the following to launch an interactive setup script.
+   execute the following to launch an interactive setup script:
    ```sh
    python3 ./curate.py mariadb <your_image>
    ```
 
    Please provide below inputs on UI:
-   - --datadir <database_abs_path> when prompted for command-line arguments
-   - -v <abs_path_to_encrypted_database>:<abs_path_to_encrypted_database> when prompted for additional docker flags
-   - <abs_path_to_encrypted_database> and <encryption_key> when prompted for encrypted files and encryption key respectively
+   - `--datadir <database_abs_path>` when prompted for command-line arguments
+   - `-v <abs_path_to_encrypted_database>:<abs_path_to_encrypted_database>` when prompted for
+     additional docker flags
+   - `<abs_path_to_encrypted_database>` and `<encryption_key>` when prompted for encrypted files
+     and encryption key respectively
 
 ## Run the confidential compute image for MariaDB
 
@@ -73,27 +76,28 @@ Execute the below commands on your system.
 
 ## Connect MySQL client
 
-   Install MySQL client using command:
-   ```sh
-   sudo apt-get -y install mysql-client
-   ```
+MariaDB is fully compatible with MySQL client. Install MySQL client using command:
+```sh
+sudo apt-get -y install mysql-client
+```
 
-   Connect the client to the test MariaDB server created at step 4:
-   ```sh
-   mysql -h 127.0.0.0 -uroot
-   ```
+Connect the client to the test MariaDB server created at step 4 or 5:
+```sh
+mysql -h 127.0.0.1 -uroot
+```
 
 ## Decrypt MariaDB database
 
-   Execute below command to decrypt the MariaDB database:
-   ```sh
-   gramine-sgx-pf-crypt decrypt -w workloads/mariadb/base_image_helper/encryption_key \
-       -i /var/run/test_db_encrypted -o workloads/mariadb/test_db_plain
-   ```
+Execute below command to decrypt the MariaDB database:
+```sh
+gramine-sgx-pf-crypt decrypt -w workloads/mariadb/base_image_helper/encryption_key \
+      -i /var/run/test_db_encrypted -o workloads/mariadb/test_db_plain
+```
 
 ## Contents
-This sub-directory contains artifacts which help in creating curated GSC MariaDB image, as explained
-below:
+
+This sub-directory contains artifacts which help in creating curated GSC MariaDB image, as
+explained below:
 
     .
     |-- mariadb-gsc.dockerfile.template     # Template used by `curation_script.sh` to create a
