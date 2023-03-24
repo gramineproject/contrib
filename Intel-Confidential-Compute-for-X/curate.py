@@ -377,7 +377,8 @@ def create_custom_image(stdscr, docker_socket, workload_type, base_image_name, d
         distro = 'debian:11'
 
     # 2. Provide command-line arguments
-    if args := get_insecure_args(workload_type):
+    args = get_insecure_args(workload_type)
+    if args:
         arg_input[5:5] = arg_example.format(workload_type, args).split(',')
     update_user_and_commentary_win_array(user_console, guide_win, arg_input, arg_help)
     user_args = update_user_input()
@@ -390,7 +391,8 @@ def create_custom_image(stdscr, docker_socket, workload_type, base_image_name, d
         args_json = 'CMD ' + json.dumps(args_list)
 
     # 3. Provide environment variables
-    if env_vars := get_env_vars(workload_type):
+    env_vars = get_env_vars(workload_type)
+    if env_vars:
         env_input[5:5] = env_example.format(workload_type, env_vars).split(',')
     update_user_and_commentary_win_array(user_console, guide_win, env_input, env_help)
     env_required = 'n'
@@ -399,7 +401,8 @@ def create_custom_image(stdscr, docker_socket, workload_type, base_image_name, d
         env_required = 'y'
 
     # 4. Provide additional docker run flags
-    if flags := get_docker_run_flags(workload_type):
+    flags = get_docker_run_flags(workload_type)
+    if flags:
         flags_input[5:5] = flags_example.format(workload_type, flags).split(',')
     update_user_and_commentary_win_array(user_console, guide_win, flags_input, flags_help)
     flags = update_user_input()
@@ -408,7 +411,8 @@ def create_custom_image(stdscr, docker_socket, workload_type, base_image_name, d
     ef_required = 'n'
     encryption_key_path = ''
     enc_key_path_in_verifier = ''
-    if enc_files := get_encrypted_files(workload_type):
+    enc_files = get_encrypted_files(workload_type)
+    if enc_files:
         encrypted_files_prompt[5:5] = encrypted_input_example.format(workload_type,
                                                                      enc_files).split(',')
 
