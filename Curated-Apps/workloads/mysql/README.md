@@ -1,10 +1,12 @@
 # Gramine Curated MySQL
+
 In the following two sections, we explain how a Docker image for the protected MySQL version can
 be built and how the image can be executed.
 [Prerequisites](https://github.com/gramineproject/contrib/tree/master/Curated-Apps/README.md) for
 both the phases are assumed to be met.
 
 ## Build a confidential compute image for MySQL
+
 Execute the below commands on your system.
 
 1. Clone the Gramine Contrib repository and move to the Curated-Apps folder:
@@ -28,9 +30,10 @@ Execute the below commands on your system.
 
 3. Encrypt MySQL database
 
-   1. Install prerequisites for encrypting MySQL database
+   1. Install the only prerequisite required for encrypting MySQL database:
 
-      [Install Gramine](https://gramine.readthedocs.io/en/latest/quickstart.html#install-gramine):
+      [Install Gramine](https://gramine.readthedocs.io/en/latest/quickstart.html#install-gramine).
+
       Encryption is done using `gramine-sgx-pf-crypt` tool which is part of Gramine installation.
 
    2. Encrypt MySQL database following below steps:
@@ -58,7 +61,7 @@ Execute the below commands on your system.
    python3 ./curate.py mysql <your_image>
    ```
 
-   Please provide below inputs on UI:
+   Please provide below inputs via UI:
    - `--datadir <database_abs_path>` when prompted for command-line arguments
    - `-v <abs_path_to_encrypted_database>:<abs_path_to_encrypted_database>` when prompted for
      additional docker flags
@@ -91,6 +94,7 @@ Execute the below commands on your system.
    ```
 
 ## Contents
+
 This sub-directory contains artifacts which help in creating curated GSC MySQL image, as explained
 below:
 
