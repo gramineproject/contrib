@@ -1,10 +1,12 @@
 # Gramine Curated Memcached
+
 In the following two sections, we explain how a Docker image for the protected Memcached version
 can be built and how the image can be executed.
 [Prerequisites](https://github.com/gramineproject/contrib/tree/master/Curated-Apps/README.md) for
 both the phases are assumed to be met.
 
 ## Build a confidential compute image for Memcached
+
 Execute the below commands on your system.
 
 1. Clone the Gramine Contrib repository:
@@ -31,6 +33,7 @@ Execute the below commands on your system.
 - Follow the output of the image build script `curate.py` to run the generated Docker image.
 
 ## Contents
+
 This sub-directory contains artifacts which help in creating curated GSC Memcached image, as
 explained below:
 
