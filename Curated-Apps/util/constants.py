@@ -107,7 +107,7 @@ encypted_files_help = ["Gramine's Encrypted FS feature supports transparently de
 encryption_key_prompt = ('Please input encryption key path. e.g.:,{}' + color_set +
                          ',Press CTRL+G when done')
 
-arg_example = 'e.g. Command-line arguments for {} would be:,{}' + color_set
+arg_example = 'e.g. command-line arguments for {} would be:,{}' + color_set
 arg_input = ['>> Command-line arguments:', 'Specify docker command-line arguments here in a single'
              ' string. For example, if your docker runtime is ', 'docker run <image_name> arg1'
              ' arg2' + color_set, 'then the arguments that need to be provided here are', 'arg1'
@@ -116,7 +116,7 @@ arg_help = ['Allowing an attacker to control executable arguments can break the 
             ' resulting enclave. Gramine will ignore any arguments provided at docker run-time,'
             ' so ensure those are provided here now']
 
-env_example = 'e.g. Environment variables for {} would be:,{}' + color_set
+env_example = 'e.g. environment variables for {} would be:,{}' + color_set
 env_input = ['>> Environment variables:', 'Please specify a list of env variables and respective'
              ' values in below mentioned format:',
              '-e ENV_NAME1="value1" -e ENV_NAME2="value2"' + color_set,
