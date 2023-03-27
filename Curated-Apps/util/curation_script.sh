@@ -181,11 +181,12 @@ if [ "$6" = "test-image" ]; then
 fi
 
 # Get Attestation Input
+copy_cert_files=''
 attestation_required=$6
 if [ "$attestation_required" = "y" ]; then
     ca_cert_path=$8
     cp $CUR_DIR/$ca_cert_path ca.crt
-    sed -i 's|# COPY ca.crt /ca.crt|COPY ca.crt /ca.crt|' $wrapper_dockerfile
+    copy_cert_files='COPY ca.crt /'
     echo '' >> $app_image_manifest
     echo '# Attestation related entries' >> $app_image_manifest
     echo 'sgx.remote_attestation = "dcap"' >> $app_image_manifest
@@ -198,6 +199,7 @@ if [ "$attestation_required" = "y" ]; then
     echo '# loader.env.SECRET_PROVISION_SET_KEY = "default"' >> $app_image_manifest
     echo '' >> $app_image_manifest
 fi
+sed -i "s|<copy_cert_files>|$copy_cert_files|" $wrapper_dockerfile
 
 # Environment Variables:
 env_required=$9
