@@ -22,7 +22,7 @@ Execute the below commands on your system.
 
        $ python3 ./curate.py memcached ubuntu/memcached:1.5-20.04_beta test
 
-4. To generate a custom confidential compute image based on a user-provided Memcached image,
+4. Or, to generate a custom confidential compute image based on a user-provided Memcached image,
    execute the following to launch an interactive setup script:
 
        $ python3 ./curate.py memcached <your_image>
