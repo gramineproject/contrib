@@ -62,7 +62,7 @@ Execute the below commands on your system.
    python3 ./curate.py mariadb <your_image>
    ```
 
-   Please provide below inputs on UI:
+   Please provide below inputs via UI:
    - `--datadir <database_abs_path>` when prompted for command-line arguments
    - `-v <abs_path_to_encrypted_database>:<abs_path_to_encrypted_database>` when prompted for
      additional docker flags
@@ -81,7 +81,7 @@ MariaDB is fully compatible with MySQL client. Install MySQL client using comman
 sudo apt-get -y install mysql-client
 ```
 
-Connect the client to the test MariaDB server created at step 4 or 5:
+Connect the client to the test MariaDB server created at step 4:
 ```sh
 mysql -h 127.0.0.1 -uroot
 ```
