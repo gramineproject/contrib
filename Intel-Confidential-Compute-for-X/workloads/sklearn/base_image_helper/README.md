@@ -14,5 +14,5 @@ python3 -m pip install scikit-learn-intelex pandas numpy
 
 Execute `bash ./helper.sh` command to create Scikit-learn base image.
 
-Please refer to `Curated-Apps/workloads/sklearn/README.md` to curate the image created in above
+Please refer to `Intel-Confidential-Compute-for-X/workloads/sklearn/README.md` to curate the image created in above
 steps with GSC.

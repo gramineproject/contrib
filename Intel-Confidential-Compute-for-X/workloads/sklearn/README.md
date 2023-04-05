@@ -2,17 +2,17 @@
 
 In the following two sections, we explain how a Docker image for the Scikit-learn machine learning
 library can be built and how the image can be executed.
-[Prerequisites](https://github.com/gramineproject/contrib/tree/master/Curated-Apps/README.md) for
+[Prerequisites](https://github.com/gramineproject/contrib/tree/master/Intel-Confidential-Compute-for-X/README.md) for
 both the phases are assumed to be met.
 
 ## Build a confidential compute image for Scikit-learn
 
 Execute the below commands on your system.
 
-1. Clone the Gramine Contrib repository and move to the Curated-Apps folder:
+1. Clone the Gramine Contrib repository and move to the Intel-Confidential-Compute-for-X folder:
    ```sh
    git clone --depth 1 https://github.com/gramineproject/contrib.git
-   cd contrib/Curated-Apps
+   cd contrib/Intel-Confidential-Compute-for-X
    ```
 
 2. User is expected to first have a base image `<base_image_with_scikit-learn>` ready with
@@ -23,7 +23,7 @@ Execute the below commands on your system.
 3. To generate a preconfigured non-production test confidential compute image for Scikit-learn,
    follow the below steps:
 
-   1. Install prerequisites given [here](https://github.com/gramineproject/contrib/blob/master/Curated-Apps/workloads/sklearn/base_image_helper/README.md) for creating sample Scikit-learn application image `sklearn-base`
+   1. Install prerequisites given [here](https://github.com/gramineproject/contrib/blob/master/Intel-Confidential-Compute-for-X/workloads/sklearn/base_image_helper/README.md) for creating sample Scikit-learn application image `sklearn-base`
 
    2. Generate a sample Scikit-learn application image `sklearn-base`:
       ```sh

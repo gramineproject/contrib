@@ -77,7 +77,7 @@ verifier_build_messg = 'Building the RA-TLS Verifier image, this might take coup
 verifier_log_help = 'You may monitor verifier/{} for progress'
 attestation_prompt = ['>> Remote Attestation:' , 'To enable remote attestation using Azure DCAP'
                       ' client libs, use another terminal to copy the ca.crt, server.crt, and'
-                      ' server.key certificates to Curated-Apps/verifier/ssl directory',
+                      ' server.key certificates to Intel-Confidential-Compute-for-X/verifier/ssl directory',
                       'NOTE: Encrypted Filesystem of Gramine requires Attestation to provision'
                       ' a decryption key for encrypted files.',
                       '- Type done when ready, OR',

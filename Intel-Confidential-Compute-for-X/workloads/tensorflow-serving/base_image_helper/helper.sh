@@ -54,5 +54,5 @@ docker build \
 popd
 
 echo -e '\n\nCreated base image `'$TF_SERVING_IMAGE_FINAL'`.'
-echo -e 'Please refer to `Curated-Apps/workloads/tensorflow-serving/README.md` to curate the above image' \
+echo -e 'Please refer to `Intel-Confidential-Compute-for-X/workloads/tensorflow-serving/README.md` to curate the above image' \
 ' with GSC.\n'

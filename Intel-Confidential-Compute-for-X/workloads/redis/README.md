@@ -1,16 +1,16 @@
 # Gramine Curated Redis
 In the following two sections, we explain how a Docker image for the protected Redis version can be
 built and how the image can be executed.
-[Prerequisites](https://github.com/gramineproject/contrib/tree/master/Curated-Apps/README.md) for
+[Prerequisites](https://github.com/gramineproject/contrib/tree/master/Intel-Confidential-Compute-for-X/README.md) for
 both the phases are assumed to be met.
 
 ## Build a confidential compute image for Redis
 Execute the below commands on your system.
 
-1. Clone the Gramine Contrib repository and move to the Curated-Apps folder:
+1. Clone the Gramine Contrib repository and move to the Intel-Confidential-Compute-for-X folder:
    ```sh
    git clone --depth 1 https://github.com/gramineproject/contrib.git
-   cd contrib/Curated-Apps
+   cd contrib/Intel-Confidential-Compute-for-X
    ```
 
 2. To generate a preconfigured non-production test confidential compute image for Redis, execute

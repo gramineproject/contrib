@@ -23,5 +23,5 @@ docker build -t $image_name .
 cd $CUR_DIR
 
 echo -e '\n\nCreated base image `'$image_name'`.'
-echo -e 'Please refer to `Curated-Apps/workloads/sklearn/README.md` to curate the above image' \
+echo -e 'Please refer to `Intel-Confidential-Compute-for-X/workloads/sklearn/README.md` to curate the above image' \
 ' with GSC.\n'
