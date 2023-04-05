@@ -1,32 +1,29 @@
-This directory contains steps and artifacts to create a docker image with encrypted files.
+This directory contains steps and artifacts to create a PyTorch Docker image containing an encrypted
+model and an encrypted sample picture.
 
 # Prerequisites
-  ```sh
-  sudo apt install libnss-mdns libnss-myhostname python3-pip lsb-release
-  python3 -m pip install --upgrade pip # on ubuntu 18.04 machine
-  python3 -m pip install --user torchvision pillow
-  ```
+- Install dependencies:
+    - Ubuntu 18.04:
+        ```sh
+        sudo apt install libnss-mdns libnss-myhostname python3-pip lsb-release
+        python3 -m pip install --upgrade pip # on ubuntu 18.04 machine
+        python3 -m pip install --user torchvision pillow
+        ```
+- [Install Gramine](https://gramine.readthedocs.io/en/latest/quickstart.html#install-gramine)
+    as the encryption is done using the `gramine-sgx-pf-crypt` tool which is part of Gramine
+    installation.
+    You can learn more about Gramine's support of encrypted files in the
+    [corresponding documentation](https://gramine.readthedocs.io/en/stable/manifest-syntax.html#encrypted-files).
 
-  [Install Gramine](https://gramine.readthedocs.io/en/latest/quickstart.html#install-gramine): File Encryption is done using `gramine-sgx-pf-crypt` tool which is part of Gramine installation.
 
-# Base docker image creation
+# Create base Docker image
 
-We will use PyTorch example available [here](https://github.com/gramineproject/examples/blob/master/pytorch/)
-to demonstrate the base image creation with encrypted files.
+Execute the helper script contained in this directory: `./helper.sh`.
 
-- Execute `bash ./helper.sh` command to encrypt the files and create base image with
-  encrypted files.
+This script clones Gramine's [PyTorch example](https://github.com/gramineproject/examples/blob/master/pytorch/),
+downloads a pre-trainer model; generates a weak encryption key (that must not be used in
+production); encrypts an example picture and the model; and builds a Docker image containing PyTorch
+the encrypted picture.
 
-Please refer to `Intel-Confidential-Compute-for-X/workloads/pytorch/README.md` to curate the image created in above
-steps with GSC.
-
-# Retrieve and decrypt the results
-
-Results are generated in `/workspace/result.txt` within container in encrypted form after running
-the curated GSC image. User need to copy results from container to local machine and decrypt using
-below commands
-
-- Execute `docker cp <container id or name>:/workspace/result.txt .` to fetch results from docker
-  container to local machine.
-- Execute `gramine-sgx-pf-crypt decrypt -w encryption_key -i result.txt -o result_plaintext.txt` to
-  decrypt the results. Make sure `encryption_key` path in decryption command is correct.
+Please refer to the [README of Intel® Confidential Compute for PyTorch](../README.md)
+to generate a Gramine-protected version of this Docker image.

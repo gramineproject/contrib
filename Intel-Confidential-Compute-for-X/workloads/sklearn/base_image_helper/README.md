@@ -1,18 +1,21 @@
-This directory contains steps and artifacts to create a base docker image of Intel® extension
-for Scikit-learn.
+This directory contains steps and artifacts to create a Scikit-learn Docker image.
 
-# Installing prerequisites
 
-Please run the following command to install the required packages (Ubuntu-specific):
+# Prerequisites
 
-```sh
-python3 -m pip install --upgrade pip # on ubuntu 18.04 machine
-python3 -m pip install scikit-learn-intelex pandas numpy
-```
+- Install dependencies:
+    - Ubuntu 18.04:
+        ```sh
+        python3 -m pip install --upgrade pip # on ubuntu 18.04 machine
+        python3 -m pip install scikit-learn-intelex pandas numpy
+        ```
 
-# Base docker image creation
 
-Execute `bash ./helper.sh` command to create Scikit-learn base image.
+# Create base Docker image
 
-Please refer to `Intel-Confidential-Compute-for-X/workloads/sklearn/README.md` to curate the image created in above
-steps with GSC.
+Execute the helper script contained in this directory: `./helper.sh`.
+
+This script downloads a test dataset and builds a Scikit-learn Docker image.
+
+Please refer to the [README of Intel® Confidential Compute for Scikit-learn](../README.md)
+to generate a Gramine-protected version of this Docker image.

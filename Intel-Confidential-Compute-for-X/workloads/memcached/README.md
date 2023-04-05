@@ -1,48 +1,52 @@
-# Gramine Curated Memcached
+# Intel® Confidential Compute for Memcached
 
-In the following two sections, we explain how a Docker image for the protected Memcached version
+In the following two sections, we explain how a Docker image for a Gramine-protected Memcached version
 can be built and how the image can be executed.
-[Prerequisites](https://github.com/gramineproject/contrib/tree/master/Intel-Confidential-Compute-for-X/README.md) for
-both the phases are assumed to be met.
+We assume that the [prerequisites](https://github.com/gramineproject/contrib/tree/master/Intel-Confidential-Compute-for-X/README.md)
+for the build and the execution phase are met.
 
-## Build a confidential compute image for Memcached
+## Build a Gramine-protected Memcached image
 
-Execute the below commands on your system.
+Perform the following steps on your system:
 
 1. Clone the Gramine Contrib repository:
-
-       $ git clone --depth 1 https://github.com/gramineproject/contrib.git
-
-2. Move to the Intel-Confidential-Compute-for-X folder:
-
-       $ cd contrib/Intel-Confidential-Compute-for-X
-
-3. To generate a preconfigured non-production test confidential compute image for Memcached,
-   execute the following script:
-
-       $ python3 ./curate.py memcached ubuntu/memcached:1.5-20.04_beta test
-
-4. Or, to generate a custom confidential compute image based on a user-provided Memcached image,
-   execute the following to launch an interactive setup script:
-
+    ```sh
+    $ git clone --depth 1 https://github.com/gramineproject/contrib.git
+    ```
+2. Move to the Intel® Confidential Compute for X folder:
+    ```sh
+    $ cd contrib/Intel-Confidential-Compute-for-X
+    ```
+3. Perform one of the following alternatives:
+    - To generate a Gramine-protected, pre-configured, non-production ready, test image for
+    Memcached, execute the following script:
+        ```sh
+        $ python3 ./curate.py memcached ubuntu/memcached:1.5-20.04_beta test
+        ```
+    - To generate a Gramine-protected, pre-configured Memcached image based on a user-provided
+    Memcached image, execute the following to launch an interactive setup script:
+       ```sh
        $ python3 ./curate.py memcached <your_image>
+       ```
 
-## Run the confidential compute image for Memcached
+## Execute Gramine-protected Memcached image
 
-- This example was tested on a Standard_DC8ds_v3 Azure VM.
-- Follow the output of the image build script `curate.py` to run the generated Docker image.
+Follow the output of the image build script `curate.py` to run the generated Docker image.
+
+Note that validation was only done on a Standard_DC8s_v3 Azure VM.
+
 
 ## Contents
 
-This sub-directory contains artifacts which help in creating curated GSC Memcached image, as
-explained below:
+This directory contains the following artifacts, which help to create a Gramine-protected Memcached
+image:
 
     .
     |-- memcached-gsc.dockerfile.template    # Template used by `curation_script.sh` to create a
     |                                          wrapper dockerfile `memcached-gsc.dockerfile` that
-    |                                          includes user-provided inputs e.g. `ca.cert` file
+    |                                          includes user-provided inputs, e.g., `ca.cert` file
     |                                          etc. into the graminized Memcached image.
     |-- memcached.manifest.template          # Template used by `curation_script.sh` to create a
     |                                          user manifest file (with basic set of values defined
-    |                                          for graminizing Memcached images), that will be
+    |                                          for graminizing Memcached images) that will be
     |                                          passed to GSC.
