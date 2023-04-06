@@ -23,5 +23,5 @@ docker build -t $image_name .
 cd $CUR_DIR
 
 echo -e '\n\nCreated base image `'$image_name'`.'
-echo -e 'Please refer to `Intel-Confidential-Compute-for-X/workloads/sklearn/README.md` to' \
+echo -e 'Please refer to `Intel-Confidential-Compute-for-X/workloads/sklearn/README.md` to ' \
 'generate a Gramine-protected version of this Docker image.\n'

@@ -6,7 +6,7 @@ This directory contains steps and artifacts to create a Scikit-learn Docker imag
 - Install dependencies:
     - Ubuntu 18.04:
         ```sh
-        python3 -m pip install --upgrade pip # on ubuntu 18.04 machine
+        python3 -m pip install --upgrade pip
         python3 -m pip install scikit-learn-intelex pandas numpy
         ```
 

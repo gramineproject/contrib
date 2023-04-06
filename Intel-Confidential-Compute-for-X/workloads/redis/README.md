@@ -1,8 +1,8 @@
 # Intel® Confidential Compute for Redis
 
-In the following two sections, we explain how a Docker image for a Gramine-protected Redis version 
+In the following two sections, we explain how a Docker image for a Gramine-protected Redis version
 can be built and how the image can be executed.
-We assume that the [prerequisites](https://github.com/gramineproject/contrib/tree/master/Intel-Confidential-Compute-for-X/README.md) 
+We assume that the [prerequisites](https://github.com/gramineproject/contrib/tree/master/Intel-Confidential-Compute-for-X/README.md)
 for the build and the execution phase are met.
 
 
@@ -21,12 +21,12 @@ Perform the following steps on your system:
     ```
 
 3. Perform one of the following alternatives:
-    - To generate a Gramine-protected, pre-configured, non-production ready, test image for Redis, 
+    - To generate a Gramine-protected, pre-configured, non-production ready, test image for Redis,
         execute the following script:
         ```sh
         python3 ./curate.py redis redis:7.0.0 test
         ```
-   - To generate a Gramine-protected, pre-configured Redis image based on a user-provided Redis 
+   - To generate a Gramine-protected, pre-configured Redis image based on a user-provided Redis
         image, execute the following to launch an interactive setup script:
         ```sh
         python3 ./curate.py redis <your_image>
@@ -42,7 +42,7 @@ Note that validation was only done on a Standard_DC8s_v3 Azure VM.
 
 ## Contents
 
-This directory contains the following artifacts, which help to create a Gramine-protected Redis 
+This directory contains the following artifacts, which help to create a Gramine-protected Redis
 image:
 
     .

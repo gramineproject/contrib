@@ -35,5 +35,5 @@ rm pytorchexample.py input.jpg classes.txt alexnet-pretrained.pt
 cd $CUR_DIR
 
 echo -e '\n\nCreated base image `'$image_name'`.'
-echo -e 'Please refer to `Intel-Confidential-Compute-for-X/workloads/pytorch/README.md` to' \
+echo -e 'Please refer to `Intel-Confidential-Compute-for-X/workloads/pytorch/README.md` to ' \
 'generate a Gramine-protected version of this Docker image.\n'

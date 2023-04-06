@@ -7,6 +7,7 @@ for the build and the execution phase are met.
 
 
 ## Build a Gramine-protected PyTorch image
+
 Perform the following steps on your system:
 
 1. Clone the Gramine Contrib repository:

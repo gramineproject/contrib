@@ -54,5 +54,6 @@ docker build \
 popd
 
 echo -e '\n\nCreated base image `'$TF_SERVING_IMAGE_FINAL'`.'
-echo -e 'Please refer to `Intel-Confidential-Compute-for-X/workloads/tensorflow-serving/README.md` to' \
-'generate a Gramine-protected version of this Docker image.\n'
+echo -e 'Please refer to `' \
+'`Intel-Confidential-Compute-for-X/workloads/tensorflow-serving/README.md to generate a `' \
+'`Gramine-protected version of this Docker image.\n'

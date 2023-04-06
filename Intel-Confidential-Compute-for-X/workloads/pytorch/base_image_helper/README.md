@@ -20,8 +20,8 @@ model and an encrypted sample picture.
 
 Execute the helper script contained in this directory: `./helper.sh`.
 
-This script clones Gramine's [PyTorch example](https://github.com/gramineproject/examples/blob/master/pytorch/),
-downloads a pre-trainer model; generates a weak encryption key (that must not be used in
+This script clones Gramine's [PyTorch example](https://github.com/gramineproject/examples/blob/master/pytorch/);
+downloads a pre-trained model; generates a weak encryption key (that must not be used in
 production); encrypts an example picture and the model; and builds a Docker image containing PyTorch
 the encrypted picture.
 

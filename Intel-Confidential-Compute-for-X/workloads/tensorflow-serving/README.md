@@ -37,7 +37,8 @@ Perform the following steps on your system:
 
         2. Generate Gramine-protected, pre-configured, non-production ready, test image for
             TensorFlow Serving, which is based on the just generated `tf-serving-base` image.
-            By default, ResNet is enabled, but you can easily change the model as shown below in the "Prepared Models" section.
+            By default, ResNet is enabled, but you can easily change the model as shown below in the
+            "Prepared Models" section.
             ```sh
             python3 ./curate.py tensorflow-serving tf-serving-base test
             ```
@@ -45,7 +46,8 @@ Perform the following steps on your system:
     - To generate a Gramine-protected, pre-configured TensorFlow Serving image based on a
         user-provided TensorFlow Serving Docker image, execute the following to launch an
         interactive setup script.
-        To select the model that should be used, use the command line arguments described below in the "Prepared Models" section.
+        To select the model that should be used, use the command line arguments described below in
+        the "Prepared Models" section.
         ```sh
         python3 ./curate.py tensorflow-serving <base_image_with_tensorflow-serving>
         ```
