@@ -69,14 +69,14 @@ This image is signed with a dummy key and must only be used for experimentation 
 ## Usage of the interactive script
 
 ```sh
-python3 curate.py <workload type> <base image name> <optional args>
+python3 curate.py <app name> <base image name> <optional args>
 ```
 
 
 | Required?| Argument | Description/Possible values |
 | :----: | :----: | :--- |
-| Yes | <app name> | Name of the application, e.g., redis or pytorch. Name has to correspond to the application's folder name in 'workloads/'. |
-| Yes | <base image name> | Name of the base image to be graminized. |
+| Yes | \<app name\> | Name of the application, e.g., redis or pytorch. Name has to correspond to the application's folder name in 'workloads/'. |
+| Yes | \<base image name\> | Name of the base image to be graminized. |
 | Optional | 'debug' | To generate an insecure image with debug symbols. |
 | Optional | 'test'  | To generate an insecure image with a test enclave signing key. |
 
