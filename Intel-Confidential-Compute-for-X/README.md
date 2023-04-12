@@ -17,12 +17,12 @@ At the moment, Intel® carefully prepared the script for the following applicati
 * [Intel® Confidential Compute for Memcached](workloads/memcached/)
 * [Intel® Confidential Compute for MySQL](workloads/mysql/)
 
-One can easily graminize more applications with the interactive script by studying the prepared
-application, and adjusting the settings and templates as needed.
-
-The interactive script also provides a test feature.
+For these applications, the interactive script also provides a test feature.
 With a single command, users can generate a non-production, Gramine-protected Docker image.
 This image is signed with a dummy key and must only be used for experimentation and learning.
+
+One can easily graminize more applications with the interactive script by studying the prepared
+application, and adjusting the settings and templates as needed.
 
 
 ## Prerequisites
