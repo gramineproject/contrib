@@ -42,7 +42,7 @@ application, and adjusting the settings and templates as needed.
 
 ### For executing an "Intel® Confidential Compute for X" image
 
-- Hardware requirements: An Intel® SGX-enabled bare metal machine or a VM.
+- Hardware requirements: This project currently only works for SGX-enabled Azure VMs. With some modifications, it will work on any Intel® SGX-enabled bare metal machine or VM.
    - At Azure, VMs of the [DCsv3 and DCdsv3-series](https://learn.microsoft.com/en-us/azure/virtual-machines/dcv3-series) should be used.
    Azure provides a [quickstart guide](https://learn.microsoft.com/en-us/azure/confidential-computing/quick-create-portal)
    to setup such VMs.

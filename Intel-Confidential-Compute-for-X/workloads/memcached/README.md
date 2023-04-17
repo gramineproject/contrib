@@ -2,7 +2,7 @@
 
 In the following two sections, we explain how a Docker image for a Gramine-protected Memcached
 version can be built and how the image can be executed.
-We assume that the [prerequisites](https://github.com/gramineproject/contrib/tree/master/Intel-Confidential-Compute-for-X/README.md)
+We assume that the [prerequisites](../../README.md)
 for the build and the execution phase are met.
 
 ## Build a Gramine-protected Memcached image
