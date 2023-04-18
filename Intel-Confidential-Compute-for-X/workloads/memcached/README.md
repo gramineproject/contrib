@@ -11,22 +11,22 @@ Perform the following steps on your system:
 
 1. Clone the Gramine Contrib repository:
     ```sh
-    $ git clone --depth 1 https://github.com/gramineproject/contrib.git
+    git clone --depth 1 https://github.com/gramineproject/contrib.git
     ```
 2. Move to the Intel® Confidential Compute for X folder:
     ```sh
-    $ cd contrib/Intel-Confidential-Compute-for-X
+    cd contrib/Intel-Confidential-Compute-for-X
     ```
 3. Perform one of the following alternatives:
     - To generate a Gramine-protected, pre-configured, non-production ready, test image for
     Memcached, execute the following script:
         ```sh
-        $ python3 ./curate.py memcached ubuntu/memcached:1.5-20.04_beta test
+        python3 ./curate.py memcached ubuntu/memcached:1.5-20.04_beta test
         ```
     - To generate a Gramine-protected, pre-configured Memcached image based on a user-provided
     Memcached image, execute the following to launch an interactive setup script:
        ```sh
-       $ python3 ./curate.py memcached <your_image>
+       python3 ./curate.py memcached <your_image>
        ```
 
 ## Execute Gramine-protected Memcached image

@@ -12,12 +12,12 @@ Perform the following steps on your system:
 
 1. Clone the Gramine Contrib repository:
     ```sh
-    $ git clone --depth 1 https://github.com/gramineproject/contrib.git
+    git clone --depth 1 https://github.com/gramineproject/contrib.git
     ```
 
 2. Move to the Intel® Confidential Compute for X folder:
     ```sh
-    $ cd contrib/Intel-Confidential-Compute-for-X
+    cd contrib/Intel-Confidential-Compute-for-X
     ```
 
 3. If a new MySQL database should be used, use the following commands to initialize the database and
