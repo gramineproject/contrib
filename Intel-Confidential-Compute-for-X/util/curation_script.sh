@@ -30,7 +30,7 @@
 # -- arg8    : verifier's ca certificate path
 # -- arg9    : y or n (environment variables available?)
 # -- arg10   : Actual environment variable string
-# -- arg11   : y or n (encrypted files as part of base image?)
+# -- arg11   : y or n (encrypted files to be used with workload?)
 # -- arg12   : Path to the encrypted files in the image
 # -- arg13   : encryption key used for encrypting sensitive files such as models, data etc.
 # -- arg14   : Passphrase to the enclave signing key (if applicable)
