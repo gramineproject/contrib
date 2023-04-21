@@ -258,15 +258,6 @@ def get_attestation_input(user_console, guide_win):
                 continue
         return attestation_input
 
-def is_azure_instance():
-    service_cmd = "systemctl --type=service --state=running"
-    service_output = subprocess.run(service_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-                                    universal_newlines=True, shell=True)
-    re_pattern='wa.*?agent.service.*?Azure.*'
-    rec_pattern = re.compile(re_pattern, re.VERBOSE)
-
-    return len(rec_pattern.findall(service_output.stdout)) > 0
-
 def get_file_contents(in_file):
     try:
         with open(in_file, 'r') as pfile:
@@ -386,10 +377,6 @@ def create_custom_image(stdscr, docker_socket, workload_type, base_image_name, i
     update_user_and_commentary_win_array(user_console, guide_win, introduction, index)
     update_user_input()
 
-    if not is_azure_instance():
-        update_user_and_commentary_win_array(user_console, guide_win, azure_warning, azure_help)
-        update_user_input()
-
     # 1. Provide command-line arguments
     args = get_insecure_args(workload_type)
     if args:
@@ -497,10 +484,13 @@ def create_custom_image(stdscr, docker_socket, workload_type, base_image_name, i
     if host_net and host_net not in flags:
         flags = flags + " " + host_net
     commands_fp = open(commands_file, 'w')
+
     if attestation_required == 'y':
-        debug_enclave_env_ver_ext = ''
-        if config == 'test' or debug_flag == 'y':
-            debug_enclave_env_ver_ext = debug_enclave_env_verifier
+        verifier_env_vars = ' -e RA_TLS_ALLOW_SW_HARDENING_NEEDED=1 '
+        if attestation_input == 'test':
+            verifier_env_vars += ' -e RA_TLS_ALLOW_OUTDATED_TCB_INSECURE=1 '
+        if debug_flag == 'y':
+            verifier_env_vars += ' -e RA_TLS_ALLOW_DEBUG_ENCLAVE_INSECURE=1 '
 
         ssl_folder_abs_path_on_host = os.path.abspath(ssl_folder_path_on_host)
         verifier_cert_mount_str = verifier_cert_mount.format(ssl_folder_abs_path_on_host)
@@ -535,7 +525,7 @@ def create_custom_image(stdscr, docker_socket, workload_type, base_image_name, i
                                 f'$ docker run {host_net} --device=/dev/sgx/enclave '
                                 f'-e RA_TLS_MRENCLAVE={mr_enclave} -e RA_TLS_MRSIGNER={mr_signer} '
                                 f'-e RA_TLS_ISV_PROD_ID={isv_prod_id} -e RA_TLS_ISV_SVN={isv_svn} '
-                                f'{debug_enclave_env_ver_ext}' + verifier_cert_mount_str + ' ' +
+                                f'{verifier_env_vars}' + verifier_cert_mount_str + ' ' +
                                 enc_keys_mount_str + ' -it verifier:latest')
         custom_image_dns_info = ''
         if config != 'test':
