@@ -480,9 +480,12 @@ def create_custom_image(stdscr, docker_socket, workload_type, base_image_name, d
         flags = flags + " " + host_net
     commands_fp = open(commands_file, 'w')
     if attestation_required == 'y':
-        debug_enclave_env_ver_ext = ''
-        if config == 'test' or debug_flag == 'y':
-            debug_enclave_env_ver_ext = debug_enclave_env_verifier
+        # FIXME: Use newly introduced env var RA_TLS_ALLOW_SW_HARDENING_NEEDED and use
+        # RA_TLS_ALLOW_OUTDATED_TCB_INSECURE only when attestation_input is `test` after
+        # gramine v1.5 release
+        verifier_env_vars = ' -e RA_TLS_ALLOW_OUTDATED_TCB_INSECURE=1 '
+        if debug_flag == 'y':
+            verifier_env_vars += ' -e RA_TLS_ALLOW_DEBUG_ENCLAVE_INSECURE=1 '
 
         ssl_folder_abs_path_on_host = os.path.abspath(ssl_folder_path_on_host)
         verifier_cert_mount_str = verifier_cert_mount.format(ssl_folder_abs_path_on_host)
@@ -517,7 +520,7 @@ def create_custom_image(stdscr, docker_socket, workload_type, base_image_name, d
                                 f'$ docker run {host_net} --device=/dev/sgx/enclave '
                                 f'-e RA_TLS_MRENCLAVE={mr_enclave} -e RA_TLS_MRSIGNER={mr_signer} '
                                 f'-e RA_TLS_ISV_PROD_ID={isv_prod_id} -e RA_TLS_ISV_SVN={isv_svn} '
-                                f'{debug_enclave_env_ver_ext}' + verifier_cert_mount_str + ' ' +
+                                f'{verifier_env_vars}' + verifier_cert_mount_str + ' ' +
                                 enc_keys_mount_str + ' -it verifier:latest')
         custom_image_dns_info = ''
         if config != 'test':

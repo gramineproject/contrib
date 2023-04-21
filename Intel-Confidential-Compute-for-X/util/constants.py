@@ -162,8 +162,6 @@ enc_keys_mount = '-v {}:/keys'
 enc_key_path = '/keys/{}'
 ssl_folder_path_on_host = 'verifier/ssl_common'
 verifier_cert_mount = '-v {}:/ra-tls-secret-prov/ssl'
-debug_enclave_env_verifier = (' -e RA_TLS_ALLOW_DEBUG_ENCLAVE_INSECURE=1 -e'
-                              ' RA_TLS_ALLOW_OUTDATED_TCB_INSECURE=1 ')
 azure_warning = ['Warning: You are building'
                  ' these images on a non Azure Confidential Compute instance' + color_set,
                  'Please ensure you run the final images on an Azure VM or in the AKS cluster only'
