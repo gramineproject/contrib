@@ -67,6 +67,10 @@ extern verify_measurements_cb_t g_verify_measurements_cb;
 /** Default API version for MAA API endpoints. */
 #define DEFAULT_MAA_PROVIDER_API_VERSION "2022-08-01"
 
+/* Environment variables exposed by successful RA-TLS verification API */
+#define RA_TLS_MAA_JWT "RA_TLS_MAA_JWT"
+#define RA_TLS_MAA_SET_OF_JWKS "RA_TLS_MAA_SET_OF_JWKS"
+
 static char* g_maa_base_url = NULL;
 static char* g_maa_api_version = NULL;
 
@@ -997,6 +1001,28 @@ static int maa_verify_response_output_quote(struct maa_response* response, const
         goto out;
     }
 
+    /* expose JWT (as base64-formatted string) and "set of JWKs" (as JSON string) in envvars;
+     * at this point we know that JWT and "set of JWKs" are correctly formatted strings. */
+#if 0
+    ERROR("--- JWT is ```%s``` ---\n", token_b64->valuestring);
+    ERROR("--- set_of_jwks is ```%s``` ---\n", set_of_jwks);
+#endif
+
+    /* NOTE: manipulations with envvars are not thread-safe */
+    if (!getenv(RA_TLS_MAA_JWT)) {
+        setenv(RA_TLS_MAA_JWT, token_b64->valuestring, /*overwrite=*/1);
+    } else {
+        ERROR("MAA JWT cannot be exposed through RA_TLS_MAA_JWT envvar because this envvar is "
+              "already used (you may want to unsetenv before calling RA-TLS verification)\n");
+    }
+    if (!getenv(RA_TLS_MAA_SET_OF_JWKS)) {
+        setenv(RA_TLS_MAA_SET_OF_JWKS, set_of_jwks, /*overwrite=*/1);
+    } else {
+        ERROR("MAA \"Set of JWKs\" cannot be exposed through RA_TLS_MAA_SET_OF_JWKS envvar because "
+              "this envvar is already used (you may want to unsetenv before calling RA-TLS "
+              "verification)\n");
+    }
+
     *out_quote_body = quote_body;
     ret = 0;
 out:
@@ -1042,7 +1068,7 @@ static int parse_pk(mbedtls_pk_context* pk, uint8_t* out_pk_der, size_t* out_pk_
 }
 
 int ra_tls_verify_callback(void* data, mbedtls_x509_crt* crt, int depth, uint32_t* flags) {
-    (void)data;
+    struct ra_tls_verify_callback_results* results = (struct ra_tls_verify_callback_results*)data;
 
     int ret;
 
@@ -1051,6 +1077,12 @@ int ra_tls_verify_callback(void* data, mbedtls_x509_crt* crt, int depth, uint32_
     char* set_of_jwks             = NULL;
 
     sgx_quote_body_t* quote_from_maa = NULL;
+
+    if (results) {
+        /* TODO: when MAA becomes standard, add RA_TLS_ATTESTATION_SCHEME_MAA to core RA-TLS lib */
+        results->attestation_scheme = RA_TLS_ATTESTATION_SCHEME_UNKNOWN;
+        results->err_loc = AT_INIT;
+    }
 
     if (depth != 0) {
         /* the cert chain in RA-TLS consists of single self-signed cert, so we expect depth 0 */
@@ -1076,6 +1108,9 @@ int ra_tls_verify_callback(void* data, mbedtls_x509_crt* crt, int depth, uint32_
         ERROR("Failed to read the environment variable RA_TLS_MAA_PROVIDER_API_VERSION\n");
         goto out;
     }
+
+    if (results)
+        results->err_loc = AT_EXTRACT_QUOTE;
 
     /* extract SGX quote from "quote" OID extension from crt */
     sgx_quote_t* quote;
@@ -1103,6 +1138,10 @@ int ra_tls_verify_callback(void* data, mbedtls_x509_crt* crt, int depth, uint32_
     ret = parse_pk(&crt->pk, pk_der, &pk_der_size);
     if (ret < 0)
         goto out;
+
+    /* TODO: when MAA becomes standard, use results->maa.<fields> to expose more info on error */
+    if (results)
+        results->err_loc = AT_VERIFY_EXTERNAL;
 
     /* initialize the MAA context, get the set of JWKs from the `certs/` MAA API endpoint, send the
      * SGX quote to the `attest/` MAA API endpoint, and finally receive and verify the attestation
@@ -1146,6 +1185,9 @@ int ra_tls_verify_callback(void* data, mbedtls_x509_crt* crt, int depth, uint32_
         goto out;
     }
 
+    if (results)
+        results->err_loc = AT_VERIFY_ENCLAVE_ATTRS;
+
     /* verify enclave attributes from the SGX quote body, including the user-supplied verification
      * parameter "allow debug enclave"; NOTE: "allow outdated TCB" parameter is not used in MAA */
     ret = verify_quote_body_enclave_attributes(quote_from_maa, getenv_allow_debug_enclave());
@@ -1154,6 +1196,9 @@ int ra_tls_verify_callback(void* data, mbedtls_x509_crt* crt, int depth, uint32_
         ret = MBEDTLS_ERR_X509_CERT_VERIFY_FAILED;
         goto out;
     }
+
+    if (results)
+        results->err_loc = AT_VERIFY_ENCLAVE_MEASUREMENTS;
 
     /* verify other relevant enclave information from the SGX quote */
     if (g_verify_measurements_cb) {
@@ -1172,6 +1217,8 @@ int ra_tls_verify_callback(void* data, mbedtls_x509_crt* crt, int depth, uint32_
         goto out;
     }
 
+    if (results)
+        results->err_loc = AT_NONE;
     ret = 0;
 out:
     if (context)
