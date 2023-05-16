@@ -101,12 +101,12 @@ gramine-sgx-pf-crypt decrypt -w workloads/mariadb/base_image_helper/encryption_k
 This directory contains the following artifacts, which help to create a Gramine-protected MariaDB
 image:
 
-   .
-   |-- mariadb-gsc.dockerfile.template     # Template used by `curation_script.sh` to create a
-   |                                       wrapper dockerfile `mariadb-gsc.dockerfile` that
-   |                                       includes user-provided inputs, e.g., `ca.cert` file etc.
-   |                                       into the graminized MariaDB image.
-   |-- mariadb.manifest.template           # Template used by `curation_script.sh` to create a
-   |                                       user manifest file (with basic set of values defined
-   |                                       for graminizing MariaDB images) that will be passed to
-   |                                       GSC.
+    .
+    |-- mariadb-gsc.dockerfile.template     # Template used by `curation_script.sh` to create a
+    |                                       wrapper dockerfile `mariadb-gsc.dockerfile` that
+    |                                       includes user-provided inputs, e.g., `ca.cert` file etc.
+    |                                       into the graminized MariaDB image.
+    |-- mariadb.manifest.template           # Template used by `curation_script.sh` to create a
+    |                                       user manifest file (with basic set of values defined
+    |                                       for graminizing MariaDB images) that will be passed to
+    |                                       GSC.
