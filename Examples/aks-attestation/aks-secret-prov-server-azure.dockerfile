@@ -16,10 +16,6 @@ RUN echo "deb [arch=amd64 signed-by=/usr/share/keyrings/microsoft.asc] https://p
 RUN apt update
 RUN apt install -y az-dcap-client
 
-# restart the AESM service; Gramine Docker image provides a helpful script
-#/restart_aesm.sh
-
-
 WORKDIR /ra-tls-secret-prov
 
 COPY gramine/CI-Examples/ra-tls-secret-prov/ssl ./ssl
@@ -36,5 +32,6 @@ RUN curl -fsSLo /usr/share/keyrings/gramine-keyring.gpg https://packages.gramine
 RUN echo 'deb [arch=amd64 signed-by=/usr/share/keyrings/gramine-keyring.gpg] https://packages.gramineproject.io/ stable main' | tee /etc/apt/sources.list.d/gramine.list
 RUN apt-get update
 RUN apt-get install -y gramine-dcap
+WORKDIR /usr/local/bin 
 
-ENTRYPOINT ["server_dcap"]
+ENTRYPOINT ["server_dcap /usr/local/bin/wrap_key"]
