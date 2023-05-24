@@ -10,3 +10,14 @@ FROM <base_image_name>
 
 # Below line copies cert files into the image if user selects remote attestation
 <copy_cert_files>
+
+# enable Microsoft software repository
+curl -fsSLo /usr/share/keyrings/microsoft.asc https://packages.microsoft.com/keys/microsoft.asc
+echo "deb [arch=amd64 signed-by=/usr/share/keyrings/microsoft.asc] https://packages.microsoft.com/ubuntu/20.04/prod focal main" | \
+    tee /etc/apt/sources.list.d/msprod.list
+
+# install Azure DCAP library
+apt update
+apt install -y az-dcap-client
+
+
