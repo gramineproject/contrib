@@ -54,7 +54,7 @@ Perform the following steps on your system:
     - To generate a Gramine-protected, pre-configured, non-production ready, test image for MySQL,
       execute the following script:
       ```sh
-      python3 ./curate.py mysql mysql:8.0.32-debian test
+      python3 ./curate.py mysql mysql:8.0.33-debian test
       ```
     - To generate a Gramine-protected, pre-configured MySQL image based on a user-provided MySQL
       image, execute the following to launch an interactive setup script:
