@@ -64,7 +64,7 @@ application, and adjusting the settings and templates as needed.
             sudo apt-key add -
         sudo apt-key adv --fetch-keys https://packages.microsoft.com/keys/microsoft.asc
         sudo apt-add-repository 'https://packages.microsoft.com/ubuntu/18.04/prod main'
-        sudo apt update && sudo apt install -y az-dcap-client
+        sudo apt update && \
         sudo apt-get install -y -f libsgx-dcap-ql
         ```
 
