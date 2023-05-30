@@ -6,7 +6,8 @@
 # into the graminized MySQL image.
 
 # The curation script fills the <base_image_name> during curation.
-FROM <base_image_name>
+#FROM <base_image_name>
+FROM verifier:latest
 
 # Below line copies cert files into the image if user selects remote attestation
 <copy_cert_files>

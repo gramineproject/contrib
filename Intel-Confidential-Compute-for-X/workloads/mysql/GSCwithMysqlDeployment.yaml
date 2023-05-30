@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gsc-with-mysql
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gsc-with-mysql
+  template:
+    metadata:
+      labels:
+        app: gsc-with-mysql
+    spec:
+      containers:
+      - name: gsc-mysql
+        image: aks01containerregistry.azurecr.io/gsc-mysql:latest
+        ports:
+        - containerPort: 4433
+        resources:
+          limits:
+            kubernetes.azure.com/sgx_epc_mem_in_MiB: 4
+          requests:
+            kubernetes.azure.com/sgx_epc_mem_in_MiB: 4
+        volumeMounts:
+        - name: var-run-aesmd
+          mountPath: /var/run/aesmd  
+        env:
+        - name:  SECRET_PROVISION_SERVERS
+          value:  "demoaksbymr.eastus2.cloudapp.azure.com:4433" #IP of verifier
+      volumes:
+      - name: var-run-aesmd
+        hostPath:
+          path: /var/run/aesmd
