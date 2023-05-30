@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: verifier
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: verifier
+  template:
+    metadata:
+      labels:
+        app: verifier
+    spec:
+      containers:
+      - name: verifier
+        image: aks01containerregistry.azurecr.io/verifier:latest
+        ports:
+        - containerPort: 4433
+        resources:
+          limits:
+            kubernetes.azure.com/sgx_epc_mem_in_MiB: 4
+          requests:
+            kubernetes.azure.com/sgx_epc_mem_in_MiB: 4
+        env:
+        - name:  RA_TLS_MRENCLAVE
+          value:  "f95c4fd7267805f06c1ea94f574a2949a9529a4470342885dcb7a1f653696a3f"
+        - name: RA_TLS_MRSIGNER
+          value:   "d2d48230ab069531ac2462a99a9e26e20c8578473769a82b3b3c6b9e0ee2ccbf"
+        - name: RA_TLS_ISV_PROD_ID
+          value: "0"
+        - name: RA_TLS_ISV_SVN
+          value: "0"
+        - name: RA_TLS_ALLOW_DEBUG_ENCLAVE_INSECURE
+          value: "1"
+        - name: RA_TLS_ALLOW_OUTDATED_TCB_INSECURE
+          value: "1"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    service.beta.kubernetes.io/azure-dns-label-name: verifier
+  name: verifier
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 4433
+  selector:
+    app: verifier
