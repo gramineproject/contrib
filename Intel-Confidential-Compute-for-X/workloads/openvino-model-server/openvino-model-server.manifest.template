@@ -1,0 +1,23 @@
+# SPDX-License-Identifier: LGPL-3.0-or-later
+# Copyright (C) 2023 Intel Corporation
+
+# This file has basic set of values defined for graminizing OpenVINO Model Server images. This
+# manifest template is used by `curation_script.sh` to create the user manifest file that will be
+# passed to GSC.
+
+sgx.enclave_size = "16G"
+sgx.max_threads = 512
+
+# This is required to run workload as non-root user, any number works except `0` which is for root.
+loader.uid = 999
+loader.gid = 999
+
+sys.enable_extra_runtime_domain_names_conf = true
+
+fs.mounts = [
+  { type = "tmpfs", path = "/tmp" },
+]
+
+# FIXME: `LD_PRELOAD` should be replaced with `loader.env.LD_LIBRARY_PATH = "/ovms/lib"` when GSC
+# has the concat logic for `loader.env.LD_LIBRARY_PATH`.
+loader.env.LD_PRELOAD = "/ovms/lib/libazurestorage.so:/ovms/lib/libcpprest.so:/ovms/lib/libopenvino.so:/ovms/lib/libopencv_core.so:/ovms/lib/libopencv_imgcodecs.so:/ovms/lib/libopencv_imgproc.so:/ovms/lib/libopencv_calib3d.so:/ovms/lib/libopencv_features2d.so:/ovms/lib/libopencv_highgui.so:/ovms/lib/libopencv_optflow.so:/ovms/lib/libopencv_video.so:/ovms/lib/libopencv_videoio.so"

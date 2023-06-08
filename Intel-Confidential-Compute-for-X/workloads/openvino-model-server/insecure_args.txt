@@ -1,0 +1,1 @@
+--model_path /mnt/tmpfs/model_encrypted --model_name face-detection --port 9000 --shape auto
