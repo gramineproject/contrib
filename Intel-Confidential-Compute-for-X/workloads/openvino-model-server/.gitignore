@@ -1,0 +1,5 @@
+/*.log
+/openvino-model-server-gsc.dockerfile
+/openvino-model-server.manifest
+/models
+

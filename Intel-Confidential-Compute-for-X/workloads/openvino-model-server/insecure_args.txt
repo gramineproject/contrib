@@ -1,0 +1,1 @@
+--model_path /var/run/model_encrypted --model_name face-detection --port 9000 --plugin_config '{"CPU_THROUGHPUT_STREAMS": "1"}' --shape auto
