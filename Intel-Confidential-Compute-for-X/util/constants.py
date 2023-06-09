@@ -22,6 +22,7 @@ partition_y = 7
 
 color_set = '::reverse'
 
+supported_distros = ('ubuntu:18.04', 'ubuntu:20.04', 'debian:10', 'debian:11')
 test_image_msg = ('\nYour test GSC image is being generated. This image is not supposed to be'
                    ' used in production\n')
 
@@ -47,24 +48,15 @@ introduction = ['This application will provide step-by-step guidance for creatin
 
 index = ['The target deployment environment is assumed to be an Azure Confidential compute'
          ' instance.','Following stages are involved in the GSC image curation:',
-         '1. Distro selection',
-         '2. Command-line arguments',
-         '3. Environment variables',
-         '4. Additional docker run flags',
-         '5. Encrypted files and key provisioning',
-         '6. Remote Attestation',
-         '7. Enclave signing',
-         '8. Generation of the final curated images',
-         '9. Generation of docker run commands']
+         '1. Command-line arguments',
+         '2. Environment variables',
+         '3. Additional docker run flags',
+         '4. Encrypted files and key provisioning',
+         '5. Remote Attestation',
+         '6. Enclave signing',
+         '7. Generation of the final curated images',
+         '8. Generation of docker run commands']
 
-distro_prompt = ['>> Distro Selection:', 'Provide the distro of your base image',
-                 '- Press 1 for Ubuntu 18.04',
-                 '- Press 2 for Ubuntu 20.04',
-                 '- Press 3 for Debian 10',
-                 '- Press 4 for Debian 11',
-                 'Any other option or no input will default to Ubuntu 18.04.',
-                 'Press CTRL+G when done.']
-distro_help = ['Tested distros are Ubuntu 18.04 and Ubuntu 20.04']
 key_prompt = ['>> Enclave signing:' ,
               '- Please provide path to your enclave signing key in the blue box, OR',
               '- Type test to generate a test signing key',
