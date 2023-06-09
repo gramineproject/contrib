@@ -35,7 +35,7 @@ application, and adjusting the settings and templates as needed.
   the current user:
    - Ubuntu 18.04
         ```sh
-        sudo apt-get update && sudo apt-get install jq docker.io python3 python3-pip
+        sudo apt-get update && sudo apt-get install -y docker.io python3 python3-pip
         python3 -m pip install docker jinja2 tomli tomli-w pyyaml
         sudo chown $USER /var/run/docker.sock
         ```
