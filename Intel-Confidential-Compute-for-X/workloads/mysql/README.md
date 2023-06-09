@@ -34,7 +34,7 @@ Perform the following steps on your system:
 
 4. Encrypt MySQL database:
 
-    1. [Install Gramine](https://gramine.readthedocs.io/en/latest/quickstart.html#install-gramine)
+    1. [Install Gramine](https://gramine.readthedocs.io/en/stable/quickstart.html#install-gramine)
         as the encryption is done using the `gramine-sgx-pf-crypt` tool which is part of Gramine
         installation.
 
