@@ -9,7 +9,7 @@ model and an encrypted sample picture.
         python3 -m pip install --upgrade pip # on ubuntu 18.04 machine
         python3 -m pip install --user torchvision pillow
         ```
-- [Install Gramine](https://gramine.readthedocs.io/en/latest/quickstart.html#install-gramine)
+- [Install Gramine](https://gramine.readthedocs.io/en/stable/quickstart.html#install-gramine)
     as the encryption is done using the `gramine-sgx-pf-crypt` tool which is part of Gramine
     installation.
     You can learn more about Gramine's support of encrypted files in the
