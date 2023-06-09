@@ -290,6 +290,25 @@ def get_common_args(workload_type):
 def get_insecure_args(workload_type):
     return get_file_contents(f'workloads/{workload_type}/insecure_args.txt')
 
+def get_image_distro(docker_socket, image_name):
+    output = docker_socket.containers.run(image_name, entrypoint='cat /etc/os-release', remove=True)
+    output = output.decode('UTF-8')
+
+    pattern_id = re.compile('^ID=(.*)', flags=re.MULTILINE)
+    match = pattern_id.search(output)
+    if match is None:
+        print(f'Error: Could not find distro ID')
+        exit(1)
+    distro_id = match.group(1)
+
+    pattern_version_id = re.compile('^VERSION_ID=\"(.*)\"', flags=re.MULTILINE)
+    match = pattern_version_id.search(output)
+    if match is None:
+        print(f'Error: Could not find distro VERSION_ID')
+        exit(1)
+    distro_version_id = match.group(1)
+    return distro_id + ':' + distro_version_id
+
 def main():
     if len(argv) < 3:
         print_correct_usage()
@@ -316,25 +335,29 @@ def main():
         if pull_docker_image(docker_socket, base_image_name) == -1:
             return -1
 
+    image_distro = get_image_distro(docker_socket, base_image_name)
+    if image_distro not in supported_distros:
+        print(f'Error: Unsupported distro "{image_distro}".')
+        exit(1)
+
     log_file_name, n = re.subn('[:/]', '_', base_image_name)
     log_file = f'workloads/{workload_type}/{log_file_name}.log'
     log_file_pointer = open(log_file, 'w')
 
     gsc_app_image ='gsc-{}'.format(base_image_name)
-    gsc_app_image_unsigned ='gsc-{}-unsigned'.format(base_image_name)
 
     if test_flag:
-        create_test_image(docker_socket, workload_type, base_image_name, debug_flag, gsc_app_image,
-                          log_file, log_file_pointer)
+        create_test_image(docker_socket, workload_type, base_image_name, image_distro, debug_flag,
+                          gsc_app_image, log_file, log_file_pointer)
     else:
-        wrapper(create_custom_image, docker_socket, workload_type, base_image_name, debug_flag,
-                gsc_app_image, log_file, log_file_pointer)
+        wrapper(create_custom_image, docker_socket, workload_type, base_image_name, image_distro,
+                debug_flag, gsc_app_image, log_file, log_file_pointer)
 
-def create_test_image(docker_socket, workload_type, base_image_name, debug_flag, gsc_app_image,
-                      log_file, log_file_pointer):
+def create_test_image(docker_socket, workload_type, base_image_name, image_distro, debug_flag,
+                      gsc_app_image, log_file, log_file_pointer):
     print(f'{test_image_msg}')
     print(f'{log_progress.format(log_file)}')
-    subprocess.call(['util/curation_script.sh', workload_type, base_image_name, 'ubuntu:18.04',
+    subprocess.call(['util/curation_script.sh', workload_type, base_image_name, image_distro,
                         'test', '', 'test-image', debug_flag], stdout=log_file_pointer,
                         stderr=log_file_pointer)
 
@@ -353,8 +376,8 @@ def create_test_image(docker_socket, workload_type, base_image_name, debug_flag,
 
     return 0
 
-def create_custom_image(stdscr, docker_socket, workload_type, base_image_name, debug_flag,
-                        gsc_app_image, log_file, log_file_pointer):
+def create_custom_image(stdscr, docker_socket, workload_type, base_image_name, image_distro,
+                        debug_flag, gsc_app_image, log_file, log_file_pointer):
     stdscr.clear()
     resize_screen(screen_height, screen_width)
     stdscr = curses.initscr()
@@ -367,16 +390,7 @@ def create_custom_image(stdscr, docker_socket, workload_type, base_image_name, d
         update_user_and_commentary_win_array(user_console, guide_win, azure_warning, azure_help)
         update_user_input()
 
-    # 1. Obtain distro version
-    update_user_and_commentary_win_array(user_console, guide_win, distro_prompt, distro_help)
-    distro_option = update_user_input()
-    distro = 'ubuntu:18.04'
-    if distro_option == '2':
-        distro = 'ubuntu:20.04'
-    elif distro_option == '3' or distro_option == '4':
-        distro = 'debian:11'
-
-    # 2. Provide command-line arguments
+    # 1. Provide command-line arguments
     args = get_insecure_args(workload_type)
     if args:
         arg_input[5:5] = arg_example.format(workload_type, args).split(',')
@@ -390,7 +404,7 @@ def create_custom_image(stdscr, docker_socket, workload_type, base_image_name, d
         args_list = shlex.split(user_args)
         args_json = 'CMD ' + json.dumps(args_list)
 
-    # 3. Provide environment variables
+    # 2. Provide environment variables
     env_vars = get_env_vars(workload_type)
     if env_vars:
         env_input[5:5] = env_example.format(workload_type, env_vars).split(',')
@@ -400,14 +414,14 @@ def create_custom_image(stdscr, docker_socket, workload_type, base_image_name, d
     if envs:
         env_required = 'y'
 
-    # 4. Provide additional docker run flags
+    # 3. Provide additional docker run flags
     flags = get_docker_run_flags(workload_type)
     if flags:
         flags_input[5:5] = flags_example.format(workload_type, flags).split(',')
     update_user_and_commentary_win_array(user_console, guide_win, flags_input, flags_help)
     flags = update_user_input()
 
-    # 5. Provide encrypted files and key provisioning
+    # 4. Provide encrypted files and key provisioning
     ef_required = 'n'
     encryption_key_path = ''
     enc_key_path_in_verifier = ''
@@ -427,7 +441,7 @@ def create_custom_image(stdscr, docker_socket, workload_type, base_image_name, d
         enc_key_path_in_verifier = enc_key_path.format(encryption_key_name)
         ef_required = 'y'
 
-    # 6. Remote Attestation with RA-TLS
+    # 5. Remote Attestation with RA-TLS
     ca_cert_path = ''
     config = ''
     verifier_server = '<verifier-dns-name:port>'
@@ -443,7 +457,7 @@ def create_custom_image(stdscr, docker_socket, workload_type, base_image_name, d
         host_net, config = '--net=host', 'test'
         attestation_required = 'y'
 
-    # 7. Obtain enclave signing key
+    # 6. Obtain enclave signing key
     key_path = get_enclave_signing_input(user_console, guide_win)
     passphrase = ''
     if key_path == 'test':
@@ -457,7 +471,7 @@ def create_custom_image(stdscr, docker_socket, workload_type, base_image_name, d
                       '                   Press CTRL+G to continue')
         passphrase = update_user_input(secure=True)
 
-    # 8. Generation of the final curated images
+    # 7. Generation of the final curated images
     if attestation_required == 'y':
         os.chdir('verifier')
         verifier_log_file_pointer = open(verifier_log_file, 'w')
@@ -472,14 +486,14 @@ def create_custom_image(stdscr, docker_socket, workload_type, base_image_name, d
 
     update_user_and_commentary_win_array(user_console, guide_win, wait_message,
                                          [log_progress.format(log_file)])
-    subprocess.call(['util/curation_script.sh', workload_type, base_image_name, distro,
+    subprocess.call(['util/curation_script.sh', workload_type, base_image_name, image_distro,
                      key_path, args_json, attestation_required, debug_flag, ca_cert_path, env_required,
                      envs, ef_required, encrypted_files, encryption_key_path,
                      passphrase], stdout=log_file_pointer, stderr=log_file_pointer)
     image = gsc_app_image
     check_image_creation_success(user_console, docker_socket, image, log_file)
 
-    # 9. Generation of docker run commands
+    # 8. Generation of docker run commands
     if host_net and host_net not in flags:
         flags = flags + " " + host_net
     commands_fp = open(commands_file, 'w')
