@@ -78,7 +78,7 @@ add_encrypted_files_to_manifest() {
     IFS=':' # Setting colon as delimiter
     read -a ef_files_list <<<"$1"
     unset IFS
-    workdir_base_image="$(docker image inspect "$base_image" | jq '.[].Config.WorkingDir')"
+    workdir_base_image="$(docker image inspect -f '{{.Config.WorkingDir}}' $base_image)"
     workdir_base_image=`sed -e 's/^"//' -e 's/"$//' <<<"$workdir_base_image"`
     encrypted_files_string=''
     for i in "${ef_files_list[@]}"
