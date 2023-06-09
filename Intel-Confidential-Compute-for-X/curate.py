@@ -258,15 +258,6 @@ def get_attestation_input(user_console, guide_win):
                 continue
         return attestation_input
 
-def is_azure_instance():
-    service_cmd = "systemctl --type=service --state=running"
-    service_output = subprocess.run(service_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-                                    universal_newlines=True, shell=True)
-    re_pattern='wa.*?agent.service.*?Azure.*'
-    rec_pattern = re.compile(re_pattern, re.VERBOSE)
-
-    return len(rec_pattern.findall(service_output.stdout)) > 0
-
 def get_file_contents(in_file):
     try:
         with open(in_file, 'r') as pfile:
@@ -386,10 +377,6 @@ def create_custom_image(stdscr, docker_socket, workload_type, base_image_name, i
     update_user_and_commentary_win_array(user_console, guide_win, introduction, index)
     update_user_input()
 
-    if not is_azure_instance():
-        update_user_and_commentary_win_array(user_console, guide_win, azure_warning, azure_help)
-        update_user_input()
-
     # 1. Provide command-line arguments
     args = get_insecure_args(workload_type)
     if args:
@@ -498,10 +485,7 @@ def create_custom_image(stdscr, docker_socket, workload_type, base_image_name, i
         flags = flags + " " + host_net
     commands_fp = open(commands_file, 'w')
     if attestation_required == 'y':
-        # FIXME: Use newly introduced env var RA_TLS_ALLOW_SW_HARDENING_NEEDED and use
-        # RA_TLS_ALLOW_OUTDATED_TCB_INSECURE only when attestation_input is `test` after
-        # gramine v1.5 release
-        verifier_env_vars = ' -e RA_TLS_ALLOW_OUTDATED_TCB_INSECURE=1 '
+        verifier_env_vars = ' -e RA_TLS_ALLOW_SW_HARDENING_NEEDED=1 '
         if debug_flag == 'y':
             verifier_env_vars += ' -e RA_TLS_ALLOW_DEBUG_ENCLAVE_INSECURE=1 '
 
