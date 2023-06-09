@@ -162,12 +162,6 @@ enc_keys_mount = '-v {}:/keys'
 enc_key_path = '/keys/{}'
 ssl_folder_path_on_host = 'verifier/ssl_common'
 verifier_cert_mount = '-v {}:/ra-tls-secret-prov/ssl'
-azure_warning = ['Warning: You are building'
-                 ' these images on a non Azure Confidential Compute instance' + color_set,
-                 'Please ensure you run the final images on an Azure VM or in the AKS cluster only'
-                 ,'Press CTRL+G to continue']
-azure_help = ['The target deployment environment is assumed to be an Azure Confidential compute'
-              ' instance.']
 verifier_log_file = 'verifier.log'
 file_not_found_error = 'Error: {} file does not exist.'
 CTRL_G = 7
