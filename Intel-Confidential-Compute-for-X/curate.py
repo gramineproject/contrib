@@ -295,16 +295,24 @@ def get_insecure_args(workload_type):
     return args
 
 def get_image_distro(docker_socket, image_name):
-    output = docker_socket.containers.run(image_name, entrypoint='cat /etc/os-release', remove=True).decode('UTF-8')
+    output = docker_socket.containers.run(image_name, entrypoint='cat /etc/os-release', remove=True)
 
-    pattern_id = re.compile('^ID=(.*)', flags=re.MULTILINE | re.VERBOSE)
-    distro_id_list = pattern_id.findall(output)
-    if len(distro_id_list) > 0: distro_id = distro_id_list[0]
+    # convert from bytes to str for further string handling
+    output = output.decode('UTF-8')
+
+    pattern_id = re.compile('^ID=(.*)', flags=re.MULTILINE)
+    match = pattern_id.search(output)
+    if match == None:
+        print(f'Error: Could not find ditro ID')
+        exit(1)
+    distro_id = match.group(1)
 
     pattern_version_id = re.compile('^VERSION_ID=\"(.*)\"', flags=re.MULTILINE)
-    distro_version_id_list = pattern_version_id.findall(output)
-    if len(distro_version_id_list) > 0: distro_version_id = distro_version_id_list[0]
-
+    match = pattern_version_id.search(output)
+    if match == None:
+        print(f'Error: Could not find ditro VERSION_ID')
+        exit(1)
+    distro_version_id = match.group(1)
     return distro_id + ':' + distro_version_id
 
 def main():
@@ -336,7 +344,7 @@ def main():
     image_distro = get_image_distro(docker_socket, base_image_name)
     if image_distro not in supported_distros:
         print(f'Error: Unsupported distro "{image_distro}".')
-        exit()
+        exit(1)
 
     log_file_name, n = re.subn('[:/]', '_', base_image_name)
     log_file = f'workloads/{workload_type}/{log_file_name}.log'
