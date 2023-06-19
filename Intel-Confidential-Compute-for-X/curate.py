@@ -296,21 +296,19 @@ def get_insecure_args(workload_type):
 
 def get_image_distro(docker_socket, image_name):
     output = docker_socket.containers.run(image_name, entrypoint='cat /etc/os-release', remove=True)
-
-    # convert from bytes to str for further string handling
     output = output.decode('UTF-8')
 
     pattern_id = re.compile('^ID=(.*)', flags=re.MULTILINE)
     match = pattern_id.search(output)
-    if match == None:
-        print(f'Error: Could not find ditro ID')
+    if match is None:
+        print(f'Error: Could not find distro ID')
         exit(1)
     distro_id = match.group(1)
 
     pattern_version_id = re.compile('^VERSION_ID=\"(.*)\"', flags=re.MULTILINE)
     match = pattern_version_id.search(output)
-    if match == None:
-        print(f'Error: Could not find ditro VERSION_ID')
+    if match is None:
+        print(f'Error: Could not find distro VERSION_ID')
         exit(1)
     distro_version_id = match.group(1)
     return distro_id + ':' + distro_version_id
