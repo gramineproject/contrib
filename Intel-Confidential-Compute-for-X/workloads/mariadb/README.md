@@ -103,10 +103,17 @@ image:
 
     .
     |-- mariadb-gsc.dockerfile.template     # Template used by `curation_script.sh` to create a
-    |                                       wrapper dockerfile `mariadb-gsc.dockerfile` that
-    |                                       includes user-provided inputs, e.g., `ca.cert` file etc.
-    |                                       into the graminized MariaDB image.
+    |                                         wrapper dockerfile `mariadb-gsc.dockerfile` that
+    |                                         includes user-provided inputs, e.g., `ca.cert` file
+    |                                         etc. into the graminized MariaDB image.
     |-- mariadb.manifest.template           # Template used by `curation_script.sh` to create a
-    |                                       user manifest file (with basic set of values defined
-    |                                       for graminizing MariaDB images) that will be passed to
-    |                                       GSC.
+    |                                         user manifest file (with basic set of values defined
+    |                                         for graminizing MariaDB images) that will be passed
+    |                                         to GSC.
+    |-- base_image_helper/                  # This directory contains `encrypted_files.txt` which
+    |                                         contains encrypted database directory required for
+    |                                         running the test MariaDB image.
+    |-- docker_run_flags.txt                # This file contains docker run flags required for
+    |                                         running the test MariaDB image.
+    |-- insecure_args.txt                   # This file contains command line arguments required
+    |                                         for running the test MariaDB image.
