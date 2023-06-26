@@ -1,20 +1,20 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: gsc-with-mysql
+  name: test-mysql
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: gsc-with-mysql
+      app: test-mysql
   template:
     metadata:
       labels:
-        app: gsc-with-mysql
+        app: test-mysql
     spec:
       containers:
-      - name: gsc-mysql
-        image: aks01containerregistry.azurecr.io/gsc-mysql:debug
+      - name: test-mysql
+        image: aks01containerregistry.azurecr.io/gsc-mysql:test
         ports:
         - containerPort: 3306
         resources:
@@ -24,12 +24,9 @@ spec:
             kubernetes.azure.com/sgx_epc_mem_in_MiB: 16
         volumeMounts:
         - name: var-run-aesmd
-          mountPath: /var/run/aesmd
+          mountPath: /var/run/aesmd  
         - name: test-db-encrypted
-          mountPath: /var/run/test_db_encrypted    
-        env:
-        - name:  SECRET_PROVISION_SERVERS
-          value:  "verifierbymr.eastus2.cloudapp.azure.com:4433" #DNS of verifier with port
+          mountPath: /var/run/test_db_encrypted
       volumes:
       - name: var-run-aesmd
         hostPath:
@@ -41,10 +38,10 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: gsc-mysql
+  name: test-mysql
 spec:
   selector:
-    app.kubernetes.io/name: gsc-with-mysql
+    app.kubernetes.io/name: test-mysql
   ports:
     - protocol: TCP
       port: 3306
