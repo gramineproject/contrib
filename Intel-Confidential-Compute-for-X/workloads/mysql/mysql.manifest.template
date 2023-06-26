@@ -5,7 +5,7 @@
 # is used by `curation_script.sh` to create the user manifest file that will be passed to GSC.
 
 sgx.nonpie_binary = true
-sgx.enclave_size = "4G"
+sgx.enclave_size = "16G"
 sgx.max_threads = 128
 
 # This is required to run workload as non-root user, any number works except `0` which is for root.
