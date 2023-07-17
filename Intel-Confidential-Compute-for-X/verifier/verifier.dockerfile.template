@@ -22,7 +22,8 @@ RUN env DEBIAN_FRONTEND=noninteractive apt-get update \
     libsgx-dcap-default-qpl=1.16.100.2-jammy1 \
     gramine
 
-RUN sed -i "s|^\(  \"pccs_url\": \"https://\).*\(/sgx/certification.*\)|\1api.trustedservices.intel.com\2|g" /etc/sgx_default_qcnl.conf
+RUN sed -i "s|^\(  \"pccs_url\": \"https://\).*\(/sgx/certification.*\)|\1api.trustedservices.intel.com\2|g" \
+    /etc/sgx_default_qcnl.conf
 
 RUN git clone --depth 1 --branch v1.4 https://github.com/gramineproject/gramine.git
 
