@@ -3,9 +3,9 @@
 # Copyright (C) 2022 Intel Corporation
 
 title_height = 3
-screen_height = 46
+screen_height = 35
 screen_width = 120
-user_input_height = 7
+user_input_height = 5
 user_input_width = screen_width
 user_input_start_y = screen_height - user_input_height
 num_sub_titles = 2
@@ -13,11 +13,12 @@ title_width = screen_width
 sub_title_width = title_width / num_sub_titles
 user_console_height = guide_win_height = screen_height - user_input_height - title_height
 user_console_width = int(screen_width/2) - 3
+guide_win_height = screen_height - user_input_height - title_height
 guide_win_width = int(screen_width/2) - 2
 line_offset = 2
+partition_height = 20
 partition_width = 1
-partition_y = 5
-partition_height = screen_height - (user_input_height + partition_y + 1)
+partition_y = 7
 
 color_set = '::reverse'
 
