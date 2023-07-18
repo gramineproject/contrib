@@ -15,7 +15,6 @@ user_console_height = guide_win_height = screen_height - user_input_height - tit
 user_console_width = int(screen_width/2) - 3
 guide_win_width = int(screen_width/2) - 2
 line_offset = 2
-partition_height = 20
 partition_width = 1
 partition_y = 5
 partition_height = screen_height - (user_input_height + partition_y + 1)
