@@ -34,7 +34,7 @@ Perform the following steps on your system:
 
 4. Encrypt MariaDB database:
 
-   1. [Install Gramine](https://gramine.readthedocs.io/en/stable/quickstart.html#install-gramine)
+   1. [Install Gramine](https://gramine.readthedocs.io/en/stable/installation.html)
       as the encryption is done using the `gramine-sgx-pf-crypt` tool which is part of Gramine
       installation.
 
@@ -83,7 +83,7 @@ MariaDB is fully compatible with MySQL client. Install MySQL client:
 sudo apt-get -y install mysql-client
 ```
 
-Connect the client to the test MariaDB server:
+Connect the client to test the MariaDB server:
 ```sh
 mysql -h 127.0.0.1 -uroot
 ```
