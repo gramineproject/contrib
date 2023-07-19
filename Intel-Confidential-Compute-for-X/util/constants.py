@@ -11,7 +11,8 @@ user_input_start_y = screen_height - user_input_height
 num_sub_titles = 2
 title_width = screen_width
 sub_title_width = title_width / num_sub_titles
-user_console_height = guide_win_height = screen_height - user_input_height - title_height
+user_console_height = screen_height - user_input_height - title_height
+guide_win_height = user_console_height
 user_console_width = int(screen_width/2) - 3
 guide_win_width = int(screen_width/2) - 2
 line_offset = 2
