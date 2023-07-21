@@ -22,7 +22,7 @@ partition_y = 7
 
 color_set = '::reverse'
 
-supported_distros = ('ubuntu:18.04', 'ubuntu:20.04', 'debian:10', 'debian:11')
+supported_distros = ('ubuntu:20.04', 'ubuntu:22.04', 'debian:10', 'debian:11')
 test_image_msg = ('\nYour test GSC image is being generated. This image is not supposed to be'
                    ' used in production\n')
 
