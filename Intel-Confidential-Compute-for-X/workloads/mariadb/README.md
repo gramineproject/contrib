@@ -31,6 +31,7 @@ Perform the following steps on your system:
    docker stop init_test_db
    sudo chown -R $USER:$USER $PWD/workloads/mariadb/test_db
    ```
+   Note: The user is supposed to replace `my-root-pw` with the user's own password.
 
 4. Encrypt MariaDB database:
 
@@ -38,7 +39,7 @@ Perform the following steps on your system:
       as the encryption is done using the `gramine-sgx-pf-crypt` tool which is part of Gramine
       installation.
 
-   2. Use the `gramine-sgx-pf-crypt` tool to encrypt the MariaDB database `workloads/mariadb/test_db`.
+   2. Use the `gramine-sgx-pf-crypt` tool to encrypt the database `workloads/mariadb/test_db`.
       The encrypted database will be stored in `/var/run/test_db_encrypted`.
       ```sh
       dd if=/dev/urandom bs=16 count=1 > workloads/mariadb/base_image_helper/encryption_key
@@ -84,7 +85,7 @@ sudo apt-get -y install mysql-client
 
 Connect the client to test the MariaDB server:
 ```sh
-mysql -h 127.0.0.1 -uroot -pmy-root-pass
+mysql -h 127.0.0.1 -uroot -pmy-root-pass # replace my-root-pass with your password
 ```
 
 ## Decrypt MariaDB database
