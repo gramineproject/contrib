@@ -26,7 +26,7 @@ Perform the following steps on your system:
    mkdir workloads/mariadb/test_db
    docker run --rm --net=host --name init_test_db \
        -v $PWD/workloads/mariadb/test_db:/test_db \
-       -e MARIADB_ALLOW_EMPTY_ROOT_PASSWORD=true -e MARIADB_DATABASE=test_db mariadb:10.7 \
+       -e MARIADB_ROOT_PASSWORD=my-root-pw -e MARIADB_DATABASE=test_db mariadb:10.7 \
        --datadir /test_db &
    docker stop init_test_db
    sudo chown -R $USER:$USER $PWD/workloads/mariadb/test_db
@@ -39,8 +39,7 @@ Perform the following steps on your system:
       installation.
 
    2. Use the `gramine-sgx-pf-crypt` tool to encrypt the MariaDB database `workloads/mariadb/test_db`.
-      The following command with generate a weak encryption key, which must not be used in
-      production. The encrypted database will be stored in `/var/run/test_db_encrypted`.
+      The encrypted database will be stored in `/var/run/test_db_encrypted`.
       ```sh
       dd if=/dev/urandom bs=16 count=1 > workloads/mariadb/base_image_helper/encryption_key
 
@@ -49,7 +48,7 @@ Perform the following steps on your system:
          -i workloads/mariadb/test_db -o /var/run/test_db_encrypted
       ```
       You can learn more about Gramine's support of encrypted files in the
-      [corresponding documentation](https://gramine.readthedocs.io/en/stable/manifest-syntax.html#encrypted-files). 
+      [corresponding documentation](https://gramine.readthedocs.io/en/stable/manifest-syntax.html#encrypted-files).
 
 5. Perform one of the following alternatives:
     - To generate a Gramine-protected, pre-configured, non-production ready, test image for MariaDB,
@@ -85,7 +84,7 @@ sudo apt-get -y install mysql-client
 
 Connect the client to test the MariaDB server:
 ```sh
-mysql -h 127.0.0.1 -uroot
+mysql -h 127.0.0.1 -uroot -pmy-root-pass
 ```
 
 ## Decrypt MariaDB database
