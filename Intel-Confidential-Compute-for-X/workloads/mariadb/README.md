@@ -85,7 +85,7 @@ sudo apt-get -y install mysql-client
 
 Connect the client to test the MariaDB server:
 ```sh
-mysql -h 127.0.0.1 -uroot -pmy-root-pass # replace my-root-pass with your password
+mysql -h 127.0.0.1 -uroot -pmy-root-pw # replace my-root-pw with your password
 ```
 
 ## Decrypt MariaDB database
