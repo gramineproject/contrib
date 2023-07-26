@@ -26,12 +26,13 @@ Perform the following steps on your system:
    mkdir workloads/mariadb/test_db
    docker run --rm --net=host --name init_test_db \
        -v $PWD/workloads/mariadb/test_db:/test_db \
-       -e MARIADB_ROOT_PASSWORD=my-root-pw -e MARIADB_DATABASE=test_db mariadb:10.7 \
+       -e MARIADB_RANDOM_ROOT_PASSWORD=yes -e MARIADB_DATABASE=test_db mariadb:10.7 \
        --datadir /test_db &
    docker stop init_test_db
    sudo chown -R $USER:$USER $PWD/workloads/mariadb/test_db
    ```
-   Note: The user is supposed to replace `my-root-pw` with the user's own password.
+   Note: The user is supposed to remeber the generated root password printed to stdout
+   (GENERATED ROOT PASSWORD: .....).
 
 4. Encrypt MariaDB database:
 
@@ -85,7 +86,8 @@ sudo apt-get -y install mysql-client
 
 Connect the client to test the MariaDB server:
 ```sh
-mysql -h 127.0.0.1 -uroot -pmy-root-pw # replace my-root-pw with your password
+mysql -h 127.0.0.1 -uroot -p'my-random-root-pw'
+# replace my-random-root-pw with generated root password in step 3
 ```
 
 ## Decrypt MariaDB database
