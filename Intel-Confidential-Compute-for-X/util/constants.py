@@ -26,8 +26,8 @@ supported_distros = ('ubuntu:20.04', 'ubuntu:22.04', 'debian:10', 'debian:11')
 test_image_msg = ('\nYour test GSC image is being generated. This image is not supposed to be'
                    ' used in production\n')
 
-test_run_instr = ('Run the {} docker image in an Azure Confidential Compute'
-                  ' instance using the below command.\n\n'
+test_run_instr = ('Run the {} docker image in a SGX enabled'
+                  ' system using the below command.\n\n'
                   'Host networking (--net=host) is optional\n\n{}\n\n'
                   'Above command is saved to command.txt as well.\n')
 test_run_cmd = ('$ docker run --net=host --device=/dev/sgx/enclave {} -it {}')
@@ -46,8 +46,8 @@ introduction = ['This application will provide step-by-step guidance for creatin
                 ' more context for each of the steps.', 'Do not resize this terminal window.',
                 'Press CTRL+G to get started!']
 
-index = ['The target deployment environment is assumed to be an Azure Confidential compute'
-         ' instance.','Following stages are involved in the GSC image curation:',
+index = ['The target deployment environment is assumed to be a SGX enabled system'
+         ,'Following stages are involved in the GSC image curation:',
          '1. Command-line arguments',
          '2. Environment variables',
          '3. Additional docker run flags',
@@ -67,8 +67,8 @@ signing_key_help = ['SGX requires RSA 3072 keys with public exponent equal to 3.
                     + color_set]
 verifier_build_messg = 'Building the RA-TLS Verifier image, this might take couple of minutes'
 verifier_log_help = 'You may monitor verifier/{} for progress'
-attestation_prompt = ['>> Remote Attestation:' , 'To enable remote attestation using Azure DCAP'
-                      ' client libs, use another terminal to copy the ca.crt, server.crt, and'
+attestation_prompt = ['>> Remote Attestation:' , 'To enable remote attestation using Intel SGX DCAP'
+                      ' libs, use another terminal to copy the ca.crt, server.crt, and'
                       ' server.key certificates to Intel-Confidential-Compute-for-X/verifier/ssl'
                       ' directory',
                       'NOTE: Encrypted Filesystem of Gramine requires Attestation to provision'
@@ -80,8 +80,8 @@ attestation_prompt = ['>> Remote Attestation:' , 'To enable remote attestation u
                       ' option is thus insecure and must not be used in production environments!',
                       'Press CTRL+G when done']
 attestation_help = ['This step enables the enclave to communicate to a remote verifier over'
-                    ' an Remote Attestation TLS (RA-TLS) link. This remote verifier uses Azure'
-                    ' DCAP client libs to verify the Quote supplied by the enclave. RA-TLS'
+                    ' an Remote Attestation TLS (RA-TLS) link. This remote verifier uses'
+                    ' Intel SGX DCAP libs to verify the Quote supplied by the enclave. RA-TLS'
                     ' attestation flow requires you to provide a set of certificates and keys to'
                     ' enable the attestation flow. The CA certificate will be used to TLS'
                     ' authenticate the verifier during the RA-TLS flow. A test sample set of'
@@ -133,8 +133,7 @@ flags_help =  ['At the end of this Curation app, it writes instructions into com
 
 wait_message = ['Image Creation:', 'Your Gramine Shielded Container image is being created.'
                 ' This might take a few minutes.']
-system_config_message = ['System config by default is assumed to be an Azure Confidential compute'
-                         ' instance.']
+system_config_message = ['System config by default is assumed to be a SGX enabled system.']
 run_command_no_att = '$ docker run {} --device=/dev/sgx/enclave -it {}'
 run_with_debug = 'python3 curate.py {} {} debug' + color_set
 extra_debug_instr = ("It's also possible that you may run into issues resulting from lack of"

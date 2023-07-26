@@ -282,7 +282,7 @@ def get_insecure_args(workload_type):
     return get_file_contents(f'workloads/{workload_type}/insecure_args.txt')
 
 def get_image_distro(docker_socket, image_name):
-    output = docker_socket.containers.run(image_name, entrypoint='cat /etc/os-release', remove=True)
+    output = docker_socket.containers.run(image_name, entrypoint='cat /usr/lib/os-release', remove=True)
     output = output.decode('UTF-8')
 
     pattern_id = re.compile('^ID=(.*)', flags=re.MULTILINE)
@@ -484,6 +484,7 @@ def create_custom_image(stdscr, docker_socket, workload_type, base_image_name, i
     if host_net and host_net not in flags:
         flags = flags + " " + host_net
     commands_fp = open(commands_file, 'w')
+
     if attestation_required == 'y':
         verifier_env_vars = ' -e RA_TLS_ALLOW_SW_HARDENING_NEEDED=1 '
         if debug_flag == 'y':
