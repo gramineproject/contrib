@@ -186,12 +186,15 @@ if [ "$attestation_required" = "y" ]; then
     copy_cert_files='COPY ca.crt /'
     echo '' >> $app_image_manifest
     echo '# Attestation related entries' >> $app_image_manifest
+    echo 'sgx.remote_attestation = "dcap"' >> $app_image_manifest
 
+    # Preload `libsecret_prov_attest.so` library. But if `LD_PRELOAD` exists in workload
+    # specific manifest, then we must concatenate our lib with already-listed libs.
     secret_prov_attest="/gramine/meson_build_output/lib/x86_64-linux-gnu/libsecret_prov_attest.so"
     if ! grep -q 'loader.env.LD_PRELOAD' $app_image_manifest; then
         echo 'loader.env.LD_PRELOAD = "'$secret_prov_attest'"' >> $app_image_manifest
     else
-        sed -i "s|\(loader.env.LD_PRELOAD = .*\)\"|\1:$secret_prov_attest\"|g" \
+        sed -i "s|\(^loader.env.LD_PRELOAD[[:space:]]*=[[:space:]]*.*\)\"|\1:$secret_prov_attest\"|g" \
             $app_image_manifest
     fi
 
