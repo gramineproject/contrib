@@ -1,4 +1,4 @@
-project('mbedtls', 'c')
+project('mbedtls', 'c', version: '3.4.0')
 
 mbedtls_curl_libs = custom_target('mbedtls_curl',
     command: [

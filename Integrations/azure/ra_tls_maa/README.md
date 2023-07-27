@@ -7,6 +7,9 @@ Gramine documentation for details:
 - https://gramine.readthedocs.io/en/stable/glossary.html
 - https://gramine.readthedocs.io/en/stable/sgx-intro.html#sgx-terminology
 
+**DISCLAIMER**: This version was tested with Gramine v1.5 and MAA API version
+`2022-08-01`.
+
 ---
 
 Microsoft Azure Attestation (MAA) is the attestation protocol (attestation
@@ -86,9 +89,7 @@ MAA-specific environment variables.
 
 ### Building MAA libraries
 
-There are two prerequisites:
-1. Gramine installed on the system.
-2. libcjson: `sudo apt-get install libcjson-dev` on Ubuntu.
+The only prerequisite is that Gramine v1.5 must be installed on the system.
 
 To build the `ra_tls_verify_maa.so` and `secret_prov_verify_maa.so` libraries,
 we use the meson build system:
@@ -117,13 +118,11 @@ examples available in Gramine.
 To be able to run these tests, the machine must run on the Azure cloud, with
 access to the MAA attestation provider service.
 
-**TODO: Update patches to Gramine v1.5 when it is released.**
-
-For this, we provide a patch that should be applied on top of Gramine v1.4 repo:
+For this, we provide a patch that should be applied on top of Gramine v1.5 repo:
 ```sh
-git clone --depth 1 --branch v1.4 https://github.com/gramineproject/gramine.git
+git clone --depth 1 --branch v1.5 https://github.com/gramineproject/gramine.git
 cd gramine/
-git apply ../helpers/gramine-v1.4-ci-examples.patch
+git apply ../helpers/gramine-v1.5-ci-examples.patch
 ```
 
 To test the `ra-tls-mbedtls` example, cd to its directory and run:

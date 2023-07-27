@@ -1,5 +1,5 @@
 diff --git a/CI-Examples/ra-tls-mbedtls/Makefile b/CI-Examples/ra-tls-mbedtls/Makefile
-index 7d31e9306cca853c0ba5e45bb7638627b1629353..ed5af2ee031d33f02a8da400b233e4bf721f7fe9 100644
+index 4adc0eee275edc4508cd06eea5d818ec503f5200..6b42d6e7c6bf9973f26062f5973b032b822b0f5b 100644
 --- a/CI-Examples/ra-tls-mbedtls/Makefile
 +++ b/CI-Examples/ra-tls-mbedtls/Makefile
 @@ -27,6 +27,9 @@ epid: client_epid.manifest.sgx client_epid.sig
@@ -12,7 +12,7 @@ index 7d31e9306cca853c0ba5e45bb7638627b1629353..ed5af2ee031d33f02a8da400b233e4bf
  ############################# SSL DATA DEPENDENCY #############################
  
  # SSL data: key and x.509 self-signed certificate
-@@ -87,6 +90,23 @@ sgx_sign_client_dcap: client_dcap.manifest client
+@@ -107,6 +110,23 @@ sgx_sign_client_epid: client_epid.manifest client
  		--manifest $< \
  		--output $<.sgx
  
@@ -33,10 +33,10 @@ index 7d31e9306cca853c0ba5e45bb7638627b1629353..ed5af2ee031d33f02a8da400b233e4bf
 +		--manifest $< \
 +		--output $<.sgx
 +
- ########################### CLIENT (EPID) MANIFEST ############################
+ ############################### SGX CHECKS FOR CI #############################
  
- client_epid.manifest: client.manifest.template
-@@ -146,6 +166,26 @@ check_dcap_fail: app dcap
+ .PHONY: check_epid
+@@ -149,6 +169,26 @@ check_dcap_fail: app dcap
  	./client dcap && exit 1 || echo "[ Success 1/1 ]"; \
  	kill -9 $$SERVER_ID
  
@@ -64,10 +64,10 @@ index 7d31e9306cca853c0ba5e45bb7638627b1629353..ed5af2ee031d33f02a8da400b233e4bf
  
  .PHONY: clean
 diff --git a/CI-Examples/ra-tls-mbedtls/src/client.c b/CI-Examples/ra-tls-mbedtls/src/client.c
-index 4d2f71ba870b67467e4b402f869429715f4d6140..234874dcd2a15356ed03c6344f08a79da3ad7540 100644
+index 6b7d05609f6135488ba51bc317f49d3ea30855a3..ad51f1709b9a629012f1180969b57a7a7ca04dfe 100644
 --- a/CI-Examples/ra-tls-mbedtls/src/client.c
 +++ b/CI-Examples/ra-tls-mbedtls/src/client.c
-@@ -161,9 +161,9 @@ int main(int argc, char** argv) {
+@@ -165,9 +165,9 @@ int main(int argc, char** argv) {
      mbedtls_x509_crt_init(&cacert);
      mbedtls_entropy_init(&entropy);
  
@@ -80,7 +80,7 @@ index 4d2f71ba870b67467e4b402f869429715f4d6140..234874dcd2a15356ed03c6344f08a79d
          return 1;
      }
  
-@@ -206,6 +206,13 @@ int main(int argc, char** argv) {
+@@ -210,6 +210,13 @@ int main(int argc, char** argv) {
                  return 1;
              }
          }
@@ -115,7 +115,7 @@ index cc4e300d316d0a7cf83a69e4ca62711c845539d8..a93d19078be6940ff09c5840f5553416
  /secret_prov_pf/enc_files/input.txt
  
 diff --git a/CI-Examples/ra-tls-secret-prov/Makefile b/CI-Examples/ra-tls-secret-prov/Makefile
-index 8ab9308aeac273b30005dadfa8b24c9acce2d5c1..2dc0b44c8b41b550110796774ee8381e4ae8688c 100644
+index 27806514c822831f1416017e812244736d7e2c51..94c3ba7dfde6ceb7b7f37360ab7c66def06a8aae 100644
 --- a/CI-Examples/ra-tls-secret-prov/Makefile
 +++ b/CI-Examples/ra-tls-secret-prov/Makefile
 @@ -36,6 +36,10 @@ epid: ssl/server.crt secret_prov_minimal/server_epid secret_prov/server_epid sec
@@ -129,7 +129,7 @@ index 8ab9308aeac273b30005dadfa8b24c9acce2d5c1..2dc0b44c8b41b550110796774ee8381e
  ############################# SSL DATA DEPENDENCY #############################
  
  # SSL data: key and x.509 self-signed certificate
-@@ -65,6 +69,9 @@ LDFLAGS += -Wl,--enable-new-dtags $(shell pkg-config --libs mbedtls_gramine)
+@@ -60,6 +64,9 @@ LDFLAGS += -Wl,--enable-new-dtags $(shell pkg-config --libs secret_prov_gramine)
  %/server_dcap: %/server.c
  	$(CC) $< $(CFLAGS) $(LDFLAGS) -Wl,--no-as-needed -lsgx_urts -lsecret_prov_verify_dcap -pthread -o $@
  
@@ -139,7 +139,7 @@ index 8ab9308aeac273b30005dadfa8b24c9acce2d5c1..2dc0b44c8b41b550110796774ee8381e
  secret_prov/client: secret_prov/client.c
  	$(CC) $< $(CFLAGS) $(LDFLAGS) -lsecret_prov_attest -o $@
  
-@@ -218,6 +225,35 @@ check_dcap: app dcap
+@@ -213,6 +220,35 @@ check_dcap: app dcap
  
  	@rm OUTPUT
  
