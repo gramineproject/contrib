@@ -39,7 +39,7 @@
 #include <mbedtls/md.h>
 #include <mbedtls/x509_crt.h>
 
-#include <cjson/cJSON.h>
+#include <cJSON.h>
 
 #include "ra_tls.h"
 #include "ra_tls_common.h"

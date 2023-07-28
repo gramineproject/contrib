@@ -44,6 +44,9 @@ endif
 curl_proj = subproject('curl-7.84.0')
 libcurl_dep = curl_proj.get_variable('curl_minimal_dep')
 
+cjson_proj = subproject('cJSON-1.7.12')
+cjson_dep = cjson_proj.get_variable('cjson_dep')
+
 threads_dep = dependency('threads')
 
 mbedtls_dep = dependency('mbedtls_gramine', static: true)
@@ -68,6 +71,7 @@ libra_tls_verify_maa = shared_library('ra_tls_verify_maa',
     include_directories: ra_tls_includedir,
     link_args: ra_tls_link_args,
     dependencies: [
+        cjson_dep,
         libcurl_dep,
         mbedtls_dep,
         ra_tls_util_lib,
@@ -97,6 +101,7 @@ libsecret_prov_verify_maa = shared_library('secret_prov_verify_maa',
     include_directories: secret_prov_includedir,
     link_args: secret_prov_link_args,
     dependencies: [
+        cjson_dep,
         libcurl_dep,
         mbedtls_dep,
         ra_tls_util_lib,
