@@ -31,8 +31,8 @@ Perform the following steps on your system:
    docker stop init_test_db
    sudo chown -R $USER:$USER $PWD/workloads/mariadb/test_db
    ```
-   Note: The user is supposed to remeber the generated root password printed to stdout
-   (GENERATED ROOT PASSWORD: .....).
+   Note: The user is supposed to remember the generated root password printed to stdout
+   `(GENERATED ROOT PASSWORD: .....)`.
 
 4. Encrypt MariaDB database:
 
