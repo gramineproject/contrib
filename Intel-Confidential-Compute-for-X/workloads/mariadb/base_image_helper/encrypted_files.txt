@@ -1,1 +1,1 @@
-/var/run/test_db_encrypted
+/test_db_encrypted

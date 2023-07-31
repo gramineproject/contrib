@@ -21,7 +21,7 @@ Perform the following steps on your system:
 3. If a new MariaDB database should be used, use the following commands to initialize the database
    and to stop the initialized database afterwards. If you want to use an existing MariaDB
    database, skip this step. Note that the following steps assume a new database and you need to
-   adjust the commands when an exiting database is used.
+   adjust the commands when an existing database is used.
    ```sh
    mkdir workloads/mariadb/test_db
    docker run --rm --net=host --name init_test_db \
@@ -41,13 +41,16 @@ Perform the following steps on your system:
       installation.
 
    2. Use the `gramine-sgx-pf-crypt` tool to encrypt the database `workloads/mariadb/test_db`.
-      The encrypted database will be stored in `/var/run/test_db_encrypted`.
+      The encrypted database will be stored in newly created `tmpfs` mount point
+      `/test_db_encrypted`.
       ```sh
-      dd if=/dev/urandom bs=16 count=1 > workloads/mariadb/base_image_helper/encryption_key
+      sudo mkdir -p /test_db_encrypted
+      sudo mount -t tmpfs tmpfs /test_db_encrypted
 
-      sudo rm -rf /var/run/test_db_encrypted
-      sudo gramine-sgx-pf-crypt encrypt -w workloads/mariadb/base_image_helper/encryption_key \
-         -i workloads/mariadb/test_db -o /var/run/test_db_encrypted
+      dd if=/dev/urandom bs=16 count=1 > workloads/mariadb/base_image_helper/encryption_key
+      rm -rf /test_db_encrypted/*
+      gramine-sgx-pf-crypt encrypt -w workloads/mariadb/base_image_helper/encryption_key \
+         -i workloads/mariadb/test_db -o /test_db_encrypted
       ```
       You can learn more about Gramine's support of encrypted files in the
       [corresponding documentation](https://gramine.readthedocs.io/en/stable/manifest-syntax.html#encrypted-files).
@@ -95,7 +98,7 @@ mysql -h 127.0.0.1 -uroot -p'my-random-root-pw'
 Execute the following command to decrypt the MariaDB database:
 ```sh
 gramine-sgx-pf-crypt decrypt -w workloads/mariadb/base_image_helper/encryption_key \
-      -i /var/run/test_db_encrypted -o workloads/mariadb/test_db_plain
+      -i /test_db_encrypted -o workloads/mariadb/test_db_plain
 ```
 
 ## Contents

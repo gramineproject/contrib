@@ -1,1 +1,1 @@
---datadir /var/run/test_db_encrypted
+--datadir /test_db_encrypted
