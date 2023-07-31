@@ -41,16 +41,17 @@ Perform the following steps on your system:
       installation.
 
    2. Use the `gramine-sgx-pf-crypt` tool to encrypt the database `workloads/mariadb/test_db`.
-      The encrypted database will be stored in newly created `tmpfs` mount point
-      `/test_db_encrypted`.
+      The encrypted database will be stored in the `test_db_encrypted` directory under the newly
+      created `tmpfs` mount point `/mnt/tmpfs`.
       ```sh
-      sudo mkdir -p /test_db_encrypted
-      sudo mount -t tmpfs tmpfs /test_db_encrypted
+      sudo mkdir -p /mnt/tmpfs
+      sudo mount -t tmpfs tmpfs /mnt/tmpfs
+      mkdir /mnt/tmpfs/test_db_encrypted
 
       dd if=/dev/urandom bs=16 count=1 > workloads/mariadb/base_image_helper/encryption_key
-      rm -rf /test_db_encrypted/*
+      rm -rf /mnt/tmpfs/test_db_encrypted/*
       gramine-sgx-pf-crypt encrypt -w workloads/mariadb/base_image_helper/encryption_key \
-         -i workloads/mariadb/test_db -o /test_db_encrypted
+         -i workloads/mariadb/test_db -o /mnt/tmpfs/test_db_encrypted
       ```
       You can learn more about Gramine's support of encrypted files in the
       [corresponding documentation](https://gramine.readthedocs.io/en/stable/manifest-syntax.html#encrypted-files).
@@ -98,7 +99,7 @@ mysql -h 127.0.0.1 -uroot -p'my-random-root-pw'
 Execute the following command to decrypt the MariaDB database:
 ```sh
 gramine-sgx-pf-crypt decrypt -w workloads/mariadb/base_image_helper/encryption_key \
-      -i /test_db_encrypted -o workloads/mariadb/test_db_plain
+      -i /mnt/tmpfs/test_db_encrypted -o workloads/mariadb/test_db_plain
 ```
 
 ## Contents

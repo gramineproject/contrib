@@ -1,1 +1,1 @@
---datadir /test_db_encrypted
+--datadir /mnt/tmpfs/test_db_encrypted

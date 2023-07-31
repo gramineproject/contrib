@@ -1,1 +1,1 @@
--v /test_db_encrypted:/test_db_encrypted
+-v /mnt/tmpfs/test_db_encrypted:/mnt/tmpfs/test_db_encrypted
