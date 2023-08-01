@@ -25,7 +25,7 @@ Perform the following steps on your system:
 
    ```
    mkdir workloads/openvino-model-server/models
-   curl --create-dirs https://storage.openvinotoolkit.org/repositories/open_model_zoo/2022.1/models_bin/2/face-detection-retail-0004/FP32/face-detection-retail-0004.xml https://storage.openvinotoolkit.org/repositories/open_model_zoo/2022.1/models_bin/2/face-detection-retail-0004/FP32/face-detection-retail-0004.bin -o workloads/openvino-model-server/models/1/face-detection-retail-0004.xml -o workloads/openvino-model-server/models/1/face-detection-retail-0004.bin
+   curl --create-dirs https://storage.openvinotoolkit.org/repositories/open_model_zoo/2023.0/models_bin/1/face-detection-retail-0004/FP32/face-detection-retail-0004.xml https://storage.openvinotoolkit.org/repositories/open_model_zoo/2023.0/models_bin/1/face-detection-retail-0004/FP32/face-detection-retail-0004.bin -o workloads/openvino-model-server/models/1/face-detection-retail-0004.xml -o workloads/openvino-model-server/models/1/face-detection-retail-0004.bin
    ```
 
 4. Encrypting model:
@@ -35,15 +35,17 @@ Perform the following steps on your system:
         installation.
 
     2. Use the `gramine-sgx-pf-crypt` tool to encrypt the test model
-       `workloads/openvino-model-server/models`. The following command will generate a weak
-       encryption key, which must not be used in production. The encrypted model will be stored in
-       `/var/run/model_encrypted`.
+       `workloads/openvino-model-server/models`. The encrypted model will be stored in the
+       `model_encrypted` directory under the newly created `tmpfs` mount point `/mnt/tmpfs`.
        ```sh
+       sudo mkdir -p /mnt/tmpfs
+       sudo mount -t tmpfs tmpfs /mnt/tmpfs
+       mkdir /mnt/tmpfs/model_encrypted
+
        dd if=/dev/urandom bs=16 count=1 > workloads/openvino-model-server/base_image_helper/encryption_key
-       sudo rm -rf /var/run/model_encrypted
-       sudo gramine-sgx-pf-crypt encrypt \
+       gramine-sgx-pf-crypt encrypt \
            -w workloads/openvino-model-server/base_image_helper/encryption_key \
-           -i workloads/openvino-model-server/models -o /var/run/model_encrypted
+           -i workloads/openvino-model-server/models -o /mnt/tmpfs/model_encrypted
        ```
        You can learn more about Gramine's support of encrypted files in the
        [corresponding documentation](https://gramine.readthedocs.io/en/stable/manifest-syntax.html#encrypted-files).
@@ -67,7 +69,8 @@ Perform the following steps on your system:
       - `--model_path <abs_path_to_encrypted_model> --model_name face-detection --port 9000
         --plugin_config '{"CPU_THROUGHPUT_STREAMS": "1"}' --shape auto` when prompted for
         command-line arguments.
-      - `-v <abs_path_to_encrypted_model>:<abs_path_to_encrypted_model>` when prompted for
+      - `-u $(id -u):$(id -g) -p 9000:9000
+        -v <abs_path_to_encrypted_model>:<abs_path_to_encrypted_model>` when prompted for
         additional docker flags.
       - `<abs_path_to_encrypted_model>` and `<encryption_key>` when prompted for encrypted
         files and encryption key respectively.
@@ -79,38 +82,38 @@ Follow the output of the image build script `curate.py` to run the generated Doc
 Note that validation was only done on a Standard_DC8s_v3 Azure VM.
 
 
-## Run Inference on the test image generated at step 5.i
+## Run inference on the test image
 
-- Move to workload/openvino-model-server folder:
+- Move to `workloads/openvino-model-server` folder:
    ```sh
-   cd workload/openvino-model-server
+   cd workloads/openvino-model-server
    ```
 
-- Prepare the Example Client Components:
+- Prepare the example client components:
   ```sh
-  curl --fail https://raw.githubusercontent.com/openvinotoolkit/model_server/releases/2023/0/demos/common/python/client_utils.py -o client_utils.py https://raw.githubusercontent.com/openvinotoolkit/model_server/releases/2023/0/demos/face_detection/python/face_detection.py -o face_detection.py
+  curl https://raw.githubusercontent.com/openvinotoolkit/model_server/releases/2023/0/demos/common/python/client_utils.py -o client_utils.py
+  curl https://raw.githubusercontent.com/openvinotoolkit/model_server/releases/2023/0/demos/face_detection/python/face_detection.py -o face_detection.py
   ```
 
-- Download Data for Inference:
+- Download data for inference:
   ```sh
-  curl --fail --create-dirs https://raw.githubusercontent.com/openvinotoolkit/model_server/releases/2023/0/demos/common/static/images/people/people1.jpeg -o images/people1.jpeg
+  curl --create-dirs https://raw.githubusercontent.com/openvinotoolkit/model_server/releases/2023/0/demos/common/static/images/people/people1.jpeg -o images/people1.jpeg
   ```
 
-- Run Inference:
+- Run inference:
   ```sh
   python3 -m venv env
   source env/bin/activate
   pip install --upgrade pip
   pip install -r client_requirements.txt
-  
+
   mkdir results
-  export no_proxy=intel.com,.intel.com,localhost,127.0.0.1
 
   python3 face_detection.py --batch_size 1 --width 600 --height 400 --input_images_dir images \
-  --output_dir results --grpc_port 9000
+      --output_dir results --grpc_port 9000
 
   deactivate
-  ``` 
+  ```
 
 ## Contents
 
@@ -129,15 +132,17 @@ Model Server image:
     |                                                       basic set of values defined for
     |                                                       graminizing OpenVINO Model Server
     |                                                       images) that will be passed to GSC.
-    |-- base_image_helper/                                # This directory contains `encrypted_file
-    |                                                       s.txt` which contains encrypted
-    |                                                       model directory required for running
-    |                                                       the test OpenVINO Model Server image.
+    |-- base_image_helper/                                # This directory contains
+    |                                                       `encrypted_files.txt` which contains
+    |                                                       encrypted model directory required for
+    |                                                       running the test OpenVINO Model Server
+    |                                                       image.
     |-- docker_run_flags.txt                              # This file contains docker run flags
     |                                                       required for running the test OpenVINO
     |                                                       Model Server image.
     |-- insecure_args.txt                                 # This file contains command line
     |                                                       arguments required for running the test
     |                                                       OpenVINO Model Server image.
-    |-- client_requirements.txt                           # This file contains all dependencies that
-    |                                                       need to be installed to run inference.
+    |-- client_requirements.txt                           # This file contains all dependencies
+    |                                                       that need to be installed to run
+    |                                                       inference.
