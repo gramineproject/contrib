@@ -1,1 +1,1 @@
--u 0:0 -p 9000:9000 -v /var/run/model_encrypted:/var/run/model_encrypted
+-u $(id -u):$(id -g) -p 9000:9000 -v /mnt/tmpfs/model_encrypted:/mnt/tmpfs/model_encrypted

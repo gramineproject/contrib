@@ -191,14 +191,9 @@ if [ "$attestation_required" = "y" ]; then
     echo '' >> $app_image_manifest
     echo '# Attestation related entries' >> $app_image_manifest
     echo 'sgx.remote_attestation = "dcap"' >> $app_image_manifest
-    if ! grep -q 'loader.env.LD_PRELOAD' $app_image_manifest; then
-	echo 'loader.env.LD_PRELOAD = ' \
-	'"/gramine/meson_build_output/lib/x86_64-linux-gnu/libsecret_prov_attest.so"' >> \
-	$app_image_manifest
-    else
-	sed -i "s|\(loader.env.LD_PRELOAD = .*\)\"|\1:/gramine/meson_build_output/lib/x86_64-linux-gnu/libsecret_prov_attest.so\"|g" \
-            $app_image_manifest
-    fi
+    echo 'loader.env.LD_PRELOAD = ' \
+    '"/gramine/meson_build_output/lib/x86_64-linux-gnu/libsecret_prov_attest.so"' >> \
+    $app_image_manifest
     echo 'loader.env.SECRET_PROVISION_SERVERS = { passthrough = true }' >> $app_image_manifest
     echo 'loader.env.SECRET_PROVISION_CONSTRUCTOR = "1"' >> $app_image_manifest
     echo 'loader.env.SECRET_PROVISION_CA_CHAIN_PATH = "/ca.crt"' >> $app_image_manifest

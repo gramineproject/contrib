@@ -16,6 +16,7 @@ Intel® carefully prepared the script for the following applications:
 * [Intel® Confidential Compute for Scikit-learn](workloads/sklearn/)
 * [Intel® Confidential Compute for Memcached](workloads/memcached/)
 * [Intel® Confidential Compute for MySQL](workloads/mysql/)
+* [Intel® Confidential Compute for OpenVINO Model Server](workloads/openvino-model-server/)
 
 For these applications, the interactive script also provides a test feature. With a single command,
 users can generate a non-production, Gramine-protected Docker image. This image is signed with a
