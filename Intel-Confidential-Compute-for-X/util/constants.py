@@ -26,7 +26,7 @@ supported_distros = ('ubuntu:20.04', 'ubuntu:22.04', 'debian:10', 'debian:11')
 test_image_msg = ('\nYour test GSC image is being generated. This image is not supposed to be'
                    ' used in production\n')
 
-test_run_instr = ('Run the {} docker image in a SGX enabled'
+test_run_instr = ('Run the {} docker image in an SGX enabled'
                   ' system using the below command.\n\n'
                   'Host networking (--net=host) is optional\n\n{}\n\n'
                   'Above command is saved to command.txt as well.\n')
@@ -46,7 +46,7 @@ introduction = ['This application will provide step-by-step guidance for creatin
                 ' more context for each of the steps.', 'Do not resize this terminal window.',
                 'Press CTRL+G to get started!']
 
-index = ['The target deployment environment is assumed to be a SGX enabled system'
+index = ['The target deployment environment is assumed to be an SGX enabled system'
          ,'Following stages are involved in the GSC image curation:',
          '1. Command-line arguments',
          '2. Environment variables',
@@ -133,7 +133,7 @@ flags_help =  ['At the end of this Curation app, it writes instructions into com
 
 wait_message = ['Image Creation:', 'Your Gramine Shielded Container image is being created.'
                 ' This might take a few minutes.']
-system_config_message = ['System config by default is assumed to be a SGX enabled system.']
+system_config_message = ['System config by default is assumed to be an SGX enabled system.']
 run_command_no_att = '$ docker run {} --device=/dev/sgx/enclave -it {}'
 run_with_debug = 'python3 curate.py {} {} debug' + color_set
 extra_debug_instr = ("It's also possible that you may run into issues resulting from lack of"
