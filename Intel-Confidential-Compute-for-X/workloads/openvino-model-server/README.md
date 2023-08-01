@@ -67,8 +67,7 @@ Perform the following steps on your system:
 
       Please provide the following inputs to the script:
       - `--model_path <abs_path_to_encrypted_model> --model_name face-detection --port 9000
-        --plugin_config '{"CPU_THROUGHPUT_STREAMS": "1"}' --shape auto` when prompted for
-        command-line arguments.
+        --shape auto` when prompted for command-line arguments.
       - `-u $(id -u):$(id -g) -p 9000:9000
         -v <abs_path_to_encrypted_model>:<abs_path_to_encrypted_model>` when prompted for
         additional docker flags.
@@ -100,7 +99,7 @@ Note that validation was only done on a Standard_DC8s_v3 Azure VM.
   curl --create-dirs https://raw.githubusercontent.com/openvinotoolkit/model_server/releases/2023/0/demos/common/static/images/people/people1.jpeg -o images/people1.jpeg
   ```
 
-- Run inference:
+- Trigger inference run in the GSC OpenVINO Model Server from a Python client:
   ```sh
   python3 -m venv env
   source env/bin/activate
@@ -109,6 +108,8 @@ Note that validation was only done on a Standard_DC8s_v3 Azure VM.
 
   mkdir results
 
+  # if you are behind a corporate proxy, export no_proxy envvar to avoid Python failure below
+  # "UNKNOWN:failed to connect to all addresses;..."
   python3 face_detection.py --batch_size 1 --width 600 --height 400 --input_images_dir images \
       --output_dir results --grpc_port 9000
 

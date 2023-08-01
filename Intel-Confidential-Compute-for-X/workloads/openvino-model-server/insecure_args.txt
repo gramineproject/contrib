@@ -1,1 +1,1 @@
---model_path /mnt/tmpfs/model_encrypted --model_name face-detection --port 9000 --plugin_config '{"CPU_THROUGHPUT_STREAMS": "1"}' --shape auto
+--model_path /mnt/tmpfs/model_encrypted --model_name face-detection --port 9000 --shape auto
