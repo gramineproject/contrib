@@ -26,7 +26,7 @@ Perform the following steps on your system:
    mkdir workloads/mariadb/test_db
    docker run --rm --net=host --name init_test_db \
        -v $PWD/workloads/mariadb/test_db:/test_db \
-       -e MARIADB_RANDOM_ROOT_PASSWORD=yes -e MARIADB_DATABASE=test_db mariadb:10.7 \
+       -e MARIADB_RANDOM_ROOT_PASSWORD=yes -e MARIADB_DATABASE=test_db mariadb:11.0.3-jammy \
        --datadir /test_db &
    docker stop init_test_db
    sudo chown -R $USER:$USER $PWD/workloads/mariadb/test_db
@@ -60,7 +60,7 @@ Perform the following steps on your system:
     - To generate a Gramine-protected, pre-configured, non-production ready, test image for MariaDB,
       execute the following script:
       ```sh
-      python3 ./curate.py mariadb mariadb:10.7 test
+      python3 ./curate.py mariadb mariadb:11.0.3-jammy test
       ```
     - To generate a Gramine-protected, pre-configured MariaDB image based on a user-provided MariaDB
       image, execute the following to launch an interactive setup script:
