@@ -84,7 +84,7 @@ struct maa_context_t {
 /*! MAA response (JWT token for `attest/` API, set of Signing keys for `certs/` API) */
 struct maa_response {
     char* data;              /*!< response (JSON string) */
-    size_t data_size;        /*!< size of \a token string */
+    size_t data_size;        /*!< size of \a data string */
 };
 
 /* Parse hex string to buffer; returns 0 on success, otherwise -1 */
@@ -338,7 +338,7 @@ out:
 }
 
 /*! Send GET request (empty) to MAA attestation provider's `certs/` API endpoint and save the
- * resulting set of JWKs \a out_set_of_jwks; caller is responsible for its cleanup */
+ * resulting set of JWKs in \a out_set_of_jwks; caller is responsible for its cleanup */
 static int maa_get_signing_certs(struct maa_context_t* context, char** out_set_of_jwks) {
     int ret;
 
@@ -937,7 +937,7 @@ static int maa_verify_response_output_quote(struct maa_response* response, const
         goto out;
     }
 
-    /* construct a dummy SGX quote (body) with contents takes from the JWT payload; this is for
+    /* construct a dummy SGX quote (body) with contents taken from the JWT payload; this is for
      * convenience because other functions in RA-TLS library operate on an SGX quote */
     quote_body = calloc(1, sizeof(*quote_body));
     if (!quote_body) {
@@ -1054,7 +1054,7 @@ out:
     return ret;
 }
 
-/*! parse the public key \p pk into DER format and copy it into \p pk_der */
+/*! parse the public key \p pk into DER format and copy it into \p out_pk_der */
 static int parse_pk(mbedtls_pk_context* pk, uint8_t* out_pk_der, size_t* out_pk_der_size) {
     /* below function writes data at the end of the buffer */
     int pk_der_size_byte = mbedtls_pk_write_pubkey_der(pk, out_pk_der, PUB_KEY_SIZE_MAX);
