@@ -43,7 +43,7 @@ index 4adc0eee275edc4508cd06eea5d818ec503f5200..6b42d6e7c6bf9973f26062f5973b032b
 +.PHONY: check_maa
 +check_maa: app maa
 +	gramine-sgx server >/dev/null & SERVER_ID=$$!; \
-+	../../../scripts/wait_for_server 60 127.0.0.1 4433; \
++	../../scripts/wait_for_server 60 127.0.0.1 4433; \
 +	./client maa > OUTPUT; \
 +	./client maa 0 0 0 0 >> OUTPUT; \
 +	kill -9 $$SERVER_ID
@@ -56,7 +56,7 @@ index 4adc0eee275edc4508cd06eea5d818ec503f5200..6b42d6e7c6bf9973f26062f5973b032b
 +.PHONY: check_maa_fail
 +check_maa_fail: app maa
 +	gramine-sgx server --test-malicious-quote >/dev/null & SERVER_ID=$$!; \
-+	../../../scripts/wait_for_server 60 127.0.0.1 4433; \
++	../../scripts/wait_for_server 60 127.0.0.1 4433; \
 +	./client maa && exit 1 || echo "[ Success 1/1 ]"; \
 +	kill -9 $$SERVER_ID
 +
