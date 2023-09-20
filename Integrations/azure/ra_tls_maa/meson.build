@@ -36,9 +36,9 @@ add_project_arguments(
 
     language: 'c')
 
-debug = get_option('buildtype') == 'debug' or get_option('buildtype') == 'debugoptimized'
-if debug
-    add_project_arguments('-DDEBUG', language: 'c')
+release_mode = get_option('buildtype') == 'release'
+if release_mode
+    add_project_arguments('-DNDEBUG', language: 'c')
 endif
 
 curl_proj = subproject('curl-7.84.0')

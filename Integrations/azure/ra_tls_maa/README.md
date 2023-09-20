@@ -46,6 +46,16 @@ then should verify the signature of the JWT (using a JWK obtained from the MAA
 provider separately) and examine the contents of the JWT and decide whether to
 trust the remote SGX enclave or not.
 
+For more information on JWT and JWKs, refer to the standards:
+- https://datatracker.ietf.org/doc/html/rfc7519
+- https://datatracker.ietf.org/doc/html/rfc7517
+
+For more information on MAA, refer to official documentation:
+- https://learn.microsoft.com/en-us/azure/attestation/overview
+- https://learn.microsoft.com/en-us/rest/api/attestation/
+
+### Gramine manifest file
+
 Because MAA attestation uses DCAP-formatted SGX quotes, the manifest in Gramine
 must contain the following line:
 ```
@@ -61,9 +71,25 @@ certificate and the SGX quote by sending it to the Microsoft Azure Attestation
 (MAA) provider and retrieving the attestation response (the JWT) from it. This
 library is *not* thread-safe.
 
+Note that the JWT's signature is verified using one of the set of JSON Web Keys
+(JWKs). The RA-TLS library retrieves this set of JWKs together with retrieving
+the JWT (this eager fetching of JWKs guarantees the freshness of these keys).
+
+The library verifies the following set of claims in the received JWT:
+- `x-ms-ver` (JWT schema version, expected to be "1.0")
+- `x-ms-attestation-type` (expected to be "sgx")
+- `exp` (expiration time of JWT)
+- `nbf` (not-before time of JWT)
+- `x-ms-sgx-is-debuggable` (verified using `RA_TLS_ALLOW_DEBUG_ENCLAVE_INSECURE`)
+- `x-ms-sgx-mrenclave` (verified against `RA_TLS_MRENCLAVE`)
+- `x-ms-sgx-mrsigner` (verified against `RA_TLS_MRSIGNER`)
+- `x-ms-sgx-product-id` (verified against `RA_TLS_ISV_PROD_ID`)
+- `x-ms-sgx-svn` (verified against `RA_TLS_ISV_SVN`)
+- `x-ms-sgx-report-data` (verified to contain the hash of the RA-TLS public key)
+
 The library uses the same [SGX-specific environment variables as
 `ra_tls_verify_epid.so`](https://gramine.readthedocs.io/en/stable/attestation.html#ra-tls-verify-epid-so)
-and ignores the EPID-specific environment variables.  Similarly to the EPID
+and ignores the EPID-specific environment variables. Similarly to the EPID
 version, instead of using environment variables, the four SGX measurements may
 be verified via a user-specified callback registered via
 `ra_tls_set_measurement_callback()`.
@@ -76,6 +102,21 @@ The library uses the following MAA-specific environment variables:
   provider's REST API `attest/` endpoint. If not specified, the default
   hard-coded version `2022-08-01` is used.
 
+Note that the library does *not* use the following SGX-enclave-status
+environment variables: `RA_TLS_ALLOW_OUTDATED_TCB_INSECURE`,
+`RA_TLS_ALLOW_HW_CONFIG_NEEDED` and `RA_TLS_ALLOW_SW_HARDENING_NEEDED`. This is
+because MAA generates a JWT for the SGX enclave with a possibly-insecure status
+depending on the used MAA policy. However, the library uses
+`RA_TLS_ALLOW_DEBUG_ENCLAVE_INSECURE` because typically MAA policies allow debug
+enclaves.
+
+The library sets the following MAA-specific environment variables: (the library
+does not overwrite these environment variables, so you may want to unset them
+before every invocation)
+
+- `RA_TLS_MAA_JWT` -- contains the raw MAA JWT (JSON object).
+- `RA_TLS_MAA_SET_OF_JWKS` -- contains the raw set of JWKs (JSON object).
+
 ### Secret Provisioning library: `secret_prov_verify_maa.so`
 
 Similarly to `secret_prov_verify_epid.so`, this library is used in
@@ -86,6 +127,9 @@ The library uses the same [SGX-specific environment variables as
 `secret_prov_verify_epid.so`](https://gramine.readthedocs.io/en/stable/attestation.html#secret-prov-verify-epid-so),
 ignores the EPID-specific environment variables and expects instead the
 MAA-specific environment variables.
+
+The library sets the same environment variables as `ra_tls_verify_maa.so`,
+namely `RA_TLS_MAA_JWT` and `RA_TLS_MAA_SET_OF_JWKS`.
 
 ### Building MAA libraries
 

@@ -32,6 +32,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 #include <curl/curl.h>
 
@@ -256,11 +257,8 @@ static void maa_cleanup(struct maa_context_t* context) {
     if (!context)
         return;
 
-    if (context->headers)
-        curl_slist_free_all(context->headers);
-
-    if (context->curl)
-        curl_easy_cleanup(context->curl);
+    curl_slist_free_all(context->headers);
+    curl_easy_cleanup(context->curl);
 
     /* every curl_global_init() must have a corresponding curl_global_cleanup() */
     if (context->curl_global_init_done)
@@ -904,9 +902,32 @@ static int maa_verify_response_output_quote(struct maa_response* response, const
         goto out;
     }
 
+    /*
+     * FIXME: the self-signed token-signing certificate obtained from the `certs/` MAA API endpoint
+     * (`token_signing_crt`) is supposed to embed an SGX quote; this SGX quote has the measurements
+     * like MRSIGNER that are published by the Azure Attestation team, and this SGX quote also has a
+     * binding to the public key of `token_signing_crt` via the classic hash-of-public-key:
+     *   token_signing_crt.sgx_quote.sgx_report.report_data = hash(token_signing_crt.pk)
+     *
+     * So ideally our code must extract the SGX quote from this certificate, verify this quote,
+     * verify that the quote binds to the cert's public key and verify the SGX measurements (against
+     * the ones published by the Azure Attestation team).
+     *
+     * Unfortunately, currently MAA has two problems: (a) not all MAA providers run inside the SGX
+     * environment, and (b) SGX measurements of MAA are not published online but must be requested
+     * from the MS Azure support team. Therefore, our code currently doesn't perform the
+     * SGX-specific verification of the token-signing certificate.
+     *
+     * For more info, read
+     * https://learn.microsoft.com/en-us/azure/attestation/overview#how-to-establish-trust-with-azure-attestation
+     */
+
     /* we verified the header and the signature of the received JWT, can trust its payload */
     cJSON* x_ms_ver  = cJSON_GetObjectItem(json_token_payload, "x-ms-ver");
     cJSON* x_ms_type = cJSON_GetObjectItem(json_token_payload, "x-ms-attestation-type");
+
+    cJSON* expiration_time = cJSON_GetObjectItem(json_token_payload, "exp");
+    cJSON* not_before_time = cJSON_GetObjectItem(json_token_payload, "nbf");
 
     cJSON* sgx_is_debuggable = cJSON_GetObjectItem(json_token_payload, "x-ms-sgx-is-debuggable");
     cJSON* sgx_mrenclave     = cJSON_GetObjectItem(json_token_payload, "x-ms-sgx-mrenclave");
@@ -924,6 +945,28 @@ static int maa_verify_response_output_quote(struct maa_response* response, const
         ERROR("MAA JWT payload's `x-ms-ver` and/or `x-ms-attestation-type` fields contain "
               "unrecognized values\n");
         ret = MBEDTLS_ERR_X509_CERT_UNKNOWN_FORMAT;
+        goto out;
+    }
+
+    /* expiration_time (exp) and not_before_time (nbf) are represented as JSON numbers with a
+     * NumericDate value -- the number of seconds from 1970-01-01 UTC (Seconds Since the Epoch).
+     * Verify against the current time, otherwise this JWT must not be accepted. */
+    if (!cJSON_IsNumber(expiration_time) || !cJSON_IsNumber(not_before_time)) {
+        ERROR("MAA JWT payload's `exp` and/or `nbf` fields have incorrect types\n");
+        ret = MBEDTLS_ERR_X509_CERT_UNKNOWN_FORMAT;
+        goto out;
+    }
+    time_t curr_time = time(NULL);
+    if (curr_time == (time_t)-1) {
+        ERROR("Failed to fetch current time (to compare against `exp` and `nbf` of MAA JWT)\n");
+        ret = MBEDTLS_ERR_X509_FATAL_ERROR;
+        goto out;
+    }
+    if (!((time_t)not_before_time->valueint <= curr_time
+                && curr_time <= (time_t)expiration_time->valueint)) {
+        ERROR("MAA JWT is expired (nbf=%d, exp=%d in 'Seconds Since the Epoch' format)\n",
+              not_before_time->valueint, expiration_time->valueint);
+        ret = MBEDTLS_ERR_X509_FATAL_ERROR;
         goto out;
     }
 
@@ -1158,10 +1201,9 @@ int ra_tls_verify_callback(void* data, mbedtls_x509_crt* crt, int depth, uint32_
     }
 
     ret = maa_send_request(context, quote, quote_size, pk_der, pk_der_size, &response);
-    if (ret < 0) {
+    if (ret < 0 || !response || !response->data) {
         goto out;
     }
-    assert(response && response->data);
 
     /* The attestation response is JWT -- we need to verify its signature using one of the set of
      * JWKs, as well as verify its header and payload, and construct an SGX quote from the
@@ -1189,7 +1231,8 @@ int ra_tls_verify_callback(void* data, mbedtls_x509_crt* crt, int depth, uint32_
         results->err_loc = AT_VERIFY_ENCLAVE_ATTRS;
 
     /* verify enclave attributes from the SGX quote body, including the user-supplied verification
-     * parameter "allow debug enclave"; NOTE: "allow outdated TCB" parameter is not used in MAA */
+     * parameter "allow debug enclave"; NOTE: "allow outdated TCB", "allow HW config needed", "allow
+     * SW hardening needed" parameters are not used in MAA */
     ret = verify_quote_body_enclave_attributes(quote_from_maa, getenv_allow_debug_enclave());
     if (ret < 0) {
         ERROR("Failed verification of JWT's SGX enclave attributes\n");
