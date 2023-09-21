@@ -105,10 +105,14 @@ The library uses the following MAA-specific environment variables:
 Note that the library does *not* use the following SGX-enclave-status
 environment variables: `RA_TLS_ALLOW_OUTDATED_TCB_INSECURE`,
 `RA_TLS_ALLOW_HW_CONFIG_NEEDED` and `RA_TLS_ALLOW_SW_HARDENING_NEEDED`. This is
-because MAA generates a JWT for the SGX enclave with a possibly-insecure status
-depending on the used MAA policy. However, the library uses
-`RA_TLS_ALLOW_DEBUG_ENCLAVE_INSECURE` because typically MAA policies allow debug
-enclaves.
+because MAA will only generate a JWT for the SGX enclave if the enclave's TCB
+level matches the "TCB baseline" specified in the used MAA policy. In other
+words, MAA takes the responsibility away from the Gramine user and decides about
+the allowed security status of the SGX enclave based on its policy and not based
+on the aforementioned RA-TLS environment variables.
+
+However, the library uses the `RA_TLS_ALLOW_DEBUG_ENCLAVE_INSECURE` environment
+variable because typically MAA policies allow debug enclaves.
 
 The library sets the following MAA-specific environment variables: (the library
 does not overwrite these environment variables, so you may want to unset them
