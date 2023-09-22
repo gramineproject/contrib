@@ -114,9 +114,7 @@ on the aforementioned RA-TLS environment variables.
 However, the library uses the `RA_TLS_ALLOW_DEBUG_ENCLAVE_INSECURE` environment
 variable because typically MAA policies allow debug enclaves.
 
-The library sets the following MAA-specific environment variables: (the library
-does not overwrite these environment variables, so you may want to unset them
-before every invocation)
+The library sets the following MAA-specific environment variables:
 
 - `RA_TLS_MAA_JWT` -- contains the raw MAA JWT (JSON object).
 - `RA_TLS_MAA_SET_OF_JWKS` -- contains the raw set of JWKs (JSON object).

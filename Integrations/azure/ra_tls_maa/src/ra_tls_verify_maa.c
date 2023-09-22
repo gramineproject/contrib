@@ -76,7 +76,7 @@ static char* g_maa_base_url = NULL;
 static char* g_maa_api_version = NULL;
 
 /*! Context used in maa_*() calls */
-struct maa_context_t {
+struct maa_context {
     bool curl_global_init_done;
     CURL* curl;                 /*!< CURL context for this session */
     struct curl_slist* headers; /*!< Request headers sent to MAA attestation provider */
@@ -148,8 +148,6 @@ static int mbedtls_base64url_decode(uint8_t* dst, size_t dlen, size_t* olen, con
 }
 
 static int init_from_env(char** ptr, const char* env_name, const char* default_val) {
-    assert(ptr == &g_maa_base_url || ptr == &g_maa_api_version);
-
     if (*ptr) {
         /* already initialized */
         return 0;
@@ -253,7 +251,7 @@ static void response_cleanup(struct maa_response* response) {
     free(response);
 }
 
-static void maa_cleanup(struct maa_context_t* context) {
+static void maa_cleanup(struct maa_context* context) {
     if (!context)
         return;
 
@@ -267,10 +265,10 @@ static void maa_cleanup(struct maa_context_t* context) {
     free(context);
 }
 
-static int maa_init(struct maa_context_t** out_context) {
+static int maa_init(struct maa_context** out_context) {
     int ret;
 
-    struct maa_context_t* context = calloc(1, sizeof(*context));
+    struct maa_context* context = calloc(1, sizeof(*context));
     if (!context) {
         ret = MBEDTLS_ERR_X509_ALLOC_FAILED;
         goto out;
@@ -337,7 +335,7 @@ out:
 
 /*! Send GET request (empty) to MAA attestation provider's `certs/` API endpoint and save the
  * resulting set of JWKs in \a out_set_of_jwks; caller is responsible for its cleanup */
-static int maa_get_signing_certs(struct maa_context_t* context, char** out_set_of_jwks) {
+static int maa_get_signing_certs(struct maa_context* context, char** out_set_of_jwks) {
     int ret;
 
     char* request_url = NULL;
@@ -431,7 +429,7 @@ out:
 
 /*! Send request (with \a quote embedded in it) to MAA attestation provider's `attest/` API endpoint
  * and save response in \a out_maa_response; caller is responsible for its cleanup */
-static int maa_send_request(struct maa_context_t* context, const void* quote, size_t quote_size,
+static int maa_send_request(struct maa_context* context, const void* quote, size_t quote_size,
                             const void* runtime_data, size_t runtime_data_size,
                             struct maa_response** out_maa_response) {
     int ret;
@@ -1044,26 +1042,44 @@ static int maa_verify_response_output_quote(struct maa_response* response, const
         goto out;
     }
 
-    /* expose JWT (as base64-formatted string) and "set of JWKs" (as JSON string) in envvars;
-     * at this point we know that JWT and "set of JWKs" are correctly formatted strings. */
 #if 0
     ERROR("--- JWT is ```%s``` ---\n", token_b64->valuestring);
     ERROR("--- set_of_jwks is ```%s``` ---\n", set_of_jwks);
 #endif
 
-    /* NOTE: manipulations with envvars are not thread-safe */
-    if (!getenv(RA_TLS_MAA_JWT)) {
-        setenv(RA_TLS_MAA_JWT, token_b64->valuestring, /*overwrite=*/1);
-    } else {
+    /*
+     * Expose JWT (as base64-formatted string) and "set of JWKs" (as JSON string) in envvars;
+     * at this point we know that JWT and "set of JWKs" are correctly formatted strings.
+     *
+     * NOTE: manipulations with envvars are not thread-safe.
+     */
+    if (getenv(RA_TLS_MAA_JWT)) {
         ERROR("MAA JWT cannot be exposed through RA_TLS_MAA_JWT envvar because this envvar is "
-              "already used (you may want to unsetenv before calling RA-TLS verification)\n");
+              "already used (you must unsetenv before calling RA-TLS verification)\n");
+        ret = MBEDTLS_ERR_X509_FATAL_ERROR;
+        goto out;
     }
-    if (!getenv(RA_TLS_MAA_SET_OF_JWKS)) {
-        setenv(RA_TLS_MAA_SET_OF_JWKS, set_of_jwks, /*overwrite=*/1);
-    } else {
+    ret = setenv(RA_TLS_MAA_JWT, token_b64->valuestring, /*overwrite=*/1);
+    if (ret < 0) {
+        ERROR("MAA JWT cannot be exposed through RA_TLS_MAA_JWT envvar because setenv() failed "
+              "with error %d\n", errno);
+        ret = MBEDTLS_ERR_X509_FATAL_ERROR;
+        goto out;
+    }
+
+    if (getenv(RA_TLS_MAA_SET_OF_JWKS)) {
         ERROR("MAA \"Set of JWKs\" cannot be exposed through RA_TLS_MAA_SET_OF_JWKS envvar because "
-              "this envvar is already used (you may want to unsetenv before calling RA-TLS "
+              "this envvar is already used (you must unsetenv before calling RA-TLS "
               "verification)\n");
+        ret = MBEDTLS_ERR_X509_FATAL_ERROR;
+        goto out;
+    }
+    ret = setenv(RA_TLS_MAA_SET_OF_JWKS, set_of_jwks, /*overwrite=*/1);
+    if (ret < 0) {
+        ERROR("MAA \"Set of JWKs\" cannot be exposed through RA_TLS_MAA_SET_OF_JWKS envvar because "
+              "setenv() failed with error %d\n", errno);
+        ret = MBEDTLS_ERR_X509_FATAL_ERROR;
+        goto out;
     }
 
     *out_quote_body = quote_body;
@@ -1115,7 +1131,7 @@ int ra_tls_verify_callback(void* data, mbedtls_x509_crt* crt, int depth, uint32_
 
     int ret;
 
-    struct maa_context_t* context = NULL;
+    struct maa_context* context   = NULL;
     struct maa_response* response = NULL;
     char* set_of_jwks             = NULL;
 
