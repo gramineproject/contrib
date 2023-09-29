@@ -25,7 +25,7 @@ rm -rf  ssl_common >/dev/null 2>&1
 mkdir -p ssl_common
 
 if [ "$1" = "done" ]; then
-    cp ssl/ca.crt ssl/server.crt ssl/server.key ssl_common/
+    cp -f ssl/ca.crt ssl/server.crt ssl/server.key ssl_common/
 else
     openssl genrsa -out ssl_common/ca.key 2048
     openssl req -x509 -new -nodes -key ssl_common/ca.key -sha256 -days 1024 -out ssl_common/ca.crt -config ca_config.conf
@@ -34,7 +34,7 @@ else
     openssl x509 -req -days 360 -in ssl_common/server.csr -CA ssl_common/ca.crt -CAkey ssl_common/ca.key -CAcreateserial -out ssl_common/server.crt
 fi
 
-cp verifier.dockerfile.template verifier.dockerfile
+cp -f verifier.dockerfile.template verifier.dockerfile
 
 args=''
 # Use `secret_prov_pf` if base image has encrypted files
