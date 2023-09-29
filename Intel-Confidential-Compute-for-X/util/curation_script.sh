@@ -34,6 +34,7 @@
 # -- arg12   : Path to the encrypted files in the image
 # -- arg13   : encryption key used for encrypting sensitive files such as models, data etc.
 # -- arg14   : Passphrase to the enclave signing key (if applicable)
+
 set -e
 
 echo printing args $0 $@
