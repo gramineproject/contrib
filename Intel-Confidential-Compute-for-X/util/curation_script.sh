@@ -34,6 +34,7 @@
 # -- arg12   : Path to the encrypted files in the image
 # -- arg13   : encryption key used for encrypting sensitive files such as models, data etc.
 # -- arg14   : Passphrase to the enclave signing key (if applicable)
+set -e
 
 echo printing args $0 $@
 
@@ -46,8 +47,8 @@ WORKLOAD_DIR=$CUR_DIR'/workloads/'$workload_type
 cd $WORKLOAD_DIR
 rm -rf $CUR_DIR'/test' && mkdir $CUR_DIR'/test' >/dev/null 2>&1
 
-cp $wrapper_dockerfile'.template' $wrapper_dockerfile
-cp $app_image_manifest'.template' $app_image_manifest
+cp -f $wrapper_dockerfile'.template' $wrapper_dockerfile
+cp -f $app_image_manifest'.template' $app_image_manifest
 
 base_image="$2"
 distro="$3"
@@ -124,7 +125,7 @@ create_gsc_image () {
     rm -rf gsc >/dev/null 2>&1
     git clone --depth 1 --branch v1.5 https://github.com/gramineproject/gsc.git
     cd gsc
-    cp config.yaml.template config.yaml
+    cp -f config.yaml.template config.yaml
     sed -i 's|ubuntu:.*|'$distro'"|' config.yaml
 
     if [ "$1" = "y" ]; then
@@ -182,7 +183,7 @@ fi
 attestation_required=$6
 if [ "$attestation_required" = "y" ]; then
     ca_cert_path=$8
-    cp $CUR_DIR/$ca_cert_path ca.crt
+    cp -f $CUR_DIR/$ca_cert_path ca.crt
     copy_cert_files='COPY ca.crt /'
     echo '' >> $app_image_manifest
     echo '# Attestation related entries' >> $app_image_manifest
