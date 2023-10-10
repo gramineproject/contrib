@@ -1,0 +1,7 @@
+/build
+/gramine
+.history/
+.vscode/
+*.diff
+*.patch
+.cache/

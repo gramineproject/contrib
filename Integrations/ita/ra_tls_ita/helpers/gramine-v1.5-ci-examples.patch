@@ -1,0 +1,177 @@
+diff --git a/CI-Examples/ra-tls-mbedtls/Makefile b/CI-Examples/ra-tls-mbedtls/Makefile
+index 4adc0ee..81b2d6f 100644
+--- a/CI-Examples/ra-tls-mbedtls/Makefile
++++ b/CI-Examples/ra-tls-mbedtls/Makefile
+@@ -27,6 +27,9 @@ epid: client_epid.manifest.sgx client_epid.sig
+ .PHONY: dcap
+ dcap: client_dcap.manifest.sgx client_dcap.sig
+ 
++.PHONY: ita
++ita: client_ita.manifest.sgx client_ita.sig
++
+ ############################# SSL DATA DEPENDENCY #############################
+ 
+ # SSL data: key and x.509 self-signed certificate
+@@ -107,6 +110,23 @@ sgx_sign_client_epid: client_epid.manifest client
+ 		--manifest $< \
+ 		--output $<.sgx
+ 
++########################### CLIENT (ita) MANIFEST #############################
++
++client_ita.manifest: client.manifest.template
++	gramine-manifest \
++		-Dlog_level=$(GRAMINE_LOG_LEVEL) \
++		-Darch_libdir=$(ARCH_LIBDIR) \
++		$< >$@
++
++client_ita.manifest.sgx client_ita.sig: sgx_sign_client_ita
++	@:
++
++.INTERMEDIATE: sgx_sign_client_ita
++sgx_sign_client_ita: client_ita.manifest client
++	gramine-sgx-sign \
++		--manifest $< \
++		--output $<.sgx
++
+ ############################### SGX CHECKS FOR CI #############################
+ 
+ .PHONY: check_epid
+@@ -149,6 +169,26 @@ check_dcap_fail: app dcap
+ 	./client dcap && exit 1 || echo "[ Success 1/1 ]"; \
+ 	kill -9 $$SERVER_ID
+ 
++.PHONY: check_ita
++check_ita: app ita
++	gramine-sgx server >/dev/null & SERVER_ID=$$!; \
++	../../scripts/wait_for_server 60 127.0.0.1 4433; \
++	./client ita > OUTPUT; \
++	./client ita 0 0 0 0 >> OUTPUT; \
++	kill -9 $$SERVER_ID
++	@grep -q "using default SGX-measurement verification callback" OUTPUT && echo "[ Success 1/4 ]"
++	@grep -q "using our own SGX-measurement verification callback" OUTPUT && echo "[ Success 2/4 ]"
++	@grep -q "Verifying peer X.509 certificate... ok" OUTPUT && echo "[ Success 3/4 ]"
++	@(exit `grep -c "failed" "OUTPUT"`) && echo "[ Success 4/4 ]"
++	@rm OUTPUT
++
++.PHONY: check_ita_fail
++check_ita_fail: app ita
++	gramine-sgx server --test-malicious-quote >/dev/null & SERVER_ID=$$!; \
++	../../scripts/wait_for_server 60 127.0.0.1 4433; \
++	./client ita && exit 1 || echo "[ Success 1/1 ]"; \
++	kill -9 $$SERVER_ID
++
+ ################################## CLEANUP ####################################
+ 
+ .PHONY: clean
+diff --git a/CI-Examples/ra-tls-mbedtls/src/client.c b/CI-Examples/ra-tls-mbedtls/src/client.c
+index 6b7d056..b8decbd 100644
+--- a/CI-Examples/ra-tls-mbedtls/src/client.c
++++ b/CI-Examples/ra-tls-mbedtls/src/client.c
+@@ -165,9 +165,9 @@ int main(int argc, char** argv) {
+     mbedtls_x509_crt_init(&cacert);
+     mbedtls_entropy_init(&entropy);
+ 
+-    if (argc < 2 ||
+-            (strcmp(argv[1], "native") && strcmp(argv[1], "epid") && strcmp(argv[1], "dcap"))) {
+-        mbedtls_printf("USAGE: %s native|epid|dcap [SGX measurements]\n", argv[0]);
++    if (argc < 2 || (strcmp(argv[1], "native") && strcmp(argv[1], "epid") &&
++                strcmp(argv[1], "dcap") && strcmp(argv[1], "ita"))) {
++        mbedtls_printf("USAGE: %s native|epid|dcap|ita [SGX measurements]\n", argv[0]);
+         return 1;
+     }
+ 
+@@ -210,6 +210,13 @@ int main(int argc, char** argv) {
+                 return 1;
+             }
+         }
++    } else if (!strcmp(argv[1], "ita")) {
++        ra_tls_verify_lib = dlopen("libra_tls_verify_ita.so", RTLD_LAZY);
++        if (!ra_tls_verify_lib) {
++            mbedtls_printf("%s\n", dlerror());
++            mbedtls_printf("User requested RA-TLS verification with ita but cannot find lib\n");
++            return 1;
++        }
+     }
+ 
+     if (ra_tls_verify_lib) {
+diff --git a/CI-Examples/ra-tls-secret-prov/.gitignore b/CI-Examples/ra-tls-secret-prov/.gitignore
+index cc4e300..a125fa6 100644
+--- a/CI-Examples/ra-tls-secret-prov/.gitignore
++++ b/CI-Examples/ra-tls-secret-prov/.gitignore
+@@ -2,12 +2,15 @@
+ /secret_prov/client
+ /secret_prov/server_epid
+ /secret_prov/server_dcap
++/secret_prov/server_ita
+ /secret_prov_minimal/client
+ /secret_prov_minimal/server_epid
+ /secret_prov_minimal/server_dcap
++/secret_prov_minimal/server_ita
+ /secret_prov_pf/client
+ /secret_prov_pf/server_epid
+ /secret_prov_pf/server_dcap
++/secret_prov_pf/server_ita
+ /secret_prov_pf/wrap_key
+ /secret_prov_pf/enc_files/input.txt
+ 
+diff --git a/CI-Examples/ra-tls-secret-prov/Makefile b/CI-Examples/ra-tls-secret-prov/Makefile
+index 2780651..96a6094 100644
+--- a/CI-Examples/ra-tls-secret-prov/Makefile
++++ b/CI-Examples/ra-tls-secret-prov/Makefile
+@@ -36,6 +36,10 @@ epid: ssl/server.crt secret_prov_minimal/server_epid secret_prov/server_epid sec
+ dcap: ssl/server.crt secret_prov_minimal/server_dcap secret_prov/server_dcap secret_prov_pf/server_dcap \
+       secret_prov_pf/wrap_key secret_prov_pf/enc_files/input.txt
+ 
++.PHONY: ita
++ita: ssl/server.crt secret_prov_minimal/server_ita secret_prov/server_ita secret_prov_pf/server_ita \
++     secret_prov_pf/wrap_key secret_prov_pf/enc_files/input.txt
++
+ ############################# SSL DATA DEPENDENCY #############################
+ 
+ # SSL data: key and x.509 self-signed certificate
+@@ -60,6 +64,9 @@ LDFLAGS += -Wl,--enable-new-dtags $(shell pkg-config --libs secret_prov_gramine)
+ %/server_dcap: %/server.c
+ 	$(CC) $< $(CFLAGS) $(LDFLAGS) -Wl,--no-as-needed -lsgx_urts -lsecret_prov_verify_dcap -pthread -o $@
+ 
++%/server_ita: %/server.c
++	$(CC) $< $(CFLAGS) $(LDFLAGS) -lsecret_prov_verify_ita -pthread -o $@
++
+ secret_prov/client: secret_prov/client.c
+ 	$(CC) $< $(CFLAGS) $(LDFLAGS) -lsecret_prov_attest -o $@
+ 
+@@ -213,6 +220,35 @@ check_dcap: app dcap
+ 
+ 	@rm OUTPUT
+ 
++.PHONY: check_ita
++check_ita: app ita
++	# secret_prov_minimal
++	cd secret_prov_minimal; \
++	./server_ita >/dev/null & SERVER_ID=$$!; \
++	../../../scripts/wait_for_server 60 127.0.0.1 4433; \
++	gramine-sgx client > ../OUTPUT; \
++	kill -9 $$SERVER_ID;
++	@grep -E "Received secret = 'A_SIMPLE_SECRET'" OUTPUT && echo "[ Success 1/4 ]"
++
++	# secret_prov
++	cd secret_prov; \
++	./server_ita >/dev/null & SERVER_ID=$$!; \
++	../../../scripts/wait_for_server 60 127.0.0.1 4433; \
++	gramine-sgx client > ../OUTPUT; \
++	kill -9 $$SERVER_ID;
++	@grep -E "Received secret1 = 'FIRST_SECRET', secret2 = '42'" OUTPUT && echo "[ Success 2/4 ]"
++
++	# secret_prov_pf
++	cd secret_prov_pf; \
++	./server_ita wrap_key >/dev/null & SERVER_ID=$$!; \
++	../../../scripts/wait_for_server 60 127.0.0.1 4433; \
++	gramine-sgx client > ../OUTPUT; \
++	kill -9 $$SERVER_ID;
++	@grep -E "\[parent\] Read from protected file: 'helloworld'" OUTPUT && echo "[ Success 3/4 ]"
++	@grep -E "\[child\] Read from protected file: 'helloworld'" OUTPUT && echo "[ Success 4/4 ]"
++
++	@rm OUTPUT
++
+ ################################## CLEANUP ####################################
+ 
+ .PHONY: clean
