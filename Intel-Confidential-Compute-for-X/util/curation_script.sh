@@ -26,7 +26,7 @@
 # -- arg6    : 'test-image' string to create a non-production GSC image when curate.py is run in
 #            :  test mode
 #            : y or n (attestation required?) in case of custom image creation
-# -- arg7    : y or n (build GSC with debug?)
+# -- arg7    : buildtype, valid values are release, debug and debugoptimized
 # -- arg8    : verifier's ca certificate path
 # -- arg9    : y or n (environment variables available?)
 # -- arg10   : Actual environment variable string
@@ -129,11 +129,7 @@ create_gsc_image () {
     cp -f config.yaml.template config.yaml
     sed -i 's|ubuntu:.*|'$distro'"|' config.yaml
 
-    if [ "$1" = "y" ]; then
-        ./gsc build $cmdline_flag -d $app_image_x  $WORKLOAD_DIR/$app_image_manifest
-    else
-        ./gsc build $cmdline_flag $app_image_x $WORKLOAD_DIR/$app_image_manifest
-    fi
+    ./gsc build $cmdline_flag --buildtype $1 $app_image_x  $WORKLOAD_DIR/$app_image_manifest
 
     echo
     docker tag gsc-$app_image_x-unsigned gsc-$base_image-unsigned
@@ -142,9 +138,8 @@ create_gsc_image () {
         password_arg="-p $2"
     fi
     ./gsc sign-image $base_image $signing_key_path $password_arg
-    docker rmi -f gsc-$base_image-unsigned >/dev/null 2>&1
-    docker rmi gsc-$app_image_x-unsigned
-    docker rmi -f $app_image_x >/dev/null 2>&1
+    docker rmi -f gsc-$base_image-unsigned gsc-$app_image_x-unsigned $app_image_x >/dev/null 2>&1
+
     ./gsc info-image gsc-$base_image
 
     cd ../
