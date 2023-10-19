@@ -89,15 +89,11 @@ sudo sed -i "s|^\(  \"pccs_url\": \"https://\).*\(/sgx/certification.*\)|\1globa
 python3 curate.py <app name> <base image name> <optional args>
 ```
 
+For detailed usage information
 
-| Required?| Argument | Description/Possible values |
-| :----: | :----: | :--- |
-| Yes | \<app name\> | Name of the application, e.g., redis or pytorch. Name has to correspond to the application's folder name in 'workloads/'. |
-| Yes | \<base image name\> | Name of the base image to be graminized. |
-| Optional | 'debug' | To generate an insecure image with debug symbols. |
-| Optional | 'test'  | To generate an insecure image with a test enclave signing key. |
-
-
+```sh
+python3 curate.py --help
+```
 ## Contents
 
     .
