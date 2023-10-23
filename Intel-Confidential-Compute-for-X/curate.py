@@ -304,6 +304,9 @@ def get_image_distro(docker_socket, image_name):
 def curate_gsc_image(args):
     base_image_name = args.base_image_name
     workload_type = args.workload_type
+    buildtype = args.buildtype
+    is_test_image = args.test
+
     docker_socket = docker.from_env()
     base_image = get_docker_image(docker_socket, base_image_name)
     if base_image is None:
@@ -322,12 +325,12 @@ def curate_gsc_image(args):
 
     gsc_app_image ='gsc-{}'.format(base_image_name)
 
-    if args.test:
-        create_test_image(docker_socket, workload_type, base_image_name, image_distro, args.buildtype,
+    if is_test_image:
+        create_test_image(docker_socket, workload_type, base_image_name, image_distro, buildtype,
                           gsc_app_image, log_file, log_file_pointer)
     else:
         wrapper(create_custom_image, docker_socket, workload_type, base_image_name, image_distro,
-                args.buildtype, gsc_app_image, log_file, log_file_pointer)
+                buildtype, gsc_app_image, log_file, log_file_pointer)
 
 def create_test_image(docker_socket, workload_type, base_image_name, image_distro, buidtype,
                       gsc_app_image, log_file, log_file_pointer):
@@ -459,8 +462,8 @@ def create_custom_image(stdscr, docker_socket, workload_type, base_image_name, i
     update_user_and_commentary_win_array(user_console, guide_win, wait_message,
                                          [log_progress.format(log_file)])
     subprocess.call(['util/curation_script.sh', workload_type, base_image_name, image_distro,
-                     key_path, args_json, attestation_required, buidtype, ca_cert_path, env_required,
-                     envs, ef_required, encrypted_files, encryption_key_path,
+                     key_path, args_json, attestation_required, buidtype, ca_cert_path,
+                     env_required, envs, ef_required, encrypted_files, encryption_key_path,
                      passphrase], stdout=log_file_pointer, stderr=log_file_pointer)
     image = gsc_app_image
     check_image_creation_success(user_console, docker_socket, image, log_file)
@@ -540,10 +543,10 @@ def create_custom_image(stdscr, docker_socket, workload_type, base_image_name, i
     return 0
 
 parser = argparse.ArgumentParser()
-parser.add_argument('workload_type', help='Type of workload (refer to workload/sub-directory for'
-                       'full list of supported workload types) e.g. redis.')
-parser.add_argument('base_image_name', help='Base image name to be graminized.')
-parser.add_argument('--test', action='store_true',
+parser.add_argument('workload_type', help='Name of the application, e.g., redis or pytorch. Name '
+                    'has to correspond to the application\'s folder name in \'workloads/\'.')
+parser.add_argument('base_image_name', help='Name of the base image to be graminized.')
+parser.add_argument('-t', '--test', action='store_true',
     help='To generate an insecure image with a test enclave signing key.')
 parser.add_argument('-b', '--buildtype', choices=['release', 'debug', 'debugoptimized'],
     default='release', help='Compile Gramine in release, debug or debugoptimized mode.')

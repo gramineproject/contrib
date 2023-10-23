@@ -89,7 +89,7 @@ sudo sed -i "s|^\(  \"pccs_url\": \"https://\).*\(/sgx/certification.*\)|\1globa
 python3 curate.py <app name> <base image name> <optional args>
 ```
 
-For detailed usage information
+For detailed usage information:
 
 ```sh
 python3 curate.py --help

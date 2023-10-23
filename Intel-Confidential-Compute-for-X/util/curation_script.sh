@@ -129,7 +129,7 @@ create_gsc_image () {
     cp -f config.yaml.template config.yaml
     sed -i 's|ubuntu:.*|'$distro'"|' config.yaml
 
-    ./gsc build $cmdline_flag -b $1 $app_image_x  $WORKLOAD_DIR/$app_image_manifest
+    ./gsc build $cmdline_flag --buildtype $1 $app_image_x  $WORKLOAD_DIR/$app_image_manifest
 
     echo
     docker tag gsc-$app_image_x-unsigned gsc-$base_image-unsigned
