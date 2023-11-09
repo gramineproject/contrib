@@ -8,7 +8,7 @@ RUN apt-get update \
     python3
 
 # Installing DCAP libraries
-RUN echo 'deb [arch=amd64] https://download.01.org/intel-sgx/sgx_repo/ubuntu bionic main' \
+RUN echo 'deb [arch=amd64] https://download.01.org/intel-sgx/sgx_repo/ubuntu focal main' \
     > /etc/apt/sources.list.d/intel-sgx.list \
     && wget https://download.01.org/intel-sgx/sgx_repo/ubuntu/intel-sgx-deb.key \
     && apt-key add intel-sgx-deb.key
@@ -22,6 +22,6 @@ WORKDIR /ra-tls-secret-prov
 
 COPY gramine/CI-Examples/ra-tls-secret-prov/ssl ./ssl
 
-COPY gramine/CI-Examples/ra-tls-secret-prov/secret_prov_min_client /usr/local/bin
+COPY gramine/CI-Examples/ra-tls-secret-prov/secret_prov_minimal /usr/local/bin
 
-ENTRYPOINT ["secret_prov_min_client"]
+ENTRYPOINT ["secret_prov_minimal"]
