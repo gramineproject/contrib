@@ -60,7 +60,7 @@ Perform the following steps on your system:
     - To generate a Gramine-protected, pre-configured, non-production ready, test image for MariaDB,
       execute the following script:
       ```sh
-      python3 ./curate.py mariadb mariadb:11.0.3-jammy test
+      python3 ./curate.py mariadb mariadb:11.0.3-jammy --test
       ```
     - To generate a Gramine-protected, pre-configured MariaDB image based on a user-provided MariaDB
       image, execute the following to launch an interactive setup script:

@@ -55,7 +55,7 @@ Perform the following steps on your system:
     1. To generate a Gramine-protected, pre-configured, non-production ready, test image for
       OpenVINO Model Server, execute the following script:
       ```sh
-      python3 ./curate.py openvino-model-server openvino/model_server:2023.0 test
+      python3 ./curate.py openvino-model-server openvino/model_server:2023.0 --test
       ```
 
     2. To generate a Gramine-protected, pre-configured OpenVINO Model Server image based on a

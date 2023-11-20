@@ -38,7 +38,7 @@ Perform the following steps on your system:
      3. Generate Gramine-protected, pre-configured, non-production ready, test image for
         Scikit-learn, which is based on the just generated `sklearn-base` image:
         ```sh
-        python3 ./curate.py sklearn sklearn-base test
+        python3 ./curate.py sklearn sklearn-base --test
         ```
    - To generate a Gramine-protected, pre-configured Scikit-learn image based on a user-provided
      Scikit-learn Docker image, execute the following to launch an interactive setup script:
