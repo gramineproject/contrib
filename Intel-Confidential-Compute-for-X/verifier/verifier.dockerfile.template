@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: LGPL-3.0-or-later
 # Copyright (C) 2022 Intel Corporation
 
-FROM ubuntu:20.04
+FROM ubuntu:22.04
 
 RUN env DEBIAN_FRONTEND=noninteractive apt-get update \
     && env DEBIAN_FRONTEND=noninteractive apt-get install -y \
@@ -9,7 +9,7 @@ RUN env DEBIAN_FRONTEND=noninteractive apt-get update \
     git \
     pkg-config
 
-#COPY keys/* /usr/share/keyrings/
+COPY keys/* /usr/share/keyrings/
 
 RUN echo "deb [arch=amd64 signed-by=/usr/share/keyrings/intel-sgx-deb.asc] https://download.01.org/intel-sgx/sgx_repo/ubuntu jammy main" \
     | tee /etc/apt/sources.list.d/intel-sgx.list
