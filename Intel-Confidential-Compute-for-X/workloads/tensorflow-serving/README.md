@@ -38,7 +38,7 @@ Perform the following steps on your system:
         enabled, but you can easily change the model as shown below in the "Prepared Models"
         section.
         ```sh
-        python3 ./curate.py tensorflow-serving tf-serving-base test
+        python3 ./curate.py tensorflow-serving tf-serving-base --test
         ```
 
    - To generate a Gramine-protected, pre-configured TensorFlow Serving image based on a

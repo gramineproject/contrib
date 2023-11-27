@@ -20,7 +20,7 @@ Perform the following steps on your system:
     - To generate a Gramine-protected, pre-configured, non-production ready, test image for
       Memcached, execute the following script:
       ```sh
-      python3 ./curate.py memcached ubuntu/memcached:1.5-20.04_beta test
+      python3 ./curate.py memcached ubuntu/memcached:1.5-20.04_beta --test
       ```
     - To generate a Gramine-protected, pre-configured Memcached image based on a user-provided
       Memcached image, execute the following to launch an interactive setup script:

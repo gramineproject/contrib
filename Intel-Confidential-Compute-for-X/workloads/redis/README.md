@@ -23,7 +23,7 @@ Perform the following steps on your system:
    - To generate a Gramine-protected, pre-configured, non-production ready, test image for Redis,
      execute the following script:
      ```sh
-     python3 ./curate.py redis redis:7.0.0 test
+     python3 ./curate.py redis redis:7.0.10 --test
      ```
    - To generate a Gramine-protected, pre-configured Redis image based on a user-provided Redis
      image, execute the following to launch an interactive setup script:

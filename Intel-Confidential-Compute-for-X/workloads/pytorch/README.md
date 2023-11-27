@@ -38,7 +38,7 @@ Perform the following steps on your system:
      3. Generate Gramine-protected, pre-configured, non-production ready, test image for PyTorch,
         which is based on the just generated `pytorch-encrypted` image:
         ```sh
-        python3 ./curate.py pytorch pytorch-encrypted test
+        python3 ./curate.py pytorch pytorch-encrypted --test
         ```
 
      4. Run the generated PyTorch image using below command:

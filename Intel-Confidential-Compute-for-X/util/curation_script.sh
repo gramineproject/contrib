@@ -26,14 +26,16 @@
 # -- arg6    : 'test-image' string to create a non-production GSC image when curate.py is run in
 #            :  test mode
 #            : y or n (attestation required?) in case of custom image creation
-# -- arg7    : y or n (build GSC with debug?)
+# -- arg7    : buildtype, valid values are release, debug and debugoptimized
 # -- arg8    : verifier's ca certificate path
 # -- arg9    : y or n (environment variables available?)
 # -- arg10   : Actual environment variable string
-# -- arg11   : y or n (encrypted files as part of base image?)
+# -- arg11   : y or n (encrypted files to be used with workload?)
 # -- arg12   : Path to the encrypted files in the image
 # -- arg13   : encryption key used for encrypting sensitive files such as models, data etc.
 # -- arg14   : Passphrase to the enclave signing key (if applicable)
+
+set -e
 
 echo printing args $0 $@
 
@@ -46,8 +48,8 @@ WORKLOAD_DIR=$CUR_DIR'/workloads/'$workload_type
 cd $WORKLOAD_DIR
 rm -rf $CUR_DIR'/test' && mkdir $CUR_DIR'/test' >/dev/null 2>&1
 
-cp $wrapper_dockerfile'.template' $wrapper_dockerfile
-cp $app_image_manifest'.template' $app_image_manifest
+cp -f $wrapper_dockerfile'.template' $wrapper_dockerfile
+cp -f $app_image_manifest'.template' $app_image_manifest
 
 base_image="$2"
 distro="$3"
@@ -78,7 +80,7 @@ add_encrypted_files_to_manifest() {
     IFS=':' # Setting colon as delimiter
     read -a ef_files_list <<<"$1"
     unset IFS
-    workdir_base_image="$(docker image inspect "$base_image" | jq '.[].Config.WorkingDir')"
+    workdir_base_image="$(docker image inspect -f '{{.Config.WorkingDir}}' $base_image)"
     workdir_base_image=`sed -e 's/^"//' -e 's/"$//' <<<"$workdir_base_image"`
     encrypted_files_string=''
     for i in "${ef_files_list[@]}"
@@ -122,20 +124,12 @@ create_gsc_image () {
     echo
     cd $CUR_DIR
     rm -rf gsc >/dev/null 2>&1
-
-    # FIXME: Using out of tree GSC brach `v1.4-for-curated-apps` to take the fix with commit
-    # fa5a07385ac205d89fb6ddb2bc5505ebe97d0539
-    git clone --depth 1 --branch v1.4-for-curated-apps https://github.com/gramineproject/gsc.git
-
+    git clone --depth 1 --branch v1.5 https://github.com/gramineproject/gsc.git
     cd gsc
-    cp config.yaml.template config.yaml
+    cp -f config.yaml.template config.yaml
     sed -i 's|ubuntu:.*|'$distro'"|' config.yaml
 
-    if [ "$1" = "y" ]; then
-        ./gsc build $cmdline_flag -d $app_image_x  $WORKLOAD_DIR/$app_image_manifest
-    else
-        ./gsc build $cmdline_flag $app_image_x $WORKLOAD_DIR/$app_image_manifest
-    fi
+    ./gsc build $cmdline_flag --buildtype $1 $app_image_x  $WORKLOAD_DIR/$app_image_manifest
 
     echo
     docker tag gsc-$app_image_x-unsigned gsc-$base_image-unsigned
@@ -144,9 +138,8 @@ create_gsc_image () {
         password_arg="-p $2"
     fi
     ./gsc sign-image $base_image $signing_key_path $password_arg
-    docker rmi -f gsc-$base_image-unsigned >/dev/null 2>&1
-    docker rmi gsc-$app_image_x-unsigned
-    docker rmi -f $app_image_x >/dev/null 2>&1
+    docker rmi -f gsc-$base_image-unsigned gsc-$app_image_x-unsigned $app_image_x >/dev/null 2>&1
+
     ./gsc info-image gsc-$base_image
 
     cd ../
@@ -186,14 +179,22 @@ fi
 attestation_required=$6
 if [ "$attestation_required" = "y" ]; then
     ca_cert_path=$8
-    cp $CUR_DIR/$ca_cert_path ca.crt
+    cp -f $CUR_DIR/$ca_cert_path ca.crt
     copy_cert_files='COPY ca.crt /'
     echo '' >> $app_image_manifest
     echo '# Attestation related entries' >> $app_image_manifest
     echo 'sgx.remote_attestation = "dcap"' >> $app_image_manifest
-    echo 'loader.env.LD_PRELOAD = ' \
-    '"/gramine/meson_build_output/lib/x86_64-linux-gnu/libsecret_prov_attest.so"' >> \
-    $app_image_manifest
+
+    # Preload `libsecret_prov_attest.so` library. But if `LD_PRELOAD` exists in workload
+    # specific manifest, then we must concatenate our lib with already-listed libs.
+    secret_prov_attest="/gramine/meson_build_output/lib/x86_64-linux-gnu/libsecret_prov_attest.so"
+    if ! grep -q 'loader.env.LD_PRELOAD' $app_image_manifest; then
+        echo 'loader.env.LD_PRELOAD = "'$secret_prov_attest'"' >> $app_image_manifest
+    else
+        sed -i "s|\(^loader.env.LD_PRELOAD[[:space:]]*=[[:space:]]*.*\)\"|\1:$secret_prov_attest\"|g" \
+            $app_image_manifest
+    fi
+
     echo 'loader.env.SECRET_PROVISION_SERVERS = { passthrough = true }' >> $app_image_manifest
     echo 'loader.env.SECRET_PROVISION_CONSTRUCTOR = "1"' >> $app_image_manifest
     echo 'loader.env.SECRET_PROVISION_CA_CHAIN_PATH = "/ca.crt"' >> $app_image_manifest
