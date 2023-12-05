@@ -1,5 +1,6 @@
-gramine-contrib (1.5post~UNRELEASED) UNRELEASED; urgency=medium
+gramine-contrib (1.6) bookworm bullseye jammy focal; urgency=medium
 
-  *
+  * Initial packaging
+  * Only gramine-ratls-maa is currently built
 
- -- Wojtek Porczyk <woju@invisiblethingslab.com>  Wed, 4 Oct 2023 14:30:00 +0200
+ -- Wojtek Porczyk <woju@invisiblethingslab.com>  Thu, 14 Dec 2023 22:00:00 +0100
