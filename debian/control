@@ -2,6 +2,7 @@ Source: gramine-contrib
 Priority: optional
 Maintainer: Wojtek Porczyk <woju@invisiblethingslab.com>
 Build-Depends: debhelper-compat (= 13),
+ gramine (= 1.6),
  meson (>= 0.56),
  pkg-config,
 Standards-Version: 4.1.3
@@ -23,6 +24,6 @@ Description: Microsoft Azure Attestation (MAA) verifier for RA-TLS
  only difference with secret_prov_verify_epid.so is that this library uses MAA
  based RA-TLS flows underneath.
 Depends:
- gramine,
+ gramine (= 1.6),
  ${misc:Depends},
  ${shlibs:Depends},

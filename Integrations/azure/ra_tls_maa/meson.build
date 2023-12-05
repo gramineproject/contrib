@@ -5,7 +5,7 @@
 project(
     'ra-tls-maa',
     'c', 'cpp',
-    version: '0.1',
+    version: '1.6',
     license: 'LGPLv3+',
 
     meson_version: '>=0.56',
