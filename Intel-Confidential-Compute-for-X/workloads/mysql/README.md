@@ -27,7 +27,7 @@ Perform the following steps on your system:
    mkdir workloads/mysql/test_db
    docker run --rm --net=host --name init_test_db --user $(id -u):$(id -g) \
        -v $PWD/workloads/mysql/test_db:/test_db \
-       -e MYSQL_ALLOW_EMPTY_PASSWORD=true -e MYSQL_DATABASE=test_db mysql:8.0.34-debian \
+       -e MYSQL_ALLOW_EMPTY_PASSWORD=true -e MYSQL_DATABASE=test_db mysql:8.0.35-debian \
        --datadir /test_db &
    docker stop init_test_db
    ```
@@ -54,7 +54,7 @@ Perform the following steps on your system:
     - To generate a Gramine-protected, pre-configured, non-production ready, test image for MySQL,
       execute the following script:
       ```sh
-      python3 ./curate.py mysql mysql:8.0.34-debian --test
+      python3 ./curate.py mysql mysql:8.0.35-debian --test
       ```
     - To generate a Gramine-protected, pre-configured MySQL image based on a user-provided MySQL
       image, execute the following to launch an interactive setup script:
