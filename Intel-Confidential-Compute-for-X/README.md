@@ -72,11 +72,12 @@ for other distro specific commands.
 sudo apt-get update && sudo apt-get install -y docker.io
 sudo chown $USER /var/run/docker.sock
 
-echo 'deb [arch=amd64] https://download.01.org/intel-sgx/sgx_repo/ubuntu focal main' |
+echo 'deb [arch=amd64] https://download.01.org/intel-sgx/sgx_repo/ubuntu focal main' | \
     sudo tee /etc/apt/sources.list.d/intel-sgx.list
-wget -qO - https://download.01.org/intel-sgx/sgx_repo/ubuntu/intel-sgx-deb.key |
+wget -qO - https://download.01.org/intel-sgx/sgx_repo/ubuntu/intel-sgx-deb.key | \
     sudo apt-key add -
-sudo apt-get install -y -f libsgx-dcap-ql libsgx-dcap-default-qpl=1.16.100.2-focal1
+sudo apt-get update && \
+    sudo apt-get install -y -f libsgx-dcap-ql libsgx-dcap-default-qpl=1.16.100.2-focal1
 
 # Execute below command (only on Azure VM) to change PCCS_URL to Azure PCCS
 sudo sed -i "s|^\(  \"pccs_url\": \"https://\).*\(/sgx/certification.*\)|\1global.acccache.azure.net\2|g" \
