@@ -1,17 +1,17 @@
-project('mbedtls', 'c', version: '3.4.0')
+project('mbedtls', 'c', version: '3.5.0')
 
 mbedtls_curl_libs = custom_target('mbedtls_curl',
     command: [
         find_program('compile-curl.sh'),
         '@CURRENT_SOURCE_DIR@',
-        '@CURRENT_SOURCE_DIR@/mbedtls-mbedtls-3.4.0',
+        '@CURRENT_SOURCE_DIR@/mbedtls-mbedtls-3.5.0',
         meson.current_build_dir(),
         '@PRIVATE_DIR@',
         meson.build_root() / 'subprojects',
         '@OUTPUT@',
     ],
 
-    input: ['mbedtls-mbedtls-3.4.0/Makefile'],
+    input: ['mbedtls-mbedtls-3.5.0/Makefile'],
 
     output: [
         'libmbedcrypto.a',
@@ -22,7 +22,7 @@ mbedtls_curl_libs = custom_target('mbedtls_curl',
     build_by_default: true,
 )
 
-mbedtls_inc = include_directories('include', 'mbedtls-mbedtls-3.4.0/include')
+mbedtls_inc = include_directories('include', 'mbedtls-mbedtls-3.5.0/include')
 
 mbedtls_curl_dep = declare_dependency(
     # HACK: Apparently Meson considers the `mbedtls_curl_libs` to be "not linkable", because it has

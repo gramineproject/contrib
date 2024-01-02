@@ -41,7 +41,7 @@ if release_mode
     add_project_arguments('-DNDEBUG', language: 'c')
 endif
 
-curl_proj = subproject('curl-7.84.0')
+curl_proj = subproject('curl-8.4.0')
 libcurl_dep = curl_proj.get_variable('curl_minimal_dep')
 
 cjson_proj = subproject('cJSON-1.7.12')

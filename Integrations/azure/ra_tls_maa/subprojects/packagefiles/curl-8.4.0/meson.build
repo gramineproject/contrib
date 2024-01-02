@@ -1,4 +1,4 @@
-project('curl', 'c', version: '7.84.0')
+project('curl', 'c', version: '8.4.0')
 
 curl_libs_output = [
     'libcurl.a',
@@ -13,7 +13,7 @@ curl = custom_target('curl',
         meson.build_root() / 'subprojects',
     ],
 
-    depends: subproject('mbedtls-mbedtls-3.4.0').get_variable('mbedtls_curl_libs'),
+    depends: subproject('mbedtls-mbedtls-3.5.0').get_variable('mbedtls_curl_libs'),
     output: curl_libs_output,
 )
 
