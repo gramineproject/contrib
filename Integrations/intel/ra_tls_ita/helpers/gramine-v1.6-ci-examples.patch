@@ -1,0 +1,114 @@
+diff --git a/CI-Examples/ra-tls-mbedtls/Makefile b/CI-Examples/ra-tls-mbedtls/Makefile
+index 3e575ddf95fc745d67b1a0c0f1f979dd70d77dba..047e504057f1c12b59fed71115bf3eeb9be6bfbb 100644
+--- a/CI-Examples/ra-tls-mbedtls/Makefile
++++ b/CI-Examples/ra-tls-mbedtls/Makefile
+@@ -27,6 +27,9 @@ epid: client_epid.manifest.sgx client_epid.sig
+ .PHONY: dcap
+ dcap: client_dcap.manifest.sgx client_dcap.sig
+ 
++.PHONY: ita
++ita: client_ita.manifest.sgx client_ita.sig
++
+ ############################# SSL DATA DEPENDENCY #############################
+ 
+ # SSL data: key and x.509 self-signed certificate
+@@ -107,6 +110,23 @@ sgx_sign_client_epid: client_epid.manifest client
+ 		--manifest $< \
+ 		--output $<.sgx
+ 
++########################### CLIENT (ITA) MANIFEST #############################
++
++client_ita.manifest: client.manifest.template
++	gramine-manifest \
++		-Dlog_level=$(GRAMINE_LOG_LEVEL) \
++		-Darch_libdir=$(ARCH_LIBDIR) \
++		$< >$@
++
++client_ita.manifest.sgx client_ita.sig: sgx_sign_client_ita
++	@:
++
++.INTERMEDIATE: sgx_sign_client_ita
++sgx_sign_client_ita: client_ita.manifest client
++	gramine-sgx-sign \
++		--manifest $< \
++		--output $<.sgx
++
+ ############################### SGX CHECKS FOR CI #############################
+ 
+ .PHONY: check_epid
+diff --git a/CI-Examples/ra-tls-mbedtls/src/client.c b/CI-Examples/ra-tls-mbedtls/src/client.c
+index 6b7d05609f6135488ba51bc317f49d3ea30855a3..ad51f1709b9a629012f1180969b57a7a7ca04dfe 100644
+--- a/CI-Examples/ra-tls-mbedtls/src/client.c
++++ b/CI-Examples/ra-tls-mbedtls/src/client.c
+@@ -165,9 +165,9 @@ int main(int argc, char** argv) {
+     mbedtls_x509_crt_init(&cacert);
+     mbedtls_entropy_init(&entropy);
+ 
+-    if (argc < 2 ||
+-            (strcmp(argv[1], "native") && strcmp(argv[1], "epid") && strcmp(argv[1], "dcap"))) {
+-        mbedtls_printf("USAGE: %s native|epid|dcap [SGX measurements]\n", argv[0]);
++    if (argc < 2 || (strcmp(argv[1], "native") && strcmp(argv[1], "epid") &&
++                strcmp(argv[1], "dcap") && strcmp(argv[1], "ita"))) {
++        mbedtls_printf("USAGE: %s native|epid|dcap|ita [SGX measurements]\n", argv[0]);
+         return 1;
+     }
+ 
+@@ -210,6 +210,13 @@ int main(int argc, char** argv) {
+                 return 1;
+             }
+         }
++    } else if (!strcmp(argv[1], "ita")) {
++        ra_tls_verify_lib = dlopen("libra_tls_verify_ita.so", RTLD_LAZY);
++        if (!ra_tls_verify_lib) {
++            mbedtls_printf("%s\n", dlerror());
++            mbedtls_printf("User requested RA-TLS verification with ITA but cannot find lib\n");
++            return 1;
++        }
+     }
+ 
+     if (ra_tls_verify_lib) {
+diff --git a/CI-Examples/ra-tls-secret-prov/.gitignore b/CI-Examples/ra-tls-secret-prov/.gitignore
+index cc4e300d316d0a7cf83a69e4ca62711c845539d8..a93d19078be6940ff09c5840f5553416ea777346 100644
+--- a/CI-Examples/ra-tls-secret-prov/.gitignore
++++ b/CI-Examples/ra-tls-secret-prov/.gitignore
+@@ -2,12 +2,15 @@
+ /secret_prov/client
+ /secret_prov/server_epid
+ /secret_prov/server_dcap
++/secret_prov/server_ita
+ /secret_prov_minimal/client
+ /secret_prov_minimal/server_epid
+ /secret_prov_minimal/server_dcap
++/secret_prov_minimal/server_ita
+ /secret_prov_pf/client
+ /secret_prov_pf/server_epid
+ /secret_prov_pf/server_dcap
++/secret_prov_pf/server_ita
+ /secret_prov_pf/wrap_key
+ /secret_prov_pf/enc_files/input.txt
+ 
+diff --git a/CI-Examples/ra-tls-secret-prov/Makefile b/CI-Examples/ra-tls-secret-prov/Makefile
+index 27806514c822831f1416017e812244736d7e2c51..94c3ba7dfde6ceb7b7f37360ab7c66def06a8aae 100644
+--- a/CI-Examples/ra-tls-secret-prov/Makefile
++++ b/CI-Examples/ra-tls-secret-prov/Makefile
+@@ -36,6 +36,10 @@ epid: ssl/server.crt secret_prov_minimal/server_epid secret_prov/server_epid sec
+ dcap: ssl/server.crt secret_prov_minimal/server_dcap secret_prov/server_dcap secret_prov_pf/server_dcap \
+       secret_prov_pf/wrap_key secret_prov_pf/enc_files/input.txt
+ 
++.PHONY: ita
++ita: ssl/server.crt secret_prov_minimal/server_ita secret_prov/server_ita secret_prov_pf/server_ita \
++     secret_prov_pf/wrap_key secret_prov_pf/enc_files/input.txt
++
+ ############################# SSL DATA DEPENDENCY #############################
+ 
+ # SSL data: key and x.509 self-signed certificate
+@@ -60,6 +64,9 @@ LDFLAGS += -Wl,--enable-new-dtags $(shell pkg-config --libs secret_prov_gramine)
+ %/server_dcap: %/server.c
+ 	$(CC) $< $(CFLAGS) $(LDFLAGS) -Wl,--no-as-needed -lsgx_urts -lsecret_prov_verify_dcap -pthread -o $@
+ 
++%/server_ita: %/server.c
++	$(CC) $< $(CFLAGS) $(LDFLAGS) -lsecret_prov_verify_ita -pthread -o $@
++
+ secret_prov/client: secret_prov/client.c
+ 	$(CC) $< $(CFLAGS) $(LDFLAGS) -lsecret_prov_attest -o $@
+ 
