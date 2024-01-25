@@ -6,7 +6,7 @@ Build-Depends: debhelper-compat (= 13),
  meson (>= 0.56),
  pkg-config,
 Standards-Version: 4.1.3
-Section: misc
+Section: contrib/misc
 Homepage: https://gramine.readthedocs.io/projects/contrib/
 Vcs-Browser: https://github.com/gramineproject/contrib
 Vcs-Git: https://github.com/gramineproject/contrib.git
