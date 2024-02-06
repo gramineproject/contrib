@@ -1034,22 +1034,23 @@ static int ita_verify_response_output_quote(struct ita_response* response, const
     cJSON* policy_ids_matched = cJSON_GetObjectItem(json_token_payload, "policy_ids_matched");
     cJSON* policy_ids_unmatched = cJSON_GetObjectItem(json_token_payload, "policy_ids_unmatched");
 
-    /* FIXME: What should we actually do with policies? Do we fail verification if at least one
-     *        policy is unmatched? */
+    /*
+     * ITA sends both matched and unmatched policy IDs in the Attestation Token. It is supposed to
+     * be the responsibility of the Relying Party to decide whether and how to check both of these.
+     * However, RA-TLS must have some sane default, so currently we (a) make sure that matched
+     * policies are correctly formatted and (b) there are *no* unmatched policies.
+     *
+     * FIXME: "Signed policies" are currently not verified in our code. From ITA docs: "If elevated
+     *         trust is required, the RP should verify the matched policy IDs by requesting a copy
+     *         of the signed policy stored in the Intel Trust Authority database. An RP can verify
+     *         that both the policy ID and hash have the expected values."
+     */
     if (policy_ids_matched) {
         if (policy_ids_matched->type != cJSON_Array) {
             ERROR("ITA JWT: Unexpected type of `policy_ids_matched` field (expected JSON array)\n");
             ret = MBEDTLS_ERR_X509_CERT_UNKNOWN_FORMAT;
             goto out;
         }
-        char* policy_ids_matched_str = cJSON_Print(policy_ids_matched);
-        if (!policy_ids_matched_str) {
-            ERROR("ITA JWT: Failed to print `policy_ids_matched` field\n");
-            ret = MBEDTLS_ERR_X509_CERT_UNKNOWN_FORMAT;
-            goto out;
-        }
-        INFO("         [ policy IDs matched: %s ]\n", policy_ids_matched_str);
-        free(policy_ids_matched_str);
     }
 
     if (policy_ids_unmatched) {
@@ -1059,14 +1060,11 @@ static int ita_verify_response_output_quote(struct ita_response* response, const
             ret = MBEDTLS_ERR_X509_CERT_UNKNOWN_FORMAT;
             goto out;
         }
-        char* policy_ids_unmatched_str = cJSON_Print(policy_ids_unmatched);
-        if (!policy_ids_unmatched_str) {
-            ERROR("ITA JWT: Failed to print `policy_ids_unmatched` field\n");
+        if (cJSON_GetArraySize(policy_ids_unmatched)) {
+            ERROR("ITA JWT: Found unmatched policy IDs; RA-TLS forbids this\n");
             ret = MBEDTLS_ERR_X509_CERT_UNKNOWN_FORMAT;
             goto out;
         }
-        INFO("         [ policy IDs unmatched: %s ]\n", policy_ids_unmatched_str);
-        free(policy_ids_unmatched_str);
     }
 
     /* c. Verify Attester claims: attester_type, attester_tcb_status, attester_advisory_ids; we
