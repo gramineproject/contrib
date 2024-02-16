@@ -111,17 +111,11 @@ secret-provisioning services. The only difference is that this library uses ITA
 based RA-TLS flows underneath.
 
 The library sets the same environment variables as `ra_tls_verify_ita.so`,
-namely `RA_TLS_ITA_JWT` and `RA_TLS_ita_SET_OF_JWKS`.
+namely `RA_TLS_ITA_JWT` and `RA_TLS_ITA_SET_OF_JWKS`.
 
 ### Building ITA libraries
 
 The only prerequisite is that Gramine v1.6 must be installed on the system.
-
-First, you need to copy some files from the MAA plugin, as both ITA and MAA
-have many commonalities in the build process:
-```sh
-cp -r ../../azure/ra_tls_maa/subprojects ./
-```
 
 To build the `ra_tls_verify_ita.so` and `secret_prov_verify_ita.so` libraries,
 we use the meson build system:

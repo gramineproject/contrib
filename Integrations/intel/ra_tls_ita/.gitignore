@@ -1,6 +1,3 @@
 # build and testing artifacts
 /build
 /gramine
-
-# the `subprojects` dir is copied from the MAA RA-TLS plugin as-is
-/subprojects
