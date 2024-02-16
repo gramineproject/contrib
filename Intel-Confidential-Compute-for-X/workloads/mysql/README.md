@@ -112,10 +112,10 @@ image:
     |                                       user manifest file (with basic set of values defined
     |                                       for graminizing MySQL images) that will be passed to
     |                                       GSC.
-    |-- base_image_helper/                  # This directory contains `encrypted_files.txt` which
-    |                                         contains encrypted database directory path required
-    |                                         for running the test MySQL image.
-    |-- docker_run_flags.txt                # This file contains docker run flags required for
-    |                                         running the test MySQL image.
-    |-- insecure_args.txt                   # This file contains command line arguments required
-    |                                         for running the test MySQL image.
+    |-- base_image_helper/                # This directory contains `encrypted_files.txt` which
+    |                                       contains encrypted database directory path required
+    |                                       for running the test MySQL image.
+    |-- docker_run_flags.txt              # This file contains docker run flags required for
+    |                                       running the test MySQL image.
+    |-- insecure_args.txt                 # This file contains command line arguments required
+    |                                       for running the test MySQL image.
