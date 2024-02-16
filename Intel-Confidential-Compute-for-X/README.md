@@ -99,6 +99,7 @@ python3 curate.py --help
 
     .
     |-- curate.py  # Interactive script that does the transformation explained above.
+    |-- keys/      # Gramine and Intel-SGX repository keys for installing packages.
     |-- util/      # Helper scripts and files that curate.py uses.
     |-- verifier/  # Contents to build attestation verifier image.
     |-- workloads/ # Contains  script settings and templates for prepared applications.

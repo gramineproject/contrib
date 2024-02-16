@@ -41,11 +41,6 @@ Perform the following steps on your system:
         python3 ./curate.py pytorch pytorch-encrypted --test
         ```
 
-     4. Run the generated PyTorch image using below command:
-        ```sh
-        docker run --net=host --device=/dev/sgx/enclave -it gsc-pytorch-encrypted
-        ```
-
    - To generate a Gramine-protected, pre-configured PyTorch image based on a user-provided PyTorch
      Docker image, execute the following to launch an interactive setup script:
      ```sh
