@@ -19,7 +19,7 @@
 # -- arg1    : workload type (see workload/ sub-directory for list of supported workload types)
 #              e.g. redis
 # -- arg2    : base_image_name e.g. name of the base image to be graminized
-# -- arg3    : distro e.g. ubuntu:18.04 or ubuntu:20.04
+# -- arg3    : distro e.g. ubuntu:20.04
 # -- arg4    : path to the enclave signing key or
 #              'test' string to generate test signing key
 # -- arg5    : CMD instruction for Dockerfile having all the command-line arguments

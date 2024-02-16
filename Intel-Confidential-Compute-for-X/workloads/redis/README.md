@@ -53,3 +53,5 @@ image:
     |                                        user manifest file (with basic set of values defined
     |                                        for graminizing Redis images) that will be passed to
     |                                        GSC.
+    |-- common_args.txt                    # This file contains command line arguments required for
+    |                                        running the Redis image.

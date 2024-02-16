@@ -3,10 +3,10 @@ model and an encrypted sample picture.
 
 # Prerequisites
 - Install dependencies:
-    - Ubuntu 18.04:
+    - Ubuntu 20.04:
         ```sh
         sudo apt install libnss-mdns libnss-myhostname python3-pip lsb-release
-        python3 -m pip install --upgrade pip # on ubuntu 18.04 machine
+        python3 -m pip install --upgrade pip
         python3 -m pip install --user torchvision pillow
         ```
 - [Install Gramine](https://gramine.readthedocs.io/en/stable/quickstart.html#install-gramine)

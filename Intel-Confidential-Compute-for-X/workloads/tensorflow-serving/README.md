@@ -85,3 +85,5 @@ Serving image:
     |                                                 passed to GSC.
     |-- base_image_helper/                          # Directory contains artifacts that help to
     |                                                 generate a base image.
+    |-- insecure_args.txt                           # This file contains command line arguments
+    |                                                 required for running the test MariaDB image.
