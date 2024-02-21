@@ -4,11 +4,29 @@ Maintainer: Wojtek Porczyk <woju@invisiblethingslab.com>
 Build-Depends: debhelper-compat (= 13),
  meson (>= 0.56),
  pkg-config,
+ gramine (>= 1.6.1),
 Standards-Version: 4.1.3
 Section: misc
 Homepage: https://gramine.readthedocs.io/projects/contrib/
 Vcs-Browser: https://github.com/gramineproject/contrib
 Vcs-Git: https://github.com/gramineproject/contrib.git
+
+Package: gramine-ratls-ita
+Architecture: amd64
+Description: Intel Trust Authority (ITA) verifier for RA-TLS
+ ra_tls_verify_ita.so library contains the verification callback that should be
+ registered with the TLS library during verification of the TLS certificate. It
+ verifies the RA-TLS certificate and the SGX quote by sending it to the
+ Intel Trust Authority (ITA) provider and retrieving the attestation
+ response (the JWT) from it.
+ .
+ secret_prov_verify_ita.so library is used in secret-provisioning services. The
+ only difference with secret_prov_verify_epid.so is that this library uses ITA
+ based RA-TLS flows underneath.
+Depends:
+ gramine,
+ ${misc:Depends},
+ ${shlibs:Depends},
 
 Package: gramine-ratls-maa
 Architecture: amd64

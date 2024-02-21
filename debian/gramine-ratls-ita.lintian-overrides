@@ -1,0 +1,4 @@
+gramine-ratls-ita: package-name-doesnt-match-sonames
+gramine-ratls-ita: shared-library-lacks-version
+gramine-ratls-ita: embedded-library
+gramine-ratls-ita: custom-library-search-path
