@@ -3,5 +3,9 @@
 include /usr/share/dpkg/default.mk
 
 %:
-	dh $@ --buildsystem=meson+ninja -D Integrations/azure/ra_tls_maa/
+	dh $@ -Smeson+ninja -DIntegrations/intel/ra_tls_ita -Bobj-$(DEB_HOST_MULTIARCH)-ita
+	dh $@ -Smeson+ninja -DIntegrations/azure/ra_tls_maa -Bobj-$(DEB_HOST_MULTIARCH)-maa
 
+override_dh_auto_install:
+	dh_auto_install -Smeson+ninja -DIntegrations/intel/ra_tls_ita -Bobj-$(DEB_HOST_MULTIARCH)-ita --destdir=debian/gramine-ratls-ita
+	dh_auto_install -Smeson+ninja -DIntegrations/azure/ra_tls_maa -Bobj-$(DEB_HOST_MULTIARCH)-maa --destdir=debian/gramine-ratls-maa

@@ -4,6 +4,7 @@ Maintainer: Wojtek Porczyk <woju@invisiblethingslab.com>
 Build-Depends: debhelper-compat (= 13),
  meson (>= 0.56),
  pkg-config,
+ gramine (>= 1.6.1),
 Standards-Version: 4.1.3
 Section: misc
 Homepage: https://gramine.readthedocs.io/projects/contrib/
@@ -22,6 +23,15 @@ Description: Microsoft Azure Attestation (MAA) verifier for RA-TLS
  secret_prov_verify_maa.so library is used in secret-provisioning services. The
  only difference with secret_prov_verify_epid.so is that this library uses MAA
  based RA-TLS flows underneath.
+Depends:
+ gramine,
+ ${misc:Depends},
+ ${shlibs:Depends},
+
+Package: gramine-ratls-ita
+Architecture: amd64
+Description: Intel Trust Authority (ITA) verifier for RA-TLS
+ TBD
 Depends:
  gramine,
  ${misc:Depends},
