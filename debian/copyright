@@ -18,6 +18,10 @@ Files: Integrations/azure/akv-sign/*
 Copyright: 2022 Intel Corporation
 License: LGPL-3.0+
 
+Files: Integrations/intel/ra_tls_ita/*
+Copyright: 2024 Intel Corporation
+License: LGPL-3.0+
+
 Files: Integrations/azure/ra_tls_maa/*
 Copyright: 2023 Intel Corporation
 License: LGPL-3.0+
