@@ -1,8 +1,8 @@
-gramine-contrib (1.6post~UNRELEASED) UNRELEASED; urgency=medium
+gramine-contrib (1.6.1) bookworm bullseye jammy focal; urgency=medium
 
-  * 
+  * Change gramine dependency to (>= 1.6)
 
- -- Wojtek Porczyk <woju@invisiblethingslab.com>  Fri, 19 Jan 2024 11:00:01 +0100
+ -- Wojtek Porczyk <woju@invisiblethingslab.com>  Mon, 26 Feb 2024 12:37:57 +0100
 
 gramine-contrib (1.6) bookworm bullseye jammy focal; urgency=medium
 
