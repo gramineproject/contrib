@@ -28,9 +28,6 @@ COPY keys/* /usr/share/keyrings/
 RUN echo "deb [arch=amd64 signed-by=/usr/share/keyrings/intel-sgx-deb.asc] https://download.01.org/intel-sgx/sgx_repo/ubuntu jammy main" \
     | tee /etc/apt/sources.list.d/intel-sgx.list
 
-RUN echo 'deb [arch=amd64 signed-by=/usr/share/keyrings/gramine-keyring.gpg] https://packages.gramineproject.io/ jammy main' \
-    | tee /etc/apt/sources.list.d/gramine.list
-
 RUN env DEBIAN_FRONTEND=noninteractive apt-get update \
     && env DEBIAN_FRONTEND=noninteractive apt-get install -y \
     libsgx-dcap-default-qpl=1.16.100.2-jammy1 \
