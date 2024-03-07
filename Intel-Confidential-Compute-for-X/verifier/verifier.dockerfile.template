@@ -20,12 +20,12 @@ RUN echo 'deb [arch=amd64 signed-by=/usr/share/keyrings/gramine-keyring.gpg] htt
 RUN env DEBIAN_FRONTEND=noninteractive apt-get update \
     && env DEBIAN_FRONTEND=noninteractive apt-get install -y \
     libsgx-dcap-default-qpl=1.16.100.2-jammy1 \
-    gramine=1.6
+    gramine
 
 RUN sed -i "s|^\(  \"pccs_url\": \"https://\).*\(/sgx/certification.*\)|\1api.trustedservices.intel.com\2|g" \
     /etc/sgx_default_qcnl.conf
 
-RUN git clone --depth 1 --branch v1.6 https://github.com/gramineproject/gramine.git
+RUN git clone --depth 1 --branch v1.6.1 https://github.com/gramineproject/gramine.git
 
 ARG server_dcap_type="secret_prov_minimal"
 RUN if [ $server_dcap_type="secret_prov_pf" ]; then \
