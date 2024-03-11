@@ -95,9 +95,13 @@ The library uses the following ITA-specific environment variables:
   `v1` is used.
 - `RA_TLS_ITA_POLICY_IDS` (optional) -- attestation policy IDs associated with
   the used API key. If not specified, no attestation policies (other than the
-  default policy that verifies the SGX platform) are evaluation. Can be
-  specified as a single policy or as a comma-separated set of policies. In the
-  latter case, each policy must be surrounded by double quotes.
+  default policy that verifies the SGX platform) are evaluated. Can be specified
+  as a single policy or as a comma-separated set of policies. In the latter
+  case, each policy must be surrounded by double quotes. Examples:
+
+  - `RA_TLS_ITA_POLICY_IDS=Policy1` -- single policy,
+  - `RA_TLS_ITA_POLICY_IDS="Policy1","Policy2","Policy3"` -- set of three
+    policies.
 
 The library sets the following ITA-specific environment variables:
 
@@ -118,7 +122,7 @@ namely `RA_TLS_ITA_JWT` and `RA_TLS_ITA_SET_OF_JWKS`.
 The only prerequisite is that Gramine v1.6 must be installed on the system.
 
 To build the `ra_tls_verify_ita.so` and `secret_prov_verify_ita.so` libraries,
-we use the meson build system:
+we use the Meson build system:
 ```sh
 meson setup build/ --buildtype=release
 ninja -C build/
@@ -141,8 +145,8 @@ and
 [`ra-tls-secret-prov`](https://github.com/gramineproject/gramine/tree/master/CI-Examples/ra-tls-secret-prov)
 examples available in Gramine.
 
-To be able to run these tests, the machine must run on the SGX enabled host, with
-access to the ITA attestation provider service.
+To be able to run these tests, the machine must run on a host with SGX support
+and with access to the ITA attestation provider service.
 
 For this, we provide a patch that should be applied on top of Gramine v1.6 repo:
 ```sh
