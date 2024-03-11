@@ -124,8 +124,9 @@ create_gsc_image () {
     echo
     cd $CUR_DIR
     rm -rf gsc >/dev/null 2>&1
-    git clone --depth 1 --branch v1.6.1 https://github.com/gramineproject/gsc.git
+    git clone https://github.com/gramineproject/gsc.git
     cd gsc
+    git checkout $(git tag --list 'v*.*' --sort=taggerdate | tail -1)
     cp -f config.yaml.template config.yaml
     sed -i 's|ubuntu:.*|'$distro'"|' config.yaml
 
