@@ -10,8 +10,9 @@ cd $MY_PATH
 
 image_name='pytorch-encrypted'
 rm -rf examples
-git clone --depth 1 --branch v1.6 https://github.com/gramineproject/examples.git
+git clone https://github.com/gramineproject/examples.git
 cd examples/pytorch
+git checkout $(git tag --sort=taggerdate | tail -1)
 
 # Download and save the pre-trained model
 python3 download-pretrained-model.py
