@@ -26,7 +26,7 @@ RUN sed -i "s|^\(  \"pccs_url\": \"https://\).*\(/sgx/certification.*\)|\1api.tr
     /etc/sgx_default_qcnl.conf
 
 RUN git clone https://github.com/gramineproject/gramine.git \
-    && cd gramine && git checkout $(git tag --sort=taggerdate | tail -1)
+    && cd gramine && git checkout $(git tag --list 'v*.*' --sort=taggerdate | tail -1)
 
 ARG server_dcap_type="secret_prov_minimal"
 RUN if [ $server_dcap_type="secret_prov_pf" ]; then \
