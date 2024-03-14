@@ -7,7 +7,7 @@ Gramine documentation for details:
 - https://gramine.readthedocs.io/en/stable/glossary.html
 - https://gramine.readthedocs.io/en/stable/sgx-intro.html#sgx-terminology
 
-**DISCLAIMER**: This version was tested with Gramine v1.6 and ITA REST API
+**DISCLAIMER**: This version was tested with Gramine v1.6.2 and ITA REST API
 version `v1.0.0`.
 
 ---
@@ -119,7 +119,7 @@ namely `RA_TLS_ITA_JWT` and `RA_TLS_ITA_SET_OF_JWKS`.
 
 ### Building ITA libraries
 
-The only prerequisite is that Gramine v1.6 must be installed on the system.
+The only prerequisite is that Gramine v1.6.2 must be installed on the system.
 
 To build the `ra_tls_verify_ita.so` and `secret_prov_verify_ita.so` libraries,
 we use the Meson build system:
@@ -148,11 +148,12 @@ examples available in Gramine.
 To be able to run these tests, the machine must run on a host with SGX support
 and with access to the ITA attestation provider service.
 
-For this, we provide a patch that should be applied on top of Gramine v1.6 repo:
+For this, we provide a patch that should be applied on top of Gramine v1.6.2
+repo:
 ```sh
-git clone --depth 1 --branch v1.6 https://github.com/gramineproject/gramine.git
+git clone --depth 1 --branch v1.6.2 https://github.com/gramineproject/gramine.git
 cd gramine/
-git apply ../helpers/gramine-v1.6-ci-examples.patch
+git apply ../helpers/gramine-v1.6.2-ci-examples.patch
 ```
 
 For all examples, we set the following environment variables:
