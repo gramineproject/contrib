@@ -129,21 +129,26 @@ static void replace_char(uint8_t* buf, size_t buf_size, char find, char replace)
 }
 
 /* mbedTLS currently doesn't implement base64url but only base64, so we introduce helpers */
-static int mbedtls_base64url_encode(uint8_t* dst, size_t dlen, size_t* olen, const uint8_t* src,
-                                    size_t slen) {
+static int base64url_encode(uint8_t* dst, size_t dlen, size_t* olen, const uint8_t* src,
+                            size_t slen) {
     int ret = mbedtls_base64_encode(dst, dlen, olen, src, slen);
-    if (ret < 0 || dlen == 0)
+    if (ret < 0 || dlen == 0 || !dst)
         return ret;
 
     /* dst contains base64-encoded string; replace `+` -> `-`, `/` -> `_`, `=` -> `\0` */
     replace_char(dst, dlen, '+', '-');
     replace_char(dst, dlen, '/', '_');
     replace_char(dst, dlen, '=', '\0');
+
+    size_t len = 0;
+    while (dst[len] != '\0')
+        len++;
+    *olen = len + 1;
     return 0;
 }
 
-static int mbedtls_base64url_decode(uint8_t* dst, size_t dlen, size_t* olen, const uint8_t* src,
-                                    size_t slen) {
+static int base64url_decode(uint8_t* dst, size_t dlen, size_t* olen, const uint8_t* src,
+                            size_t slen) {
     if (!src || slen == 0) {
         /* that's what mbedtls_base64_decode() does in this case */
         *olen = 0;
@@ -211,11 +216,11 @@ static int verify_quote_body_enclave_attributes(sgx_quote_body_t* quote_body,
  * \brief Parse response headers of the ITA attestation response (currently none).
  *
  * \param[in] buffer   Single HTTP header.
- * \param[in] size     Together with \a count a size of \a buffer.
+ * \param[in] size     Together with \a count the size of \a buffer.
  * \param[in] count    Size of \a buffer, in \a size units.
  * \param[in] context  User data pointer (of type struct ita_response).
  *
- * \returns \a size * \a count
+ * \returns Number of bytes parsed in the HTTP response headers.
  *
  * \details See cURL documentation at
  *          https://curl.haxx.se/libcurl/c/CURLOPT_HEADERFUNCTION.html
@@ -235,7 +240,7 @@ static size_t header_callback(char* buffer, size_t size, size_t count, void* con
  * \param[in] count    Size of \a buffer, in \a size units.
  * \param[in] context  User data pointer (of type struct ita_response).
  *
- * \returns \a size * \a count
+ * \returns Number of bytes parsed in the HTTP response body.
  *
  * \details See cURL documentation at
  *          https://curl.haxx.se/libcurl/c/CURLOPT_WRITEFUNCTION.html
@@ -319,7 +324,7 @@ static int ita_init(struct ita_context** out_context) {
         goto out;
     }
 
-    curl_ret = curl_easy_setopt(context->curl, CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1_2);
+    curl_ret = curl_easy_setopt(context->curl, CURLOPT_SSLVERSION, CURL_SSLVERSION_MAX_DEFAULT);
     if (curl_ret != CURLE_OK) {
         ret = MBEDTLS_ERR_X509_FATAL_ERROR;
         goto out;
@@ -490,7 +495,7 @@ static int ita_send_request(struct ita_context* context, const void* quote, size
 
     /* get needed base64url buffer size for quote, allocate it and encode the quote */
     size_t quote_b64_size = 0;
-    ret = mbedtls_base64url_encode(/*dest=*/NULL, /*dlen=*/0, &quote_b64_size, quote, quote_size);
+    ret = base64url_encode(/*dest=*/NULL, /*dlen=*/0, &quote_b64_size, quote, quote_size);
     if (ret != MBEDTLS_ERR_BASE64_BUFFER_TOO_SMALL) {
         goto out;
     }
@@ -501,16 +506,15 @@ static int ita_send_request(struct ita_context* context, const void* quote, size
         goto out;
     }
 
-    ret = mbedtls_base64url_encode((uint8_t*)quote_b64, quote_b64_size, &quote_b64_size, quote,
-                                   quote_size);
+    ret = base64url_encode((uint8_t*)quote_b64, quote_b64_size, &quote_b64_size, quote, quote_size);
     if (ret < 0) {
         goto out;
     }
 
     /* get needed base64url buffer size for runtime data, allocate it and encode the runtime data */
     size_t runtime_data_b64_size = 0;
-    ret = mbedtls_base64url_encode(/*dest=*/NULL, /*dlen=*/0, &runtime_data_b64_size, runtime_data,
-                                   runtime_data_size);
+    ret = base64url_encode(/*dest=*/NULL, /*dlen=*/0, &runtime_data_b64_size, runtime_data,
+                           runtime_data_size);
     if (ret != MBEDTLS_ERR_BASE64_BUFFER_TOO_SMALL) {
         goto out;
     }
@@ -521,8 +525,8 @@ static int ita_send_request(struct ita_context* context, const void* quote, size
         goto out;
     }
 
-    ret = mbedtls_base64url_encode((uint8_t*)runtime_data_b64, runtime_data_b64_size,
-                                   &runtime_data_b64_size, runtime_data, runtime_data_size);
+    ret = base64url_encode((uint8_t*)runtime_data_b64, runtime_data_b64_size,
+                           &runtime_data_b64_size, runtime_data, runtime_data_size);
     if (ret < 0) {
         goto out;
     }
@@ -743,8 +747,8 @@ static int ita_verify_response_output_quote(struct ita_response* response, const
     }
 
     size_t token_header_size;
-    ret = mbedtls_base64url_decode(/*dest=*/NULL, /*dlen=*/0, &token_header_size,
-                                   (const uint8_t*)token_b64_header, strlen(token_b64_header));
+    ret = base64url_decode(/*dest=*/NULL, /*dlen=*/0, &token_header_size,
+                           (const uint8_t*)token_b64_header, strlen(token_b64_header));
     if (ret != MBEDTLS_ERR_BASE64_BUFFER_TOO_SMALL) {
         goto out;
     }
@@ -755,16 +759,16 @@ static int ita_verify_response_output_quote(struct ita_response* response, const
         goto out;
     }
 
-    ret = mbedtls_base64url_decode((uint8_t*)token_header, token_header_size, &token_header_size,
-                                   (const uint8_t*)token_b64_header, strlen(token_b64_header));
+    ret = base64url_decode((uint8_t*)token_header, token_header_size, &token_header_size,
+                           (const uint8_t*)token_b64_header, strlen(token_b64_header));
     if (ret < 0) {
         ERROR("ITA JWT is incorrectly formatted (the header is not Base64Url encoded)\n");
         goto out;
     }
 
     size_t token_payload_size;
-    ret = mbedtls_base64url_decode(/*dest=*/NULL, /*dlen=*/0, &token_payload_size,
-                                   (const uint8_t*)token_b64_payload, strlen(token_b64_payload));
+    ret = base64url_decode(/*dest=*/NULL, /*dlen=*/0, &token_payload_size,
+                           (const uint8_t*)token_b64_payload, strlen(token_b64_payload));
     if (ret != MBEDTLS_ERR_BASE64_BUFFER_TOO_SMALL) {
         goto out;
     }
@@ -775,17 +779,16 @@ static int ita_verify_response_output_quote(struct ita_response* response, const
         goto out;
     }
 
-    ret = mbedtls_base64url_decode((uint8_t*)token_payload, token_payload_size, &token_payload_size,
-                                   (const uint8_t*)token_b64_payload, strlen(token_b64_payload));
+    ret = base64url_decode((uint8_t*)token_payload, token_payload_size, &token_payload_size,
+                           (const uint8_t*)token_b64_payload, strlen(token_b64_payload));
     if (ret < 0) {
         ERROR("ITA JWT is incorrectly formatted (the payload is not Base64Url encoded)\n");
         goto out;
     }
 
     size_t token_signature_size;
-    ret = mbedtls_base64url_decode(/*dest=*/NULL, /*dlen=*/0, &token_signature_size,
-                                   (const uint8_t*)token_b64_signature,
-                                   strlen(token_b64_signature));
+    ret = base64url_decode(/*dest=*/NULL, /*dlen=*/0, &token_signature_size,
+                           (const uint8_t*)token_b64_signature, strlen(token_b64_signature));
     if (ret != MBEDTLS_ERR_BASE64_BUFFER_TOO_SMALL) {
         goto out;
     }
@@ -796,9 +799,8 @@ static int ita_verify_response_output_quote(struct ita_response* response, const
         goto out;
     }
 
-    ret = mbedtls_base64url_decode((uint8_t*)token_signature, token_signature_size,
-                                   &token_signature_size, (const uint8_t*)token_b64_signature,
-                                   strlen(token_b64_signature));
+    ret = base64url_decode((uint8_t*)token_signature, token_signature_size, &token_signature_size,
+                           (const uint8_t*)token_b64_signature, strlen(token_b64_signature));
     if (ret < 0) {
         ERROR("ITA JWT is incorrectly formatted (the signature is not Base64Url encoded)\n");
         goto out;
@@ -1137,7 +1139,7 @@ static int ita_verify_response_output_quote(struct ita_response* response, const
         free(ids_str);
     }
 
-    /* d. Verify Intel SGX claims; we currently don't use sgx_config_id, sgx_collateral */
+    /* d. Verify Intel SGX claims; we currently don't use sgx_config_id and sgx_collateral */
     cJSON *sgx_is_debuggable = cJSON_GetObjectItem(json_token_payload, "sgx_is_debuggable");
     cJSON *sgx_mrenclave     = cJSON_GetObjectItem(json_token_payload, "sgx_mrenclave");
     cJSON *sgx_mrsigner      = cJSON_GetObjectItem(json_token_payload, "sgx_mrsigner");
@@ -1392,9 +1394,9 @@ int ra_tls_verify_callback(void* data, mbedtls_x509_crt* crt, int depth, uint32_
     if (results)
         results->err_loc = AT_VERIFY_EXTERNAL;
 
-    /* initialize the ITA context, get the set of JWKs from the `certs/` ita API endpoint, send the
-     * SGX quote to the `attest/` ITA API endpoint, and finally receive and verify the attestation
-     * response (JWT) */
+    /* initialize the ITA context, get the set of JWKs from the `certs/` ITA Portal API endpoint,
+     * send the SGX quote to the `attest/` ITA Attestation Provider API endpoint, and finally
+     * receive and verify the attestation response (JWT) */
     ret = ita_init(&context);
     if (ret < 0) {
         goto out;

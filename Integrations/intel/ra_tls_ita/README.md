@@ -74,7 +74,9 @@ in the received JWT:
   - `sgx_isvprodid` (verified against `RA_TLS_ISV_PROD_ID`)
   - `sgx_isvsvn` (verified against `RA_TLS_ISV_SVN`)
   - `sgx_report_data` (verified to contain the hash of the RA-TLS public key)
-- (note that EAT claims are currently not verified)
+- (note that [EAT
+  claims](https://docs.trustauthority.intel.com/main/articles/concept-attestation-tokens.html#eat-claims)
+  are currently not verified)
 
 The library uses the same [SGX-specific environment variables as
 `ra_tls_verify_epid.so`](https://gramine.readthedocs.io/en/stable/attestation.html#ra-tls-verify-epid-so)
