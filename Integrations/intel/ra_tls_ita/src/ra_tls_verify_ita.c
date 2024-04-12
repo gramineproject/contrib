@@ -21,7 +21,8 @@
  *
  * - {providerUrl} is the attestation provider URL (that releases JWTs), e.g.
  *   `https://api.trustauthority.intel.com`.
- * - {portalUrl} is the ITA portal URL (that releases certificates), e.g.
+ * - {portalUrl} is the ITA portal URL (that returns a set of JWKs, where one of these JWKs contains
+ *   a public key that corresponds to the private key with which the JWT was signed), e.g.
  *   `https://portal.trustauthority.intel.com`.
  *
  * This file is part of the RA-TLS verification library which is typically linked into client
@@ -537,15 +538,16 @@ static int ita_send_request(struct ita_context* context, const void* quote, size
     size_t request_json_size = quote_b64_size + runtime_data_b64_size;
 
     char* ita_policy_ids = getenv(RA_TLS_ITA_POLICY_IDS);
-    if (ita_policy_ids && strchr(ita_policy_ids, ',')) {
+    if (ita_policy_ids) {
+        if (!strlen(ita_policy_ids) || ita_policy_ids[0] != '"') {
+            ERROR("Environment variable RA_TLS_ITA_POLICY_IDS is not a JSON string (does not start "
+                  "with a double quote)\n");
+            ret = MBEDTLS_ERR_X509_FATAL_ERROR;
+            goto out;
+        }
         /* RA_TLS_ITA_POLICY_IDS envvar specifies a comma-separated set of policy IDs */
         request_json_fmt = "{\"quote\": \"%s\", \"runtime_data\": \"%s\","
                            " \"policy_ids\": [%s]}";
-        request_json_size += strlen(ita_policy_ids) + strlen(request_json_fmt) + 1;
-    } else if (ita_policy_ids) {
-        /* RA_TLS_ITA_POLICY_IDS envvar specifies a single policy ID (must add double-quotes) */
-        request_json_fmt = "{\"quote\": \"%s\", \"runtime_data\": \"%s\","
-                           " \"policy_ids\": [\"%s\"]}";
         request_json_size += strlen(ita_policy_ids) + strlen(request_json_fmt) + 1;
     } else {
         request_json_fmt = "{\"quote\": \"%s\", \"runtime_data\": \"%s\"}";

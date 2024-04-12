@@ -98,10 +98,10 @@ The library uses the following ITA-specific environment variables:
 - `RA_TLS_ITA_POLICY_IDS` (optional) -- attestation policy IDs associated with
   the used API key. If not specified, no attestation policies (other than the
   default policy that verifies the SGX platform) are evaluated. Can be specified
-  as a single policy or as a comma-separated set of policies. In the latter
-  case, each policy must be surrounded by double quotes. Examples:
+  as a single policy or as a comma-separated set of policies. In either case,
+  each policy must be surrounded by double quotes. Examples:
 
-  - `RA_TLS_ITA_POLICY_IDS=Policy1` -- single policy,
+  - `RA_TLS_ITA_POLICY_IDS="Policy1"` -- single policy,
   - `RA_TLS_ITA_POLICY_IDS="Policy1","Policy2","Policy3"` -- set of three
     policies.
 
