@@ -546,7 +546,7 @@ static int ita_send_request(struct ita_context* context, const void* quote, size
             ret = MBEDTLS_ERR_X509_FATAL_ERROR;
             goto out;
         }
-        free(ita_policy_ids_parsed_check);
+        cJSON_Delete(ita_policy_ids_parsed_check);
 
         request_json_fmt = "{\"quote\": \"%s\", \"runtime_data\": \"%s\","
                            " \"policy_ids\": %s}";

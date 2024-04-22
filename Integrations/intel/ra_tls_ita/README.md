@@ -101,7 +101,7 @@ The library uses the following ITA-specific environment variables:
   specified as a JSON array of strings. Examples:
 
   - `RA_TLS_ITA_POLICY_IDS=[ "Policy1" ]` -- single policy,
-  - `RA_TLS_ITA_POLICY_IDS=[ "Policy1","Policy2","Policy3" ]` -- set of three
+  - `RA_TLS_ITA_POLICY_IDS=[ "Policy1", "Policy2", "Policy3" ]` -- set of three
     policies.
 
 The library sets the following ITA-specific environment variables:
