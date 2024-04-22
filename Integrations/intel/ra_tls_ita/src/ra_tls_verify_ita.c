@@ -539,9 +539,17 @@ static int ita_send_request(struct ita_context* context, const void* quote, size
 
     char* ita_policy_ids = getenv(RA_TLS_ITA_POLICY_IDS);
     if (ita_policy_ids) {
-        /* RA_TLS_ITA_POLICY_IDS envvar specifies a comma-separated set of policy IDs */
+        /* sanity check that RA_TLS_ITA_POLICY_IDS specifies a JSON array of policy IDs (strings) */
+        cJSON* ita_policy_ids_parsed_check = cJSON_Parse(ita_policy_ids);
+        if (!ita_policy_ids_parsed_check || !cJSON_IsArray(ita_policy_ids_parsed_check)) {
+            ERROR("Environment variable RA_TLS_ITA_POLICY_IDS is not a JSON array of strings\n");
+            ret = MBEDTLS_ERR_X509_FATAL_ERROR;
+            goto out;
+        }
+        free(ita_policy_ids_parsed_check);
+
         request_json_fmt = "{\"quote\": \"%s\", \"runtime_data\": \"%s\","
-                           " \"policy_ids\": [%s]}";
+                           " \"policy_ids\": %s}";
         request_json_size += strlen(ita_policy_ids) + strlen(request_json_fmt) + 1;
     } else {
         request_json_fmt = "{\"quote\": \"%s\", \"runtime_data\": \"%s\"}";
@@ -560,17 +568,6 @@ static int ita_send_request(struct ita_context* context, const void* quote, size
         ret = MBEDTLS_ERR_X509_BUFFER_TOO_SMALL;
         goto out;
     }
-
-    /* perform a sanity check that JSON-encoded arguments in the attestation request to ITA are in
-     * correct JSON syntax, in particular the RA_TLS_ITA_POLICY_IDS envvar (this is the only user
-     * input that could render the whole JSON incorrect) */
-    cJSON* request_json_parsed_sanity_check = cJSON_Parse(request_json);
-    if (!request_json_parsed_sanity_check) {
-        ERROR("Environment variable RA_TLS_ITA_POLICY_IDS is not a JSON string\n");
-        ret = MBEDTLS_ERR_X509_FATAL_ERROR;
-        goto out;
-    }
-    free(request_json_parsed_sanity_check);
 
     /* prepare sending attestation request to ITA and receiving a response (using Curl) */
     response = calloc(1, sizeof(*response));
