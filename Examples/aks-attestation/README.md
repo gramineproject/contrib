@@ -48,29 +48,24 @@ Note: This example is Ubuntu 18.04-specific. This example was tested with Gramin
     $ docker push <dockerhubusername>/aks-secret-prov-server-img:latest
     ```
 
-3. Deploy `aks-secret-prov-server-img:latest` in the AKS confidential compute cluster using reference
-   deployment file: `aks-secret-prov-server-deployment.yaml`
+3. Deploy `aks-secret-prov-server-img:latest` in the AKS confidential compute cluster using
+   reference deployment file: `aks-secret-prov-server-deployment.yaml`
 
 ### Creating client (SGX application) image
 
-The client Docker image must run the client application inside the SGX enclave. For this, we use the
-Gramine Shielded Containers (GSC) tool (https://github.com/gramineproject/gsc). GSC transforms the
-native Docker client image into a new "graminized" Docker image.
+The client Docker image must run the client application (`client.c` in this case) inside the SGX
+enclave. For this, we use the Gramine Shielded Containers (GSC) tool (https://github.com/gramineproject/gsc).
+GSC transforms the native Docker client image into a new "graminized" Docker image.
 
-1. The `base-image-generation-script.sh` script will create the native Docker client image with the
-   name `aks-secret-prov-client-img:latest`.
+1. The `base-image-generation-script.sh` script will first create the native Docker client image
+   with the name `aks-secret-prov-client-img:latest`.
 
-2. Create the GSC client image (note that we tested this example with DCAP driver 1.11 specified in
-   the GSC configuration file):
+2. The script then creates a GSC client image `gsc-aks-secret-prov-client-img:latest` (note that we
+   tested this example with DCAP driver 1.11 specified in `config.yaml.template`) signed with a
+   test enclave signing key.
 
-    ```sh
-    $ cd gsc
-    $ ./gsc build aks-secret-prov-client-img:latest \
-        Examples/aks-attestation/aks-secret-prov-client.manifest
-    $ ./gsc sign-image aks-secret-prov-client-img:latest enclave-key.pem
-    ```
-
-5. Push resulting image to Docker Hub or your preferred registry:
+3. The user is now expected to push `gsc-aks-secret-prov-client-img:latest` to Docker Hub or the
+   preferred registry:
 
     ```sh
     $ docker tag gsc-aks-secret-prov-client-img:latest \
@@ -78,7 +73,7 @@ native Docker client image into a new "graminized" Docker image.
     $ docker push <dockerhubusername>/gsc-aks-secret-prov-client-img:latest
     ```
 
-6. Deploy `gsc-aks-secret-prov-client-img:latest` in AKS confidential compute cluster using
+4. Deploy `gsc-aks-secret-prov-client-img:latest` in AKS confidential compute cluster using
    reference deployment file: `aks-secret-prov-client-deployment.yaml`
 
 ## Deploying client and server images in AKS confidential compute cluster
@@ -100,6 +95,12 @@ certificate. On receiving the quote, the server will internally verify it using 
 libsgx-dcap-quote-verify library via the az-dcap-client library.
 
 ### Deployment
+
+Create a ConfigMap for the ssl artifacts that will be later injected into the server pod.
+```sh
+$ kubectl create configmap ssl-certs --from-file=ssl/ca.crt --from-file=ssl/server.key \
+  --from-file=ssl/server.crt
+```
 
 ```sh
 $ kubectl apply -f aks-secret-prov-server-deployment.yaml
@@ -131,7 +132,7 @@ $ kubectl logs -l app=gsc-ra-tls-secret-prov-client --tail=50
 
 Expected output:
 
-`--- Received secret = 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'`
+`--- Received secret = 'A_SIMPLE_SECRET' ---`
 
 Delete both client and server containers:
 

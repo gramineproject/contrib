@@ -2,7 +2,9 @@ FROM ubuntu:18.04
 
 RUN apt-get update \
     && env DEBIAN_FRONTEND=noninteractive apt-get install -y \
+    build-essential \
     curl \
+    git \
     gnupg2 \
     wget
 
@@ -13,21 +15,31 @@ RUN apt-get update \
 RUN wget https://packages.microsoft.com/ubuntu/18.04/prod/pool/main/a/az-dcap-client/az-dcap-client_1.10_amd64.deb \
  && dpkg -i az-dcap-client_1.10_amd64.deb
 
-WORKDIR /ra-tls-secret-prov
-
-COPY gramine/CI-Examples/ra-tls-secret-prov/ssl ./ssl
-COPY gramine/CI-Examples/ra-tls-secret-prov/files ./files
-
-COPY gramine/CI-Examples/ra-tls-secret-prov/secret_prov_server_dcap /usr/local/bin
-
 RUN echo 'deb [arch=amd64] https://download.01.org/intel-sgx/sgx_repo/ubuntu bionic main' \
     > /etc/apt/sources.list.d/intel-sgx.list \
     && wget https://download.01.org/intel-sgx/sgx_repo/ubuntu/intel-sgx-deb.key \
     && apt-key add intel-sgx-deb.key
 
 RUN curl -fsSLo /usr/share/keyrings/gramine-keyring.gpg https://packages.gramineproject.io/gramine-keyring.gpg
-RUN echo 'deb [arch=amd64 signed-by=/usr/share/keyrings/gramine-keyring.gpg] https://packages.gramineproject.io/ stable main' | tee /etc/apt/sources.list.d/gramine.list
+RUN echo 'deb [arch=amd64 signed-by=/usr/share/keyrings/gramine-keyring.gpg] https://packages.gramineproject.io/ bionic main' | tee /etc/apt/sources.list.d/gramine.list
 RUN apt-get update
 RUN apt-get install -y gramine-dcap
 
-ENTRYPOINT ["secret_prov_server_dcap"]
+RUN git clone --depth 1 --branch v1.3.1 https://github.com/gramineproject/gramine.git
+
+ARG server_dcap_pf="n"
+RUN if [ $server_dcap_pf="y" ]; then \
+        sed -i "s|verify_measurements_callback,|NULL,|g" \
+        "gramine/CI-Examples/ra-tls-secret-prov/secret_prov_pf/server.c"; \
+    fi
+
+RUN mkdir -p /ra-tls-secret-prov/secret_prov_minimal
+RUN cd gramine/CI-Examples/ra-tls-secret-prov/ \
+    && make clean && make dcap \
+    && cp secret_prov_minimal/server_dcap /ra-tls-secret-prov/secret_prov_minimal/
+
+RUN rm -rf gramine >/dev/null 2>&1
+
+WORKDIR /ra-tls-secret-prov/secret_prov_minimal
+
+ENTRYPOINT ["./server_dcap"]
