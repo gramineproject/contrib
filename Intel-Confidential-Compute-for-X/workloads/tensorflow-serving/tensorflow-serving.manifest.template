@@ -5,7 +5,6 @@
 # template is used by `curation_script.sh` to create the user manifest file that will be passed to
 # GSC.
 
-sgx.nonpie_binary = true
 sgx.enclave_size = "64G"
 sgx.max_threads = 1024
 
