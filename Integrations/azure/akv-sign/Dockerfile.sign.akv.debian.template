@@ -1,0 +1,39 @@
+# This Dockerfile template is derived from a generic
+# https://github.com/gramineproject/gsc/blob/master/templates/Dockerfile.common.sign.template
+
+FROM {{image}} as unsigned_image
+
+# Install the required packages using root user
+USER root
+
+RUN apt-get update -y \
+        && env DEBIAN_FRONTEND=noninteractive apt-get install -y \
+        curl \
+        wget \
+     && /usr/bin/python3 -B -m pip install azure-keyvault-keys azure-identity tomli tomli_w
+
+RUN curl -sL https://aka.ms/InstallAzureCLIDeb | bash
+
+# Switch back to original app_image user
+USER {{app_user}}
+
+RUN wget -P /gramine/app_files/ https://raw.githubusercontent.com/gramineproject/contrib/master/Integrations/azure/akv-sign/gramine-sgx-akv-sign
+
+RUN chmod +x /gramine/app_files/gramine-sgx-akv-sign
+
+RUN az login
+
+RUN {% block path %}export PYTHONPATH="${PYTHONPATH}:$(find /gramine/meson_build_output/lib -type d -path '*/site-packages')" &&{% endblock %} \
+    /gramine/app_files/gramine-sgx-akv-sign \
+        --url <akv_mhsm_url> \
+        --key <akv_sign_key> \
+        --manifest /gramine/app_files/entrypoint.manifest \
+        --output /gramine/app_files/entrypoint.manifest.sgx
+
+RUN az logout
+
+# This trick removes all temporary files from the previous commands
+FROM {{image}}
+
+COPY --from=unsigned_image /gramine/app_files/*.sig /gramine/app_files/
+COPY --from=unsigned_image /gramine/app_files/*.sgx /gramine/app_files/
